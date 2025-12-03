@@ -1,0 +1,316 @@
+import React, { useState, useEffect } from 'react';
+import Sidebar from './components/Sidebar';
+import MobileHeader from './components/MobileHeader';
+import Hero from './components/Hero';
+import ClipGrid from './components/ClipGrid';
+import CollectionsPage from './components/CollectionsPage';
+import CollectionDetail from './components/CollectionDetail';
+import CreateCollectionDialog from './components/CreateCollectionDialog';
+import ClipDetail from './components/ClipDetail';
+import FloatingSearchButton from './components/FloatingSearchButton';
+import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
+import SettingsPage from './components/SettingsPage';
+import ProfilePage from './components/ProfilePage';
+import SecurityPage from './components/SecurityPage';
+import NotificationsPage from './components/NotificationsPage';
+import { Settings } from 'lucide-react';
+import { auth, db } from './lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { toast, Toaster } from 'sonner';
+
+const App = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications'>('clips');
+  const [selectedCollection, setSelectedCollection] = useState<any>(null);
+  const [selectedClip, setSelectedClip] = useState<any>(null);
+  const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Mobile Sidebar State (Persists during session, resets on reload)
+  const [mobileMenuState, setMobileMenuState] = useState({
+    isMyClipOpen: false,
+    isSourceOpen: false,
+    isCollectionsOpen: false
+  });
+
+  const handleMobileMenuToggle = (key: 'isMyClipOpen' | 'isSourceOpen' | 'isCollectionsOpen') => {
+    setMobileMenuState(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Dark Mode Logic
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Language Logic
+  const [language, setLanguage] = useState<'KR' | 'EN'>('KR');
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  const toggleLanguage = () => setLanguage(prev => prev === 'KR' ? 'EN' : 'KR');
+
+  // Store previous view to return to it
+  const [previousView, setPreviousView] = useState<'clips' | 'collections' | 'collection-detail'>('clips');
+
+  const handleCategorySelect = (category: string | null) => {
+    setSelectedCategory(category);
+    setCurrentView('clips');
+  };
+
+  const handleSourceSelect = (source: string | null) => {
+    setSelectedSource(source);
+    if (currentView !== 'clips') {
+      setCurrentView('clips');
+    }
+  };
+
+  const handleNavigate = (view: 'clips' | 'collections') => {
+    setCurrentView(view);
+    if (view === 'collections') {
+      setSelectedCategory(null);
+      setSelectedCollection(null);
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentView('login');
+  };
+
+  const handleCollectionClick = (collection: any) => {
+    setSelectedCollection(collection);
+    setCurrentView('collection-detail');
+  };
+
+  const handleClipClick = (clip: any) => {
+    setSelectedClip(clip);
+    if (currentView !== 'clip-detail') {
+      setPreviousView(currentView as any);
+    }
+    setCurrentView('clip-detail');
+  };
+
+  const handleBackFromDetail = () => {
+    setCurrentView(previousView);
+    setSelectedClip(null);
+  };
+
+  const handleCreateCollection = async (data: { name: string; color: string }) => {
+    if (!user) {
+      toast.error(language === 'KR' ? "로그인이 필요합니다" : "Please login first", {
+        description: language === 'KR'
+          ? "서비스를 이용하려면 로그인해주세요"
+          : "Sign in to use this feature",
+      });
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'collections'), {
+        name: data.name,
+        color: data.color,
+        userId: user.uid,
+        createdAt: serverTimestamp()
+      });
+
+      // Success feedback already handled in CreateCollectionDialog
+      setIsCreateCollectionOpen(false);
+    } catch (error) {
+      console.error("Error creating collection:", error);
+      toast.error(language === 'KR' ? "오류가 발생했습니다" : "An error occurred", {
+        description: language === 'KR'
+          ? "폴더 생성에 실패했습니다. 다시 시도해주세요."
+          : "Failed to create folder. Please try again.",
+      });
+    }
+  };
+
+  // Full screen pages
+  if (currentView === 'login') {
+    return (
+      <LoginPage
+        onNavigate={(view: any) => setCurrentView(view)}
+        onLoginSuccess={() => setCurrentView('clips')}
+        language={language}
+      />
+    );
+  }
+
+  if (currentView === 'signup') {
+    return (
+      <SignupPage
+        onNavigate={(view: any) => setCurrentView(view)}
+        onSignupSuccess={() => setCurrentView('clips')}
+        language={language}
+      />
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen bg-white dark:bg-[#121212] font-sans text-[#3d3d3d] dark:text-white transition-colors duration-300">
+      {/* Left Sidebar (Desktop Only) */}
+      <div className="hidden md:block">
+        <Sidebar
+          onCategorySelect={handleCategorySelect}
+          onNavigate={handleNavigate}
+          onCreateCollection={() => setIsCreateCollectionOpen(true)}
+          onCollectionSelect={handleCollectionClick}
+          onSourceSelect={handleSourceSelect}
+          onLogout={handleLogout}
+          onSettingsClick={() => setCurrentView('settings')}
+          onProfileClick={() => setCurrentView('profile')}
+          currentView={
+            currentView.startsWith('settings') ? 'settings' :
+              currentView === 'clip-detail' ? 'clips' :
+                currentView as any
+          }
+          language={language}
+          user={user}
+        />
+      </div>
+
+      {/* Main Content Area */}
+      <main className="flex-1 ml-0 md:ml-[100px] relative flex flex-col h-screen">
+
+        {/* Mobile Header with Sidebar (Mobile Only) */}
+        <MobileHeader
+          onCategorySelect={handleCategorySelect}
+          onNavigate={handleNavigate}
+          onCreateCollection={() => setIsCreateCollectionOpen(true)}
+          onCollectionSelect={handleCollectionClick}
+          onSourceSelect={handleSourceSelect}
+          onLogout={handleLogout}
+          onSettingsClick={() => setCurrentView('settings')}
+          onProfileClick={() => setCurrentView('profile')}
+          currentView={currentView}
+          language={language}
+          menuState={mobileMenuState}
+          onMenuToggle={handleMobileMenuToggle}
+          user={user}
+        />
+
+        {/* Top Right Settings Button (Only visible on clips view, Desktop only) */}
+        {currentView === 'clips' && (
+          <button
+            onClick={() => setCurrentView('settings')}
+            className="absolute top-8 right-8 z-20 w-12 h-12 bg-white dark:bg-[#1e1e1e] rounded-full shadow-md hidden md:flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:shadow-lg transition-all duration-300"
+          >
+            <Settings className="w-6 h-6" />
+          </button>
+        )}
+
+        <FloatingSearchButton currentView={currentView} language={language} />
+
+        <div className="flex-1 w-full max-w-[1600px] mx-auto overflow-y-auto">
+
+          {currentView === 'clips' && (
+            <>
+              <Hero language={language} />
+              <ClipGrid
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategorySelect}
+                selectedSource={selectedSource}
+                onSourceChange={handleSourceSelect}
+                onClipClick={handleClipClick}
+                language={language}
+              />
+            </>
+          )}
+
+          {currentView === 'collections' && (
+            <CollectionsPage
+              onCollectionClick={handleCollectionClick}
+              onCreateClick={() => setIsCreateCollectionOpen(true)}
+              language={language}
+              user={user}
+            />
+          )}
+
+          {currentView === 'collection-detail' && selectedCollection && (
+            <CollectionDetail
+              collection={selectedCollection}
+              onBack={() => handleNavigate('collections')}
+              onClipClick={handleClipClick}
+              language={language}
+            />
+          )}
+
+          {currentView === 'clip-detail' && selectedClip && (
+            <div className="pt-8">
+              <ClipDetail
+                clip={selectedClip}
+                onBack={handleBackFromDetail}
+                language={language}
+              />
+            </div>
+          )}
+
+          {currentView === 'settings' && (
+            <SettingsPage
+              onLogout={handleLogout}
+              onNavigate={(view: any) => setCurrentView(view)}
+              isDarkMode={isDarkMode}
+              toggleDarkMode={toggleDarkMode}
+              language={language}
+              toggleLanguage={toggleLanguage}
+            />
+          )}
+
+          {currentView === 'profile' && (
+            <ProfilePage
+              onBack={() => setCurrentView('settings')}
+              language={language}
+              user={user}
+            />
+          )}
+
+          {currentView === 'settings-security' && (
+            <SecurityPage
+              onBack={() => setCurrentView('settings')}
+              language={language}
+              user={user}
+            />
+          )}
+
+          {currentView === 'settings-notifications' && (
+            <NotificationsPage
+              onBack={() => setCurrentView('settings')}
+              language={language}
+              user={user}
+            />
+          )}
+
+        </div>
+
+        {/* Bottom Gradient Fade */}
+        <div className="w-full h-24 bg-gradient-to-t from-white dark:from-[#121212] to-transparent fixed bottom-0 left-0 pointer-events-none z-10 transition-colors duration-300" />
+
+      </main>
+
+      <CreateCollectionDialog
+        isOpen={isCreateCollectionOpen}
+        onClose={() => setIsCreateCollectionOpen(false)}
+        onCreate={handleCreateCollection}
+        language={language}
+      />
+      <Toaster />
+    </div>
+  );
+};
+
+export default App;

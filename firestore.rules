@@ -1,0 +1,196 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isClipOwner(resource) {
+      return request.auth.uid == resource.data.userId;
+    }
+    
+    function isCollectionOwner(resource) {
+      return request.auth.uid == resource.data.userId;
+    }
+    
+    function hasValidClipData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['title', 'url', 'userId', 'category'])
+             && data.title is string
+             && data.title.size() > 0
+             && data.title.size() <= 500
+             && data.url is string
+             && data.url.size() > 0
+             && data.url.size() <= 2000
+             && data.category is string
+             && data.userId is string;
+    }
+    
+    function hasValidCollectionData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['name', 'userId'])
+             && data.name is string
+             && data.name.size() > 0
+             && data.name.size() <= 200
+             && data.userId is string;
+    }
+    
+    function hasValidSnapshotData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['clipId', 'userId', 'originalUrl', 'htmlContent'])
+             && data.clipId is string
+             && data.userId is string
+             && data.originalUrl is string
+             && data.htmlContent is string
+             && data.htmlContent.size() <= 1000000; // 1MB limit
+    }
+    
+    // Clips collection rules
+    match /clips/{clipId} {
+      // Allow read if user owns the clip
+      allow read: if isAuthenticated() && isClipOwner(resource);
+      
+      // Allow create if user is authenticated and provides valid clip data
+      allow create: if isAuthenticated()
+                    && isOwner(request.resource.data.userId)
+                    && hasValidClipData()
+                    && request.resource.data.createdAt == request.time;
+      
+      // Allow update if user owns the clip and doesn't change userId/createdAt
+      allow update: if isAuthenticated()
+                    && isClipOwner(resource)
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      
+      // Allow delete if user owns the clip
+      allow delete: if isAuthenticated() && isClipOwner(resource);
+      
+      // Sub-collection: comments
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+        
+        allow create: if isAuthenticated()
+                      && request.resource.data.userId == request.auth.uid
+                      && request.resource.data.content is string
+                      && request.resource.data.content.size() > 0
+                      && request.resource.data.content.size() <= 1000;
+        
+        allow update: if isAuthenticated()
+                      && resource.data.userId == request.auth.uid;
+        
+        allow delete: if isAuthenticated()
+                      && resource.data.userId == request.auth.uid;
+      }
+    }
+    
+    // Collections (clip groupings) rules
+    match /collections/{collectionId} {
+      // Allow read if user owns the collection
+      allow read: if isAuthenticated() && isCollectionOwner(resource);
+      
+      // Allow create if user is authenticated and provides valid collection data
+      allow create: if isAuthenticated()
+                    && isOwner(request.resource.data.userId)
+                    && hasValidCollectionData()
+                    && request.resource.data.createdAt == request.time;
+      
+      // Allow update if user owns the collection
+      allow update: if isAuthenticated()
+                    && isCollectionOwner(resource)
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      
+      // Allow delete if user owns the collection
+      allow delete: if isAuthenticated() && isCollectionOwner(resource);
+      
+      // Sub-collection: clips (references to clips in this collection)
+      match /clips/{clipId} {
+        allow read: if isAuthenticated() && isCollectionOwner(get(/databases/$(database)/documents/collections/$(collectionId)));
+        
+        allow create: if isAuthenticated()
+                      && isCollectionOwner(get(/databases/$(database)/documents/collections/$(collectionId)))
+                      && request.resource.data.clipId is string;
+        
+        allow delete: if isAuthenticated()
+                      && isCollectionOwner(get(/databases/$(database)/documents/collections/$(collectionId)));
+      }
+    }
+    
+    // Snapshots (content preservation) rules
+    match /snapshots/{snapshotId} {
+      // Allow read if user owns the snapshot
+      allow read: if isAuthenticated()
+                  && request.auth.uid == resource.data.userId;
+      
+      // Allow create if user is authenticated and provides valid snapshot data
+      allow create: if isAuthenticated()
+                    && request.auth.uid == request.resource.data.userId
+                    && hasValidSnapshotData()
+                    && request.resource.data.createdAt == request.time;
+      
+      // Allow update if user owns the snapshot (for wayback status)
+      allow update: if isAuthenticated()
+                    && request.auth.uid == resource.data.userId
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.clipId == resource.data.clipId
+                    && request.resource.data.originalUrl == resource.data.originalUrl
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      
+      // Allow delete if user owns the snapshot
+      allow delete: if isAuthenticated()
+                    && request.auth.uid == resource.data.userId;
+    }
+    
+    // User profiles collection (for storing user preferences, etc.)
+    match /users/{userId} {
+      // Allow read own profile
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      // Allow create own profile
+      allow create: if isAuthenticated()
+                    && isOwner(userId)
+                    && request.resource.data.userId == userId
+                    && request.resource.data.createdAt == request.time;
+      
+      // Allow update own profile
+      allow update: if isAuthenticated()
+                    && isOwner(userId)
+                    && request.resource.data.userId == userId
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      
+      // Sub-collection: preferences
+      match /preferences/{preferenceId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // Sub-collection: activity (read-only for user)
+      match /activity/{activityId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+      }
+    }
+    
+    // Public clips (for sharing - optional feature)
+    match /publicClips/{clipId} {
+      // Anyone can read public clips
+      allow read: if true;
+      
+      // Only owner can create/update/delete
+      allow create, update, delete: if isAuthenticated()
+                                    && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
