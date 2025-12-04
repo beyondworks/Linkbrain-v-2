@@ -7,6 +7,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'sonner';
 import { parseThreadContent } from '../../api/lib/content-processor';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import { InstagramLayout } from './ClipDetail_Instagram';
+import { ThreadsLayout } from './ClipDetail_Threads';
 
 
 interface Clip {
@@ -26,6 +28,9 @@ interface Clip {
    image?: string;
    images?: string[];  // NEW: Multiple images
    type?: string;
+   author?: string;                 // NEW: Author name/handle
+   authorHandle?: string;           // NEW: Platform handle (@username)
+   authorAvatar?: string;           // NEW: Profile image URL
 }
 
 interface ClipDetailProps {
@@ -341,242 +346,7 @@ const YoutubeLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) 
    );
 };
 
-const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => (
-   <div className="w-full max-w-[600px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#dbdbdb] dark:border-gray-800 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-[#efefef] dark:border-gray-800">
-         <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-fuchsia-600 p-[2px]">
-               <div className="w-full h-full rounded-full bg-white dark:bg-[#1e1e1e] border-2 border-transparent overflow-hidden flex items-center justify-center">
-                  <User className="w-4 h-4 text-gray-400" />
-               </div>
-            </div>
-            <div className="flex flex-col">
-               <span className="text-sm font-semibold text-[#262626] dark:text-white">Instagram User</span>
-               <span className="text-xs text-[#5a5a5a] dark:text-gray-400">Original Audio</span>
-            </div>
-         </div>
-         <MoreHorizontal className="w-5 h-5 text-[#262626] dark:text-white" />
-      </div>
 
-      {/* Image/Content */}
-      <div className="w-full aspect-square bg-[#f0f0f0] dark:bg-[#252525] flex items-center justify-center relative group overflow-hidden">
-         {clip.image ? (
-            <img src={clip.image} alt={clip.title} className="w-full h-full object-cover" />
-         ) : (
-            <div className="text-[#959595] font-medium text-lg tracking-widest">NO IMAGE</div>
-         )}
-         {/* Like Animation Placeholder */}
-         {isLiked && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-               <motion.div initial={{ scale: 0 }} animate={{ scale: 1.2, opacity: 0 }} transition={{ duration: 0.8 }}>
-                  <Heart className="w-24 h-24 text-white fill-white drop-shadow-lg" />
-               </motion.div>
-            </div>
-         )}
-      </div>
-
-      {/* Actions (Removed) */}
-      <div className="p-4 pb-2">
-         <div className="text-sm font-semibold text-[#262626] dark:text-white mb-2">Liked by others</div>
-         <div className="space-y-1">
-            <p className="text-sm text-[#262626] dark:text-white">
-               <span className="font-semibold mr-2">Instagram User</span>
-               {clip.summary}
-            </p>
-            <div className="text-[#959595] text-xs uppercase mt-2">{clip.date}</div>
-         </div>
-      </div>
-   </div>
-);
-
-const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => {
-   // Try to parse contentMarkdown if available
-   const parsed = React.useMemo(() => {
-      if (clip.contentMarkdown) {
-         try {
-            return parseThreadContent(clip.contentMarkdown);
-         } catch (e) {
-            console.error('Failed to parse thread content:', e);
-            return null;
-         }
-      }
-      return null;
-   }, [clip.contentMarkdown]);
-
-   const displayImages = clip.images && clip.images.length > 0
-      ? clip.images
-      : (clip.image ? [clip.image] : []);
-
-   // If we have parsed content with blocks, render them
-   if (parsed && parsed.sections.length > 0 && parsed.sections[0].blocks.length > 0) {
-      return (
-         <div className="space-y-6">
-            {parsed.sections.map((section: any, sectionIdx: number) => (
-               <div key={sectionIdx}>
-                  {/* Section Header for comments */}
-                  {sectionIdx > 0 && (
-                     <div className="flex items-center gap-3 mb-4">
-                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
-                        <span className="text-sm font-semibold text-[#959595] uppercase tracking-wider">
-                           {section.type === 'comment' ? '댓글' : '본문'}
-                        </span>
-                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
-                     </div>
-                  )}
-
-                  {/* Threads Card */}
-                  <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm relative">
-                     <div className="absolute left-[42px] top-[64px] bottom-[30px] w-[2px] bg-[#e5e5e5] dark:bg-[#333]"></div>
-
-                     <div className="flex gap-4">
-                        <div className="flex flex-col items-center gap-2 z-10">
-                           <div className="w-9 h-9 rounded-full bg-[#f0f0f0] dark:bg-[#252525] flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                              <User className="w-5 h-5 text-[#959595]" />
-                           </div>
-                        </div>
-                        <div className="flex-1">
-                           {/* Header */}
-                           <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-2">
-                                 <span className="text-[15px] font-semibold text-[#000000] dark:text-white">Threads User</span>
-                                 <span className="text-[#999999] text-sm">{clip.date}</span>
-                              </div>
-                              <MoreHorizontal className="w-5 h-5 text-[#000000] dark:text-white" />
-                           </div>
-
-                           {/* Blocks */}
-                           <div className="space-y-3">
-                              {section.blocks.map((block: any, blockIdx: number) => (
-                                 <div key={blockIdx}>
-                                    {block.type === 'text' ? (
-                                       <p className="text-[15px] text-[#000000] dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                                          {block.content}
-                                       </p>
-                                    ) : (
-                                       <div className="rounded-xl overflow-hidden bg-[#f0f0f0] dark:bg-[#252525]">
-                                          <img
-                                             src={block.content}
-                                             alt="Thread image"
-                                             className="w-full h-auto"
-                                             loading="lazy"
-                                             onError={(e) => {
-                                                e.currentTarget.style.display = 'none';
-                                             }}
-                                          />
-                                       </div>
-                                    )}
-                                 </div>
-                              ))}
-                           </div>
-
-                           {/* Remaining Images (not in blocks) */}
-                           {sectionIdx === parsed.sections.length - 1 && (() => {
-                              // Collect all images used in blocks
-                              const usedImages = new Set<string>();
-                              parsed.sections.forEach((s: any) => {
-                                 s.blocks.forEach((b: any) => {
-                                    if (b.type === 'image') usedImages.add(b.content);
-                                 });
-                              });
-
-                              // Filter clip.images
-                              const remainingImages = (clip.images || []).filter((img: string) => !usedImages.has(img));
-
-                              if (remainingImages.length > 0) {
-                                 return (
-                                    <div className="mt-4 grid grid-cols-2 gap-2">
-                                       {remainingImages.map((img: string, idx: number) => (
-                                          <div key={`extra-img-${idx}`} className="rounded-xl overflow-hidden bg-[#f0f0f0] dark:bg-[#252525]">
-                                             <img
-                                                src={img}
-                                                alt={`Thread image ${idx + 1}`}
-                                                className="w-full h-auto"
-                                                loading="lazy"
-                                                onError={(e) => {
-                                                   e.currentTarget.style.display = 'none';
-                                                }}
-                                             />
-                                          </div>
-                                       ))}
-                                    </div>
-                                 );
-                              }
-                              return null;
-                           })()}
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            ))}
-         </div>
-      );
-   }
-
-   // FALLBACK: Use summary and images if no contentMarkdown
-   return (
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm relative">
-         {/* Thread Line */}
-         <div className="absolute left-[42px] top-[64px] bottom-[30px] w-[2px] bg-[#e5e5e5] dark:bg-[#333]"></div>
-
-         <div className="flex gap-4">
-            <div className="flex flex-col items-center gap-2 z-10">
-               <div className="w-9 h-9 rounded-full bg-[#f0f0f0] dark:bg-[#252525] flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                  <User className="w-5 h-5 text-[#959595]" />
-               </div>
-            </div>
-            <div className="flex-1">
-               {/* Header */}
-               <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                     <span className="text-[15px] font-semibold text-[#000000] dark:text-white">Threads User</span>
-                     <span className="text-[#999999] text-sm">{clip.date}</span>
-                  </div>
-                  <MoreHorizontal className="w-5 h-5 text-[#000000] dark:text-white" />
-               </div>
-
-               {/* Content */}
-               <div className="mb-3">
-                  <h2 className="text-[15px] text-[#000000] dark:text-white leading-relaxed font-medium mb-2 max-h-[2rem] overflow-hidden break-words">{clip.title}</h2>
-                  <p className="text-[15px] text-[#000000] dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                     {clip.summary}
-                  </p>
-
-                  {/* Image Gallery */}
-                  {displayImages.length > 0 && (
-                     <div className={`mt-3 gap-2 ${displayImages.length === 1 ? 'block' :
-                        displayImages.length === 2 ? 'grid grid-cols-2' :
-                           displayImages.length === 3 ? 'grid grid-cols-3' :
-                              'grid grid-cols-2'
-                        }`}>
-                        {displayImages.slice(0, 6).map((imgUrl: string, idx: number) => (
-                           <div
-                              key={idx}
-                              className={`rounded-xl overflow-hidden bg-[#f0f0f0] dark:bg-[#252525] ${displayImages.length === 1 ? 'w-full' :
-                                 displayImages.length >= 4 && idx >= 4 ? 'col-span-2' : ''
-                                 }`}
-                           >
-                              <img
-                                 src={imgUrl}
-                                 alt={`Thread image ${idx + 1}`}
-                                 className="w-full h-full object-cover"
-                                 loading="lazy"
-                                 onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                 }}
-                              />
-                           </div>
-                        ))}
-                     </div>
-                  )}
-               </div>
-
-               {/* Actions (Removed) */}
-            </div>
-         </div>
-      </div>
-   );
-};
 
 const WebLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => (
    <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#f0f0f0] dark:border-gray-800 shadow-sm">
@@ -606,15 +376,18 @@ const WebLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => (
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-[#3d3d3d] dark:text-white mb-6 leading-tight max-h-[5rem] overflow-hidden break-words">{clip.title}</h1>
 
-            {/* Hero Image */}
-            {clip.image && (
-               <div className="w-full aspect-[21/9] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl mb-8 flex items-center justify-center overflow-hidden">
-                  <img src={clip.image} alt={clip.title} className="w-full h-full object-cover" />
-               </div>
-            )}
+            {/* Hero Image with fallback */}
+            {(() => {
+               const imageUrl = clip.image || clip.images?.[0] || '/fallback-thumbnails/fallback-1.png';
+               return (
+                  <div className="w-full aspect-[21/9] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl mb-8 flex items-center justify-center overflow-hidden">
+                     <img src={imageUrl} alt={clip.title} className="w-full h-full object-cover" />
+                  </div>
+               );
+            })()}
          </div>
 
-         {/* Archived Content */}
+         {/* Archived Content - Priority: contentHtml > contentMarkdown > summary */}
          {clip.htmlContent ? (
             <div className="w-full h-[600px] border border-gray-200 rounded-lg overflow-hidden">
                <iframe
@@ -623,6 +396,15 @@ const WebLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => (
                   className="w-full h-full"
                   sandbox="allow-scripts allow-same-origin"
                />
+            </div>
+         ) : clip.contentMarkdown ? (
+            <div className="prose prose-slate dark:prose-invert max-w-none">
+               <div
+                  className="text-lg text-[#3d3d3d] dark:text-gray-200 leading-relaxed whitespace-pre-wrap"
+                  style={{ wordBreak: 'break-word' }}
+               >
+                  {clip.contentMarkdown}
+               </div>
             </div>
          ) : (
             <div className="prose prose-slate dark:prose-invert max-w-none">

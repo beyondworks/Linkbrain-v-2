@@ -31,147 +31,36 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
     const toastId = toast.loading(language === 'KR' ? "링크를 분석하여 클립을 생성중입니다" : "Analyzing link and creating clip...");
 
     try {
-      // 1. Try calling Analysis API (works in Vercel/Production)
-      let data;
-      try {
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: inputValue, language })
-        });
+      // Get Firebase auth token
+      const token = await user.getIdToken();
 
-        if (response.ok) {
-          data = await response.json();
-        } else {
-          throw new Error('API failed');
-        }
-      } catch (apiError) {
-        console.warn("API endpoint failed, falling back to client-side analysis:", apiError);
+      // Call Analysis API with authentication
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ url: inputValue, language, userId: user.uid })
+      });
 
-        // Fallback: Client-side analysis for local dev
-        // Note: This exposes the API key in the browser, which is not recommended for production but acceptable for local prototypes.
-        const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-        if (!apiKey) throw new Error("No OpenAI API Key found for fallback.");
-
-        const { OpenAI } = await import('openai');
-        const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: `You are an advanced content analyzer for a "Second Brain" application called Linkbrain. 
-          Your goal is to extract structured data optimized for one of 4 templates: youtube | instagram | threads | web.
-          
-          Return a JSON object with these fields:
-          - title: Clean, descriptive title in ${language === 'KR' ? 'Korean' : 'English'}.
-          - summary: Concise summary (<=3 sentences) in ${language === 'KR' ? 'Korean' : 'English'}.
-          - keywords: Array of 5 relevant keywords.
-          - category: One of AI, Design, Marketing, Business, IT, Coding, Shopping, News, Other.
-          - sentiment: 'positive' | 'neutral' | 'negative'.
-          - type: 'article' | 'video' | 'image' | 'social_post' | 'website'.
-          - author: Author/channel name.
-          - template: Pick the best template among youtube | instagram | threads | web based on URL + content.
-          - profile: { name, handle, avatar, verified, subscribers, followers }
-          - media: {
-              coverImage: string | null,
-              images: string[],
-              videoId: string | null,
-              videoUrl: string | null,
-              thumbnail: string | null,
-              embedUrl: string | null
-            }
-          - mentions: array of { label, url } for key links mentioned (include the source URL as first item).
-          - comments: array of up to 3 items { author, text, likes, postedAt } synthesized from context.
-          - engagement: { likes, views, comments }
-          
-          Platform guidance:
-          - youtube: prefer videoId/embedUrl/thumbnail, channel profile, views/likes.
-          - instagram: carousel images, optional videoUrl, author handle + verified flag.
-          - threads: text-first social_post, handle, likes/comments counts.
-          - web: hero image, article author, keep links in mentions.
-          
-          IMPORTANT: If the URL is an image or if an image is provided, analyze it to determine the topic, category, and sentiment.
-          
-          Analyze the URL: ${inputValue}`
-            },
-          ],
-          response_format: { type: "json_object" }
-        });
-
-        const content = completion.choices[0].message.content;
-        if (!content) throw new Error("No content received from OpenAI");
-        const aiData = JSON.parse(content);
-
-        const detectedPlatform = (() => {
-          const lower = inputValue.toLowerCase();
-          if (lower.includes('youtube.com') || lower.includes('youtu.be')) return 'youtube';
-          if (lower.includes('instagram.com')) return 'instagram';
-          if (lower.includes('threads.net')) return 'threads';
-          return 'web';
-        })();
-
-        // Normalize platform/template
-        const aiTemplate = aiData.template && ['youtube', 'instagram', 'threads', 'web'].includes(aiData.template)
-          ? aiData.template
-          : detectedPlatform;
-
-        const template = detectedPlatform !== 'web' ? detectedPlatform : aiTemplate;
-
-        // Construct media items
-        const mediaItems: any[] = [];
-        if (aiData.media?.coverImage) mediaItems.push(aiData.media.coverImage);
-        if (aiData.media?.images) mediaItems.push(...aiData.media.images);
-        if (aiData.media?.videoId || aiData.media?.videoUrl) {
-          mediaItems.push({
-            type: 'video',
-            videoId: aiData.media.videoId,
-            url: aiData.media.videoUrl,
-            embedUrl: aiData.media.embedUrl,
-            thumbnail: aiData.media.thumbnail
-          });
-        }
-
-        data = {
-          url: inputValue,
-          platform: template,
-          template: template,
-          title: aiData.title || inputValue || "Untitled",
-          summary: aiData.summary || "No summary available.",
-          keywords: aiData.keywords || [],
-          category: aiData.category || 'Other',
-          sentiment: aiData.sentiment || 'neutral',
-          type: aiData.type || 'website',
-          image: aiData.media?.coverImage || '',
-          author: aiData.author || '',
-          authorProfile: aiData.profile || {},
-          mediaItems: mediaItems,
-          engagement: aiData.engagement || {},
-          mentions: aiData.mentions || [],
-          comments: aiData.comments || [],
-          publishDate: new Date().toISOString(),
-          createdAt: new Date().toISOString()
-        };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `API returned ${response.status}`);
       }
 
-      // 2. Save to Firestore
-      if (user?.uid) {
-        await addDoc(collection(db, 'clips'), {
-          ...data,
-          userId: user.uid,
-          createdAt: serverTimestamp(),
-          isArchived: false,
-          isFavorite: false
-        });
-      } else {
-        throw new Error("User not logged in");
-      }
+      const data = await response.json();
+
+      // Clip is already created by API, no need to save again
+      // The API returns the created clip with id
 
       setInputValue("");
       toast.success(language === 'KR' ? "클립이 생성되었습니다" : "Clip created successfully", {
         id: toastId,
       });
+
+      // Note: No need to reload - Firestore real-time listener will auto-update UI
+
 
     } catch (error) {
       console.error("Error saving clip:", error);

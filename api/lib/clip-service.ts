@@ -1,27 +1,26 @@
 
 import { OpenAI } from 'openai';
 import * as cheerio from 'cheerio';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 
 // Initialize OpenAI
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: process.env.VITE_FIREBASE_API_KEY,
-    authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.VITE_FIREBASE_APP_ID,
-    measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+// Initialize Firebase Admin SDK
+if (getApps().length === 0) {
+    initializeApp({
+        credential: cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+        })
+    });
+}
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
+const db = getFirestore();
 
 // ============================================================================
 // INTERFACES
@@ -34,6 +33,9 @@ export interface ClipContentInput {
     htmlContent?: string;       // MUST be actual HTML, never AI-generated  
     images?: string[];          // MUST be actual image URLs, never AI-generated
     userId: string;
+    author?: string;            // Author name or handle
+    authorAvatar?: string;      // Author profile image
+    authorHandle?: string;      // Platform-specific handle (e.g., @username)
 }
 
 export interface ClipMetadata {
@@ -59,6 +61,8 @@ export interface Clip {
     type: string;
     image: string | null;
     author: string;
+    authorHandle?: string;           // NEW: Platform handle (@username)
+    authorAvatar?: string;           // NEW: Profile image URL
     authorProfile: any;
     mediaItems: any[];
     engagement: any;
@@ -83,15 +87,28 @@ export interface Clip {
 
 /**
  * Detect platform from URL
+ * Handles redirect URLs (l.threads.net, t.co) and short domains (instagr.am, youtu.be)
  */
 export const detectPlatform = (url: string, sourceHint?: string): string => {
     if (sourceHint) return sourceHint;
 
     const urlLower = url.toLowerCase();
-    if (urlLower.includes('threads.net')) return 'threads';
-    if (urlLower.includes('instagram.com')) return 'instagram';
+
+    // Threads (including www and redirects)
+    if (urlLower.includes('threads.net') ||
+        urlLower.includes('threads.com') ||
+        urlLower.includes('www.threads') ||
+        urlLower.includes('l.threads.net')) return 'threads';
+
+    // Instagram (including short domain)
+    if (urlLower.includes('instagram.com') || urlLower.includes('instagr.am')) return 'instagram';
+
+    // YouTube
     if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) return 'youtube';
-    if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) return 'twitter';
+
+    // X/Twitter (including t.co redirects)
+    if (urlLower.includes('twitter.com') || urlLower.includes('x.com') || urlLower.includes('t.co')) return 'twitter';
+
     return 'web';
 };
 
@@ -280,13 +297,16 @@ export const createClipFromContent = async (
     input: ClipContentInput,
     options?: { language?: string }
 ): Promise<Clip> => {
-    const { url, sourceType, rawText, htmlContent, images, userId } = input;
+    const { url, sourceType, rawText, htmlContent, images, userId, author, authorAvatar, authorHandle } = input;
     const language = options?.language || 'KR';
 
     console.log(`[Clip Service] Creating clip from raw content`);
     console.log(`[Clip Service] - URL: ${url}`);
     console.log(`[Clip Service] - Raw text length: ${rawText?.length || 0} chars`);
     console.log(`[Clip Service] - Images count: ${images?.length || 0}`);
+    console.log(`[Clip Service] - Author: ${author || 'N/A'}`);
+    console.log(`[Clip Service] - Author Avatar: ${authorAvatar || 'N/A'}`);
+
 
     // INVARIANT: Store raw content exactly as provided
     const contentMarkdown = rawText || '';
@@ -310,21 +330,37 @@ export const createClipFromContent = async (
     console.log(`[Clip Service] - AI metadata: ${metadata ? 'generated' : 'skipped (no text)'}`);
     console.log(`[Clip Service] - Title: ${title}`);
 
+    // Determine thumbnail with fallback
+    const fallbackThumbnails = [
+        '/fallback-thumbnails/fallback-1.png',
+        '/fallback-thumbnails/fallback-2.png',
+        '/fallback-thumbnails/fallback-3.png'
+    ];
+    const randomFallback = fallbackThumbnails[Math.floor(Math.random() * fallbackThumbnails.length)];
+    const thumbnailImage = clipImages.length > 0 ? clipImages[0] : randomFallback;
+
     // Prepare clip data
+    const now = Timestamp.now();
     const clipData = {
         userId,
         url,
         platform: sourceType,
         template: sourceType,
+        source: sourceType, // For sidebar filter consistency
         title,
         summary,
         keywords,
         category,
         sentiment,
         type,
-        image: clipImages.length > 0 ? clipImages[0] : null,
-        author: '',
-        authorProfile: null,
+        image: thumbnailImage,
+        author: author || authorHandle || '',
+        authorHandle: authorHandle || '',
+        authorAvatar: authorAvatar || null,
+        authorProfile: authorAvatar ? {
+            avatar: authorAvatar,
+            handle: authorHandle || author || ''
+        } : null,
         mediaItems: clipImages,
         engagement: {
             likes: '0',
@@ -338,8 +374,8 @@ export const createClipFromContent = async (
         collectionIds: [],
         viewCount: 0,
         likeCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now,  // Use Firestore Timestamp
+        updatedAt: now,  // Use Firestore Timestamp
         // INVARIANT: These fields MUST contain ONLY raw extracted content
         rawMarkdown: contentMarkdown,
         contentMarkdown: contentMarkdown,
@@ -347,14 +383,17 @@ export const createClipFromContent = async (
         images: clipImages
     };
 
-    // Save to Firestore
-    const docRef = await addDoc(collection(db, 'clips'), clipData);
+    // Save to Firestore using Admin SDK
+    const docRef = await db.collection('clips').add(clipData);
 
     console.log(`[Clip Service] Clip created: ${docRef.id}`);
+    console.log(`[Clip Service] - userId: ${userId}`);
 
     // Return created clip
     return {
         id: docRef.id,
-        ...clipData
+        ...clipData,
+        createdAt: clipData.createdAt.toDate().toISOString(),
+        updatedAt: clipData.updatedAt.toDate().toISOString()
     };
 };

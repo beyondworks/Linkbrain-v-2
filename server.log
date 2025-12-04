@@ -1,0 +1,78 @@
+
+> Linkbrain v-1@0.1.0 dev
+> vite
+
+
+  VITE v6.3.5  ready in 142 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+1:39:35 PM [vite] api/lib/clip-service.ts changed, restarting server...
+1:39:35 PM [vite] server restarted.
+1:39:47 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:39:47 PM [vite] server restarted.
+1:39:49 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:39:49 PM [vite] server restarted.
+1:46:47 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:46:47 PM [vite] server restarted.
+1:47:03 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:47:03 PM [vite] server restarted.
+1:57:00 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:57:00 PM [vite] server restarted.
+1:57:16 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:57:16 PM [vite] server restarted.
+1:57:33 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+1:57:33 PM [vite] server restarted.
+2:11:27 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:11:27 PM [vite] server restarted.
+2:20:00 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:20:00 PM [vite] server restarted.
+2:20:22 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:20:22 PM [vite] server restarted.
+2:31:01 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:31:01 PM [vite] server restarted.
+2:40:55 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:40:55 PM [vite] server restarted.
+2:40:59 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:40:59 PM [vite] server restarted.
+2:42:35 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+✘ [ERROR] Expected "finally" but found ","
+
+    api/lib/url-content-fetcher.ts:461:5:
+      461 │     }, finalUrl); // Pass finalUrl as parameter
+          │      ^
+          ╵      finally
+
+failed to load config from /Users/yoogeon/Desktop/App build/Linkbrain v-2/vite.config.ts
+2:42:35 PM [vite] Build failed with 1 error:
+api/lib/url-content-fetcher.ts:461:5: ERROR: Expected "finally" but found ","
+2:42:35 PM [vite] server restart failed
+2:42:52 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:42:52 PM [vite] server restarted.
+2:52:45 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:52:45 PM [vite] server restarted.
+2:53:19 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+▲ [WARNING] Import "fetchUrlContent" will always be undefined because the file "api/lib/url-content-fetcher.ts" has no exports [import-is-undefined]
+
+    api/analyze.ts:14:9:
+      14 │ import { fetchUrlContent } from './lib/url-content-fetcher';
+         ╵          ~~~~~~~~~~~~~~~
+
+2:53:19 PM [vite] server restarted.
+2:53:21 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:53:21 PM [vite] server restarted.
+2:53:52 PM [vite] api/lib/url-content-fetcher.ts changed, restarting server...
+2:53:52 PM [vite] server restarted.
+3:04:50 PM [vite] api/lib/puppeteer-extractor.ts changed, restarting server...
+▲ [WARNING] Import "extractWithPuppeteer" will always be undefined because the file "api/lib/puppeteer-extractor.ts" has no exports [import-is-undefined]
+
+    api/lib/url-content-fetcher.ts:71:9:
+      71 │ import { extractWithPuppeteer } from './puppeteer-extractor';
+         ╵          ~~~~~~~~~~~~~~~~~~~~
+
+3:04:50 PM [vite] server restarted.
+3:04:56 PM [vite] api/lib/puppeteer-extractor.ts changed, restarting server...
+3:04:56 PM [vite] server restarted.
+3:05:10 PM [vite] api/lib/puppeteer-extractor.ts changed, restarting server...
+3:05:10 PM [vite] server restarted.

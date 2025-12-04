@@ -1,9 +1,14 @@
 
+import puppeteer from 'puppeteer';
+
 /**
  * URL Content Fetcher
  * 
- * Fetches content from URLs using Jina Reader API
- * Gracefully degrades on failure (returns empty content instead of throwing)
+ * Fetches content from URLs using:
+ * 1. Puppeteer (Priority for social media: Threads, Instagram, Twitter)
+ * 2. Jina Reader API (Fallback for general web content)
+ * 
+ * Guarantees accurate content extraction with graceful degradation
  */
 
 // ============================================================================
@@ -14,6 +19,10 @@ export interface FetchedUrlContent {
     rawText: string;
     htmlContent?: string;
     images: string[];
+    author?: string;
+    authorAvatar?: string;
+    authorHandle?: string;
+    finalUrl?: string;
 }
 
 // ============================================================================
@@ -59,20 +68,93 @@ const fetchWithTimeout = async (
     }
 };
 
-// ============================================================================
-// MAIN FUNCTION
-// ============================================================================
+import { extractWithPuppeteer } from './puppeteer-extractor';
 
 /**
- * Fetch URL content using Jina Reader API
+ * Detect if URL is from social media platform
+ */
+const isSocialMedia = (url: string): boolean => {
+    const lower = url.toLowerCase();
+    return lower.includes('threads.net') || lower.includes('threads.com') || lower.includes('www.threads') ||
+        lower.includes('instagram.com') || lower.includes('instagr.am') ||
+        lower.includes('twitter.com') || lower.includes('x.com') || lower.includes('youtube.com');
+};
+
+/**
+ * Main content fetcher with smart fallback strategy
  * 
- * @param url - The URL to fetch content from
- * @returns FetchedUrlContent with rawText, htmlContent, and images
- * 
- * NOTE: This function NEVER throws. On any error, it returns empty content.
- * This enables graceful degradation to URL-only clips.
+ * Strategy:
+ * 1. Social media → Puppeteer first (accurate metadata)
+ * 2. If Puppeteer result weak → Jina for text, keep Puppeteer metadata
+ * 3. General web → Jina Reader
  */
 export const fetchUrlContent = async (url: string): Promise<FetchedUrlContent> => {
+    try {
+        // STRATEGY 1: Social media → Use Puppeteer
+        if (isSocialMedia(url)) {
+            console.log('[Content Fetcher] Social media detected, using Puppeteer');
+            const puppeteerResult = await extractWithPuppeteer(url);
+
+            // Check if result is weak
+            const textLower = (puppeteerResult.rawText || '').toLowerCase();
+            const hasLoginGate = textLower.includes('log in') || textLower.includes('sign up') ||
+                textLower.includes('로그인') || textLower.includes('가입');
+
+            const isWeak = !puppeteerResult.rawText ||
+                puppeteerResult.rawText.length < 200 ||
+                puppeteerResult.images.length === 0 ||
+                hasLoginGate;
+
+            if (!isWeak) {
+                console.log('[Content Fetcher] Puppeteer succeeded');
+                return puppeteerResult;
+            }
+
+            // Weak result → Try Jina for text, keep Puppeteer metadata
+            console.warn('[Content Fetcher] Weak Puppeteer result, trying Jina fallback');
+            console.log(`[Content Fetcher] Weak reason: ${puppeteerResult.rawText.length} chars, ${puppeteerResult.images.length} images, loginGate: ${hasLoginGate}`);
+
+            let jinaUrl = url;
+            if (url.includes('threads.com')) {
+                jinaUrl = url.replace('threads.com', 'threads.net');
+                console.log(`[Content Fetcher] Canonicalized: threads.com → threads.net`);
+            }
+
+            const jinaResult = await extractWithJina(jinaUrl);
+
+            if (jinaResult.rawText && jinaResult.rawText.length > 50) {
+                console.log('[Content Fetcher] Jina fallback succeeded, merging with Puppeteer metadata');
+
+                // MERGE: Jina text + Puppeteer metadata
+                return {
+                    rawText: jinaResult.rawText,
+                    htmlContent: jinaResult.htmlContent || puppeteerResult.htmlContent,
+                    images: puppeteerResult.images.length > 0 ? puppeteerResult.images : jinaResult.images,
+                    author: puppeteerResult.author || jinaResult.author,
+                    authorAvatar: puppeteerResult.authorAvatar || jinaResult.authorAvatar,
+                    authorHandle: puppeteerResult.authorHandle || jinaResult.authorHandle,
+                    finalUrl: jinaUrl
+                };
+            }
+
+            console.warn('[Content Fetcher] Jina also failed, returning weak Puppeteer result');
+            return puppeteerResult;
+        }
+
+        // STRATEGY 2: General web → Jina Reader
+        console.log('[Content Fetcher] Using Jina Reader');
+        return await extractWithJina(url);
+
+    } catch (error) {
+        console.error('[Content Fetcher] Error:', error);
+        return { rawText: '', images: [] };
+    }
+};
+
+/**
+ * Extract content using Jina Reader API
+ */
+const extractWithJina = async (url: string): Promise<FetchedUrlContent> => {
     try {
         console.log(`[Jina Reader] Fetching content for: ${url}`);
 
