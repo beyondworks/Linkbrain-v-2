@@ -1,5 +1,128 @@
 # Linkbrain v-2 개발 로그
 
+## 2025-12-05 세션: Threads 콘텐츠 추출 대폭 개선
+
+### 목표
+Threads 게시물의 본문과 댓글을 깔끔하게 분리하여 표시하고, 쓰레기 텍스트(이미지 마크다운, 링크, JSON 프롬프트 등)를 완전히 제거
+
+### 문제점
+1. 본문이 2중으로 표시됨
+2. `[링크]`, `[]`, `[[Image...]]` 등 쓰레기 토큰 노출
+3. AI 이미지 프롬프트 JSON이 본문에 포함
+4. 댓글 섹션이 본문과 구분 없이 표시
+5. 댓글 간 구분선 없음
+
+### 해결책
+
+#### 1. 서버: threads-normalizer.ts V5 (새 파일)
+**파일:** `api/lib/threads-normalizer.ts`
+
+**12단계 정제 파이프라인:**
+1. 이미지 마크다운 제거 (`![...](url)`)
+2. 마크다운 링크 정리 (`[label](url)` → label 또는 제거)
+3. 쓰레기 토큰 제거 (`[]`, `[링크]`, 깨진 URL)
+4. JSON/프롬프트 블록 제거 (`"style_mode"`, `"negative_prompt"`)
+5. 메타데이터 제거 (Translate, Thread===, Author)
+6. 문단 중복 제거
+7. `Comments(N)` 기준 본문/댓글 분리
+8-9. 본문/댓글 각각 라인 정제
+10. 한글 필터 적용
+11. 본문 라인 중복 제거
+12. 마커 삽입: `[[[COMMENTS_SECTION]]]`, `[[[COMMENT_SPLIT]]]`
+
+**출력 포맷:**
+```
+[정제된 본문]
+
+[[[COMMENTS_SECTION]]]
+
+[댓글 1]
+
+[[[COMMENT_SPLIT]]]
+
+[댓글 2]
+...
+```
+
+#### 2. 서버: web-normalizer.ts (새 파일)
+**파일:** `api/lib/web-normalizer.ts`
+
+일반 웹 콘텐츠용 정제기:
+- 이미지/링크 마크다운 제거
+- JSON 블록 제거
+- 쓰레기 토큰 제거
+
+#### 3. 서버: content-processor.ts 수정
+**추가 함수:** `parseThreadsMarkdown()`
+- `[[[COMMENTS_SECTION]]]` 기준 본문/댓글 분리
+- `[[[COMMENT_SPLIT]]]` 기준 개별 댓글 파싱
+- 반환: `{ body: string, comments: ThreadComment[] }`
+
+#### 4. 클라이언트: ClipDetail_Threads.tsx 전면 재작성
+
+**핵심 변경:**
+- `normalizeThreads` import 제거 (서버에서만 정제)
+- 클라이언트는 마커 파싱만 수행
+
+**추가 기능:**
+- `deduplicateParagraphs()`: 본문 중복 제거
+- `looksLikeComment()`: 스마트 댓글 감지 휴리스틱
+  - 50자 미만
+  - "헐", "대박", "감사" 등으로 시작
+  - 긴 본문 다음 짧은 반응
+
+**UI 구조:**
+```
+┌─────────────────────────────────┐
+│ Content (볼드)                  │
+│ ───────────────────────         │
+│ [본문 텍스트]                    │
+│                                 │
+│ Comments (볼드)                 │
+│ ───────────────────────         │
+│ [댓글 1]                         │
+│ ───────────────────────         │
+│ [댓글 2]                         │
+│ ───────────────────────         │
+│ [댓글 3]                         │
+└─────────────────────────────────┘
+```
+
+**스타일링:**
+- `divide-y divide-gray-200`: 댓글 간 구분선
+- `border-t`: Comments 헤더 아래 첫 구분선
+- `py-4`: 댓글 간 패딩
+
+### 변경된 파일 목록
+| 파일 | 변경 유형 |
+|------|----------|
+| `api/lib/threads-normalizer.ts` | 새 파일 |
+| `api/lib/web-normalizer.ts` | 새 파일 |
+| `api/lib/web-extractor.ts` | 새 파일 |
+| `api/lib/content-processor.ts` | 수정 |
+| `api/lib/url-content-fetcher.ts` | 수정 |
+| `src/components/ClipDetail_Threads.tsx` | 전면 재작성 |
+| `package.json` | 의존성 추가 |
+
+### 설치된 패키지
+```bash
+npm install @mozilla/readability jsdom @types/jsdom
+```
+
+### 결과
+- ✅ 본문 1회만 표시 (중복 제거)
+- ✅ 쓰레기 토큰 완전 제거
+- ✅ Comments 헤더 표시
+- ✅ 댓글 간 구분선
+- ✅ Instagram/YouTube 영향 없음
+
+### 커밋
+```
+aeb6ab7 - feat: Threads 콘텐츠 추출 대폭 개선 - 본문/댓글 분리 및 중복 제거
+```
+
+---
+
 ## 2025-12-03 세션
 
 ### 오전 세션: UI 개선 및 버그 수정
