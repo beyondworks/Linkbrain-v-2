@@ -1,5 +1,7 @@
 
 import puppeteer from 'puppeteer';
+import { normalizeThreads } from './threads-normalizer';
+import { normalizeWeb } from './web-normalizer';
 
 /**
  * URL Content Fetcher
@@ -9,6 +11,9 @@ import puppeteer from 'puppeteer';
  * 2. Jina Reader API (Fallback for general web content)
  * 
  * Guarantees accurate content extraction with graceful degradation
+ * 
+ * NOTE: Instagram and YouTube pipelines are NOT modified - they work well.
+ * Only Threads and Web content get normalized.
  */
 
 // ============================================================================
@@ -17,6 +22,7 @@ import puppeteer from 'puppeteer';
 
 export interface FetchedUrlContent {
     rawText: string;
+    rawTextOriginal?: string;  // Original text before normalization (for backup)
     htmlContent?: string;
     images: string[];
     author?: string;
@@ -30,15 +36,30 @@ export interface FetchedUrlContent {
 // ============================================================================
 
 /**
- * Normalize Threads text: keep author's main text + 번호 매긴 본문/댓글을 정돈하고, 불필요한 잡음을 제거한다.
- * - parseThreadsContent는 numbered comment만 유지하고 기타 반응/감탄 댓글을 필터한다.
+ * Apply Threads-specific text normalization
+ * Preserves original in rawTextOriginal for potential future re-processing
  */
-const normalizeThreadsText = (content: FetchedUrlContent): FetchedUrlContent => {
-    const parsed = parseThreadsContent(
-        content.rawText || '',
-        content.authorHandle || content.author || ''
-    );
-    return { ...content, rawText: parsed };
+const applyThreadsNormalization = (content: FetchedUrlContent): FetchedUrlContent => {
+    const original = content.rawText || '';
+    const normalized = normalizeThreads(original);
+    return {
+        ...content,
+        rawText: normalized,
+        rawTextOriginal: original  // Keep backup of original
+    };
+};
+
+/**
+ * Apply Web-specific text normalization
+ */
+const applyWebNormalization = (content: FetchedUrlContent): FetchedUrlContent => {
+    const original = content.rawText || '';
+    const normalized = normalizeWeb(original);
+    return {
+        ...content,
+        rawText: normalized,
+        rawTextOriginal: original
+    };
 };
 
 /**
@@ -129,7 +150,7 @@ export const fetchUrlContent = async (url: string): Promise<FetchedUrlContent> =
             if (!isWeak) {
                 console.log('[Content Fetcher] Puppeteer succeeded');
                 return platform === 'threads'
-                    ? normalizeThreadsText(puppeteerResult)
+                    ? applyThreadsNormalization(puppeteerResult)
                     : puppeteerResult;
             }
 
@@ -162,183 +183,32 @@ export const fetchUrlContent = async (url: string): Promise<FetchedUrlContent> =
                 };
 
                 return platform === 'threads'
-                    ? normalizeThreadsText(merged)
+                    ? applyThreadsNormalization(merged)
                     : merged;
             }
 
             console.warn('[Content Fetcher] Jina also failed, returning weak Puppeteer result');
             return platform === 'threads'
-                ? normalizeThreadsText(puppeteerResult)
+                ? applyThreadsNormalization(puppeteerResult)
                 : puppeteerResult;
         }
 
         // STRATEGY 2: General web → Jina Reader
         console.log('[Content Fetcher] Using Jina Reader');
         const jinaDirect = await extractWithJina(url);
-        return platform === 'threads'
-            ? normalizeThreadsText(jinaDirect)
-            : jinaDirect;
+
+        // Apply appropriate normalization based on platform
+        if (platform === 'threads') {
+            return applyThreadsNormalization(jinaDirect);
+        } else {
+            // Apply web normalization to clean up markdown artifacts
+            return applyWebNormalization(jinaDirect);
+        }
 
     } catch (error) {
         console.error('[Content Fetcher] Error:', error);
         return { rawText: '', images: [] };
     }
-};
-
-/**
- * Parse and format Threads content
- * - Remove ALL links and markdown formatting
- * - Split content by "-Author" or "·Author" markers
- * - First section = main content, rest = comments
- * - Filter out noise from other threads
- */
-const parseThreadsContent = (content: string, authorHandle: string = ''): string => {
-    if (!content) return '';
-
-    console.log(`[Threads Parser] Processing content for: ${authorHandle}`);
-
-    // Step 1: Remove ALL links and markdown noise
-    let cleaned = content
-        // Remove all markdown links [text](url) - including incomplete ones
-        .replace(/\[[^\]]*\]\([^\)]*\)/g, '')
-        // Remove leftover ]() patterns
-        .replace(/\]\(\)/g, '')
-        .replace(/\]\s*\(\s*\)/g, '')
-        // Remove all image markdown ![text](url)
-        .replace(/!\[[^\]]*\]\([^\)]*\)/g, '')
-        // Remove standalone URLs
-        .replace(/https?:\/\/[^\s\)]+/g, '')
-        // Remove Image N: descriptions  
-        .replace(/\[?Image\s*\d+[:\]]?[^\n]*/gi, '')
-        // Remove equals lines (=====)
-        .replace(/={3,}/g, '')
-        // Remove like/share counts (1.4K 1.3K, 10 10, etc.)
-        .replace(/\b\d+\.?\d*K?\s+\d+\.?\d*K?\b/g, '')
-        // Remove common UI noise
-        .replace(/^Sorry, we're having trouble playing this video\.?$/gim, '')
-        .replace(/^Translate$/gim, '')
-        .replace(/^View all \d+ replies?$/gim, '')
-        .replace(/^Log in$/gim, '')
-        .replace(/^Sign up$/gim, '')
-        .replace(/^Related threads$/gim, '')
-        .replace(/^Log in to see more replies\.?$/gim, '')
-        .replace(/^Report a problem$/gim, '')
-        .replace(/^\* \d{4} \*$/gim, '')
-        // Remove standalone numbers
-        .replace(/^\d+$/gm, '')
-        // Remove decorative lines
-        .replace(/^[\*\-•·=\s]+$/gm, '')
-        // Normalize whitespace
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
-
-    // Step 2: Split by "-Author" or "·Author" markers
-    const sections = cleaned.split(/[-·]Author\s*/i).filter(s => s.trim().length > 0);
-
-    if (sections.length === 0) {
-        return cleaned;
-    }
-
-    // Detect if main content is primarily Korean
-    const isKoreanContent = (text: string): boolean => {
-        const koreanChars = (text.match(/[가-힣]/g) || []).length;
-        const totalChars = text.replace(/\s/g, '').length;
-        return koreanChars / totalChars > 0.3;
-    };
-
-    // Detect noise patterns from other threads
-    const isNoiseContent = (text: string, mainIsKorean: boolean): boolean => {
-        // Hashtag clusters (3+ hashtags) indicate other threads
-        const hashtagCount = (text.match(/#[a-zA-Z가-힣]+/g) || []).length;
-        if (hashtagCount >= 3) return true;
-
-        // If main content is Korean, long English-only sentences are likely noise
-        if (mainIsKorean) {
-            const words = text.split(/\s+/);
-            const englishWords = words.filter(w => /^[a-zA-Z]+$/.test(w)).length;
-            // More than 70% English words in a Korean post = noise
-            if (words.length > 10 && englishWords / words.length > 0.7) return true;
-        }
-
-        // Common patterns from unrelated threads
-        const noisePatterns = [
-            /Christmas ain't Christmas/i,
-            /Misery Business by Paramore/i,
-            /TIED THE GAME/i,
-            /Tesla \(TSLA\)/i,
-            /Amazon data center/i,
-            /Rolling Stone/i,
-            /buttered prawns/i,
-            /Independent Spirit Award/i,
-            /Congrats to.*nominee/i,
-            /#amithersonlyone/i,
-            /#canaldujent/i,
-            /not for publication/i,
-            /Pensa J-/i,
-            /Plum Crazy/i,
-            /Best Breakthrough Performance/i,
-        ];
-
-        for (const pattern of noisePatterns) {
-            if (pattern.test(text)) return true;
-        }
-
-        return false;
-    };
-
-    // Step 3: Clean each section
-    const cleanSection = (text: string): string => {
-        return text
-            .split('\n')
-            .map(line => line.trim())
-            .filter(line => {
-                if (line.length < 3) return false;
-                // Skip Korean names only (2-10 chars)
-                if (line.match(/^[가-힣]{2,10}$/) && line.length < 15) return false;
-                // Skip timestamps  
-                if (line.match(/^\d+\s*(분|시간|일)\s*전$/)) return false;
-                // Skip leftover empty patterns
-                if (line.match(/^[\[\]\(\)\s]+$/)) return false;
-                return true;
-            })
-            .join(' ')
-            .replace(/\s+/g, ' ')
-            // Clean up any remaining ]() patterns
-            .replace(/\]\s*\(\s*\)/g, '')
-            .replace(/\[\s*\]/g, '')
-            .trim();
-    };
-
-    // First section is main content
-    let mainContent = cleanSection(sections[0]);
-
-    // Detect if this is Korean content
-    const mainIsKorean = isKoreanContent(mainContent);
-
-    // Remove duplicate content: if first 50 chars appear twice, remove the duplicate
-    const first50 = mainContent.substring(0, 50);
-    const secondOccurrence = mainContent.indexOf(first50, 50);
-    if (secondOccurrence > 0 && first50.length >= 20) {
-        mainContent = mainContent.substring(0, secondOccurrence).trim();
-    }
-
-    // Rest are comments (if any) - filter out noise
-    const comments = sections.slice(1)
-        .map(s => cleanSection(s))
-        .filter(s => s.length > 10)
-        .filter(s => !isNoiseContent(s, mainIsKorean));
-
-    console.log(`[Threads Parser] Main content: ${mainContent.length} chars, Comments: ${comments.length}`);
-
-    // Step 4: Build output with COMMENT_DIVIDER markers for UI
-    let output = mainContent;
-
-    if (comments.length > 0) {
-        output += '\n\n**COMMENTS_SECTION**\n';
-        output += comments.join('\n**COMMENT_DIVIDER**\n');
-    }
-
-    return output;
 };
 
 
@@ -349,9 +219,9 @@ const parseThreadsContent = (content: string, authorHandle: string = ''): string
 const cleanMarkdownContent = (content: string, platform: string = '', authorHandle: string = ''): string => {
     if (!content) return '';
 
-    // Use specialized parser for Threads
+    // Use specialized normalizer for Threads
     if (platform === 'threads') {
-        return parseThreadsContent(content, authorHandle);
+        return normalizeThreads(content);
     }
 
     let cleaned = content;

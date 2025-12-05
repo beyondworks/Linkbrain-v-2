@@ -297,3 +297,52 @@ export function parseThreadContent(markdown: string): ProcessedThreadContent {
         hasComments: sections.some(s => s.type === 'comment')
     };
 }
+
+// ============================================================================
+// NEW: Threads Markdown Parser for structured [[[MARKERS]]]
+// ============================================================================
+
+export interface ThreadComment {
+    id: number;
+    text: string;
+}
+
+export interface ParsedThread {
+    body: string;
+    comments: ThreadComment[];
+}
+
+/**
+ * Parse Threads markdown with explicit markers into structured data
+ * Expects format:
+ *   [body text]
+ *   [[[COMMENTS_SECTION]]]
+ *   [comment 1]
+ *   [[[COMMENT_SPLIT]]]
+ *   [comment 2]
+ *   ...
+ */
+export function parseThreadsMarkdown(md: string): ParsedThread {
+    if (!md) {
+        return { body: '', comments: [] };
+    }
+
+    const [bodyPart, commentsPart] = md.split('[[[COMMENTS_SECTION]]]');
+    const body = (bodyPart || '').trim();
+
+    if (!commentsPart) {
+        return { body, comments: [] };
+    }
+
+    const rawComments = commentsPart
+        .split('[[[COMMENT_SPLIT]]]')
+        .map(c => c.trim())
+        .filter(Boolean);
+
+    const comments: ThreadComment[] = rawComments.map((text, idx) => ({
+        id: idx,
+        text,
+    }));
+
+    return { body, comments };
+}
