@@ -10,15 +10,17 @@ import {
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
 
 interface CollectionsPageProps {
     onCollectionClick: (collection: any) => void;
     onCreateClick: () => void;
+    onBack?: () => void;
     language?: 'KR' | 'EN';
     user?: any;
 }
 
-const CollectionsPage = ({ onCollectionClick, onCreateClick, language = 'KR', user }: CollectionsPageProps) => {
+const CollectionsPage = ({ onCollectionClick, onCreateClick, onBack, language = 'KR', user }: CollectionsPageProps) => {
     const [sortOrder, setSortOrder] = useState<'recent' | 'oldest'>('recent');
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [collectionToDelete, setCollectionToDelete] = useState<any>(null);
@@ -95,11 +97,21 @@ const CollectionsPage = ({ onCollectionClick, onCreateClick, language = 'KR', us
     return (
         <div className="w-full px-6 md:px-10 pb-20 pt-8">
 
-            {/* Header Section */}
+            {/* Header Section with Back Button */}
             <div className="flex items-center justify-between mb-8">
-                <h2 className="text-[#3d3d3d] dark:text-white text-[28px] font-bold">
-                    {language === 'KR' ? "컬렉션" : "Collections"}
-                </h2>
+                <div className="flex items-center gap-3">
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-[#959595]" />
+                        </button>
+                    )}
+                    <h2 className="text-[#3d3d3d] dark:text-white text-[28px] font-bold">
+                        {language === 'KR' ? "컬렉션" : "Collections"}
+                    </h2>
+                </div>
 
                 {/* Sort / Filter */}
                 <div className="flex items-center gap-3">

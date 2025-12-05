@@ -45,6 +45,19 @@ const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   // Language Logic
   const [language, setLanguage] = useState<'KR' | 'EN'>('KR');
+  // Thumbnail Toggle Logic
+  const [showThumbnails, setShowThumbnails] = useState(() => {
+    const saved = localStorage.getItem('showThumbnails');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const toggleThumbnails = () => {
+    setShowThumbnails(prev => {
+      const newValue = !prev;
+      localStorage.setItem('showThumbnails', String(newValue));
+      return newValue;
+    });
+  };
 
   useEffect(() => {
     if (isDarkMode) {
@@ -228,6 +241,7 @@ const App = () => {
                 onSourceChange={handleSourceSelect}
                 onClipClick={handleClipClick}
                 language={language}
+                showThumbnails={showThumbnails}
               />
             </>
           )}
@@ -236,6 +250,7 @@ const App = () => {
             <CollectionsPage
               onCollectionClick={handleCollectionClick}
               onCreateClick={() => setIsCreateCollectionOpen(true)}
+              onBack={() => handleNavigate('clips')}
               language={language}
               user={user}
             />
@@ -264,10 +279,13 @@ const App = () => {
             <SettingsPage
               onLogout={handleLogout}
               onNavigate={(view: any) => setCurrentView(view)}
+              onBack={() => handleNavigate('clips')}
               isDarkMode={isDarkMode}
               toggleDarkMode={toggleDarkMode}
               language={language}
               toggleLanguage={toggleLanguage}
+              showThumbnails={showThumbnails}
+              toggleThumbnails={toggleThumbnails}
             />
           )}
 

@@ -21,11 +21,12 @@ interface ClipGridProps {
   onSourceChange?: (source: string | null) => void;
   onClipClick?: (clip: any) => void;
   language: 'KR' | 'EN';
+  showThumbnails?: boolean;
 }
 
 import { getCategoryColor } from '../lib/categoryColors';
 
-const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSourceChange, onClipClick, language }: ClipGridProps) => {
+const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSourceChange, onClipClick, language, showThumbnails = true }: ClipGridProps) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [visibleCount, setVisibleCount] = useState(6);
@@ -456,6 +457,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
               onSelectCollection={(name) => handleSelectCollection(clip.id, name)}
               onCreateCollection={handleCreateCollection}
               onClick={!isSelectMode ? () => onClipClick && onClipClick(clip) : undefined}
+              showThumbnail={showThumbnails}
             />
           </div>
         ))}
@@ -481,6 +483,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
               onSelectCollection={(name) => handleSelectCollection(clip.id, name)}
               onCreateCollection={handleCreateCollection}
               onClick={!isSelectMode ? () => onClipClick && onClipClick(clip) : undefined}
+              showThumbnail={showThumbnails}
             />
           </div>
         ))}

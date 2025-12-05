@@ -22,6 +22,7 @@ interface ClipCardProps {
    onCreateCollection?: (data: { name: string; color: string }) => void;
    collections?: { id: string; name: string; color: string }[];
    language?: 'KR' | 'EN';
+   showThumbnail?: boolean;
 }
 
 // Platform logo fallback component - uses custom image assets
@@ -68,7 +69,8 @@ const ClipCard = ({
    onSelectCollection,
    onCreateCollection,
    collections = [],
-   language = 'KR'
+   language = 'KR',
+   showThumbnail = true
 }: ClipCardProps) => {
    const isList = variant === 'list';
    const [isCollectionDialogOpen, setIsCollectionDialogOpen] = useState(false);
@@ -136,21 +138,35 @@ const ClipCard = ({
                className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row group relative cursor-pointer"
             >
                {/* Thumbnail Section - Fixed height */}
-               <div className="relative w-full md:w-[320px] bg-[#d9d9d9] dark:bg-[#252525] flex-shrink-0 overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                  <div className="absolute top-4 left-4 flex gap-2 z-10">
-                     <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
-                        <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+               {showThumbnail && (
+                  <div className="relative w-full md:w-[320px] bg-[#d9d9d9] dark:bg-[#252525] flex-shrink-0 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                     <div className="absolute top-4 left-4 flex gap-2 z-10">
+                        <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                           <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+                        </div>
+                        <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                           {getSourceIcon(source)}
+                           <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                        </div>
                      </div>
-                     <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
-                        {getSourceIcon(source)}
-                        <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
-                     </div>
+                     {renderThumbnail()}
                   </div>
-                  {renderThumbnail()}
-               </div>
+               )}
 
                {/* Content Section */}
                <div className="p-5 flex flex-col flex-grow gap-2 md:gap-3 min-w-0 relative">
+                  {/* Category & Source Chips - shown when thumbnail hidden */}
+                  {!showThumbnail && (
+                     <div className="flex gap-2 mb-1">
+                        <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                           <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+                        </div>
+                        <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                           {getSourceIcon(source)}
+                           <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                        </div>
+                     </div>
+                  )}
                   <div className="flex items-center gap-1.5 text-[#959595] text-[11px]">
                      <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                         <path d={svgPaths.p3c99fc00} />
@@ -233,20 +249,34 @@ const ClipCard = ({
             className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col group relative cursor-pointer"
          >
             {/* Thumbnail Section - Fixed height */}
-            <div className="relative w-full bg-[#d9d9d9] dark:bg-[#252525] overflow-hidden" style={{ aspectRatio: '16/9' }}>
-               <div className="absolute top-4 left-4 flex gap-2 z-10">
-                  <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
-                     <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+            {showThumbnail && (
+               <div className="relative w-full bg-[#d9d9d9] dark:bg-[#252525] overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                  <div className="absolute top-4 left-4 flex gap-2 z-10">
+                     <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                        <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+                     </div>
+                     <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                        {getSourceIcon(source)}
+                        <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                     </div>
                   </div>
-                  <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
-                     {getSourceIcon(source)}
-                     <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
-                  </div>
+                  {renderThumbnail()}
                </div>
-               {renderThumbnail()}
-            </div>
+            )}
 
             <div className="p-5 flex flex-col flex-grow gap-3">
+               {/* Category & Source Chips - shown when thumbnail hidden */}
+               {!showThumbnail && (
+                  <div className="flex gap-2 mb-1">
+                     <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                        <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+                     </div>
+                     <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                        {getSourceIcon(source)}
+                        <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                     </div>
+                  </div>
+               )}
                <div className="flex items-center gap-1.5 text-[#959595] text-[11px]">
                   <svg className="w-3 h-3" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                      <path d={svgPaths.p3c99fc00} />

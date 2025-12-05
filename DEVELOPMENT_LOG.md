@@ -1,5 +1,37 @@
 # Linkbrain v-2 개발 로그
 
+## 2025-12-06 세션 2: UI/UX 개선 - 썸네일 토글 및 네비게이션
+
+### 목표
+1. **썸네일 표시 토글**: 설정에서 썸네일 보기/끄기 기능 추가
+2. **뒤로가기 버튼**: 설정, 컬렉션 페이지에 뒤로가기 버튼 추가
+3. **칩 표시 개선**: 썸네일 숨김 시에도 카테고리/출처 칩 표시
+
+### 주요 변경 사항
+
+#### 1. 썸네일 표시 토글 (`App.tsx`, `SettingsPage.tsx`, `ClipGrid.tsx`, `ClipCard.tsx`)
+- **설정 페이지**: 환경설정 > "썸네일 표시" 토글 추가 (Image 아이콘)
+- **상태 관리**: `showThumbnails` 상태를 localStorage에 저장하여 지속
+- **조건부 렌더링**: ClipCard에서 `showThumbnail` prop에 따라 썸네일 표시/숨김
+
+#### 2. 뒤로가기 버튼 (`SettingsPage.tsx`, `CollectionsPage.tsx`)
+- **설정 페이지**: 헤더에 ArrowLeft 아이콘 → 클립 목록으로 이동
+- **컬렉션 페이지**: 헤더에 ArrowLeft 아이콘 → 클립 목록으로 이동
+- **디자인 일관성**: 동일한 스타일 (p-2, rounded-full, hover effect)
+
+#### 3. 칩 표시 개선 (`ClipCard.tsx`)
+- 썸네일 숨김 시 카테고리/출처 칩이 콘텐츠 상단에 인라인으로 표시
+- 그리드뷰와 리스트뷰 모두에 적용
+
+### 파일 변경 목록
+- `src/App.tsx` - showThumbnails 상태 추가, onBack props 전달
+- `src/components/SettingsPage.tsx` - 썸네일 토글 및 뒤로가기 버튼 추가
+- `src/components/CollectionsPage.tsx` - 뒤로가기 버튼 추가
+- `src/components/ClipGrid.tsx` - showThumbnails prop 추가
+- `src/components/ClipCard.tsx` - 조건부 썸네일/칩 렌더링
+
+---
+
 ## 2025-12-06 세션: 웹/블로그 콘텐츠 추출 개선
 
 ### 목표
