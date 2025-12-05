@@ -188,13 +188,23 @@ const ClipCard = ({
                               <span>{date}</span>
                            </div>
 
-                           {collection && (
+                           {collection && collection !== 'Unsorted' ? (
                               <div className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-gray-100 dark:bg-gray-800 text-[#959595] text-[10px]">
                                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                                  </svg>
                                  <span className="font-medium">{collection}</span>
                               </div>
+                           ) : (
+                              <button
+                                 onClick={handleAddToCollection}
+                                 className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] border border-dashed border-[#959595] text-[#959595] hover:text-[#21dba4] hover:border-[#21dba4] transition-colors text-[10px] group/btn"
+                              >
+                                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M12 5v14M5 12h14" />
+                                 </svg>
+                                 <span className="font-medium">{language === 'KR' ? '컬렉션에 추가' : 'Add to Collection'}</span>
+                              </button>
                            )}
                         </div>
                      </div>
