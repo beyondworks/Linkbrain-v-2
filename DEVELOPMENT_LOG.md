@@ -1,5 +1,38 @@
 # Linkbrain v-2 개발 로그
 
+## 2025-12-06 세션: 웹/블로그 콘텐츠 추출 개선
+
+### 목표
+1. **YouTube 업로드 오류 수정**: Firestore `authorAvatar` undefined 에러 및 문서 크기 제한 초과 해결
+2. **웹 뉴스 콘텐츠 정리**: 네비게이션, 사이드바, 푸터 등 쓰레기 텍스트 제거
+3. **네이버 블로그 추출**: iframe 구조 우회 및 본문/이미지 추출
+
+### 주요 변경 사항
+
+#### 1. YouTube/Shorts 업로드 오류 수정 (`clip-service.ts`)
+- **authorAvatar undefined**: spread 연산자로 조건부 포함 `...(authorAvatar && { authorAvatar })`
+- **문서 크기 제한**: 콘텐츠 100KB, 이미지 10개로 제한하여 Firestore 1MB 제한 방지
+
+#### 2. 웹 뉴스 콘텐츠 정리 (`web-normalizer.ts`)
+- **네비게이션 제거**: 뉴스홈, 메뉴, 검색, 로그인 등 UI 요소 감지 및 제거
+- **카테고리 목록 제거**: 경제, 정치, 사회 등 뉴스 사이트 카테고리 필터링
+- **푸터 콘텐츠 제거**: 저작권, 무단전재 금지, 사업자등록 등 패턴 감지
+- **메인 콘텐츠 추출**: 80자 이상의 실질적인 본문 중심 추출
+
+#### 3. 네이버 블로그 전용 처리 (`naver-normalizer.ts`, `url-content-fetcher.ts`)
+- **모바일 URL 변환**: `blog.naver.com` → `m.blog.naver.com` (iframe 우회)
+- **전용 노멀라이저**: 화살표(`>`, `▶`), 특수문자 제거, 문단 포맷팅
+- **이미지 우선순위**: 네이버 블로그는 Jina 이미지 우선, 일반 웹은 image-extractor 우선
+
+### 파일 변경 목록
+- `api/lib/clip-service.ts` - authorAvatar/문서 크기 제한 수정
+- `api/lib/web-normalizer.ts` - 웹 뉴스 정리 로직 강화
+- `api/lib/naver-normalizer.ts` - 네이버 블로그 전용 노멀라이저 (신규)
+- `api/lib/url-content-fetcher.ts` - 네이버 블로그 감지 및 처리 추가
+- `api/analyze.ts` - 이미지 병합 로직 조건부 처리
+
+---
+
 ## 2025-12-05 세션: UX/UI 개선 및 다중 링크 분석
 
 ### 목표

@@ -118,9 +118,15 @@ export default async function handler(req: any, res: any) {
         const extractedImages = await extractImages(url);
         const imageUrls = extractedImages.map(img => img.url);
         console.log(`[URL Import] Extracted images: ${imageUrls.length} images`);
+        console.log(`[URL Import] Content images: ${content.images?.length || 0} images`);
 
         // Merge images from both sources (deduplicate)
-        const allImages = [...new Set([...imageUrls])];
+        // For Naver Blog: prioritize content.images (Jina extracted)
+        // For general web: prioritize imageUrls (image-extractor filtered)
+        const isNaverBlog = url.toLowerCase().includes('blog.naver.com');
+        const allImages = isNaverBlog
+            ? [...new Set([...(content.images || []), ...imageUrls])]
+            : [...new Set([...imageUrls, ...(content.images || [])])];
 
         // 3. Re-detect platform from final URL if available (handles redirects)
         if (content.finalUrl && content.finalUrl !== url) {

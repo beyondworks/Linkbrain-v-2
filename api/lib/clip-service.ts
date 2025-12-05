@@ -345,6 +345,20 @@ export const createClipFromContent = async (
     console.log(`[Clip Service] - AI metadata: ${metadata ? 'generated' : 'skipped (no text)'}`);
     console.log(`[Clip Service] - Title: ${title}`);
 
+    // Limit content size to avoid Firestore 1MB document limit
+    const MAX_CONTENT_LENGTH = 100000; // 100KB for text content
+    const MAX_IMAGES = 10; // Limit number of images
+
+    const truncatedMarkdown = contentMarkdown.length > MAX_CONTENT_LENGTH
+        ? contentMarkdown.substring(0, MAX_CONTENT_LENGTH) + '\n\n[Content truncated...]'
+        : contentMarkdown;
+    const truncatedHtml = contentHtml && contentHtml.length > MAX_CONTENT_LENGTH
+        ? contentHtml.substring(0, MAX_CONTENT_LENGTH)
+        : contentHtml;
+    const limitedImages = clipImages.slice(0, MAX_IMAGES);
+
+    console.log(`[Clip Service] - Content limited: markdown ${contentMarkdown.length} -> ${truncatedMarkdown.length}, images ${clipImages.length} -> ${limitedImages.length}`);
+
     // Determine thumbnail with fallback
     const fallbackThumbnails = [
         '/fallback-thumbnails/fallback-1.png',
@@ -352,7 +366,7 @@ export const createClipFromContent = async (
         '/fallback-thumbnails/fallback-3.png'
     ];
     const randomFallback = fallbackThumbnails[Math.floor(Math.random() * fallbackThumbnails.length)];
-    const thumbnailImage = clipImages.length > 0 ? clipImages[0] : randomFallback;
+    const thumbnailImage = limitedImages.length > 0 ? limitedImages[0] : randomFallback;
 
     // Prepare clip data
     const now = Timestamp.now();
@@ -370,7 +384,7 @@ export const createClipFromContent = async (
         type,
         image: thumbnailImage,
         author: author || '',
-        authorAvatar: authorAvatar || undefined, // Fix: Ensure undefined instead of null
+        ...(authorAvatar && { authorAvatar }), // Only include if defined
         authorHandle: authorHandle || '',
         authorProfile: authorAvatar ? {
             avatar: authorAvatar,
@@ -385,17 +399,17 @@ export const createClipFromContent = async (
         mentions: [{ label: 'Original link', url }],
         comments: [],
         publishDate: null,
-        htmlContent: contentHtml,
+        htmlContent: truncatedHtml,
         collectionIds: [],
         viewCount: 0,
         likeCount: 0,
         createdAt: now,  // Use Firestore Timestamp
         updatedAt: now,  // Use Firestore Timestamp
         // INVARIANT: These fields MUST contain ONLY raw extracted content
-        rawMarkdown: contentMarkdown,
-        contentMarkdown: contentMarkdown,
-        contentHtml: contentHtml,
-        images: clipImages
+        rawMarkdown: truncatedMarkdown,
+        contentMarkdown: truncatedMarkdown,
+        contentHtml: truncatedHtml,
+        images: limitedImages
     };
 
     // Save to Firestore using Admin SDK

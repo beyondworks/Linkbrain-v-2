@@ -2,6 +2,7 @@
 import puppeteer from 'puppeteer';
 import { normalizeThreads } from './threads-normalizer';
 import { normalizeWeb } from './web-normalizer';
+import { normalizeNaverBlog } from './naver-normalizer';
 
 /**
  * URL Content Fetcher
@@ -114,12 +115,34 @@ const isSocialMedia = (url: string): boolean => {
 };
 
 /**
+ * Detect if URL is from Naver Blog
+ */
+const isNaverBlog = (url: string): boolean => {
+    const lower = url.toLowerCase();
+    return lower.includes('blog.naver.com') || lower.includes('m.blog.naver.com');
+};
+
+/**
+ * Convert Naver Blog URL to mobile version for better extraction
+ * Mobile version doesn't use iframes
+ */
+const convertToNaverMobile = (url: string): string => {
+    // Already mobile
+    if (url.includes('m.blog.naver.com')) {
+        return url;
+    }
+    // Convert to mobile
+    return url.replace('blog.naver.com', 'm.blog.naver.com');
+};
+
+/**
  * Main content fetcher with smart fallback strategy
  * 
  * Strategy:
  * 1. Social media → Puppeteer first (accurate metadata)
  * 2. If Puppeteer result weak → Jina for text, keep Puppeteer metadata
- * 3. General web → Jina Reader
+ * 3. Naver Blog → Mobile version + Jina Reader
+ * 4. General web → Jina Reader
  */
 export const fetchUrlContent = async (url: string): Promise<FetchedUrlContent> => {
     try {
@@ -193,7 +216,44 @@ export const fetchUrlContent = async (url: string): Promise<FetchedUrlContent> =
                 : puppeteerResult;
         }
 
-        // STRATEGY 2: General web → Jina Reader
+        // STRATEGY 2: Naver Blog → Use mobile version for better extraction
+        if (isNaverBlog(url)) {
+            const mobileUrl = convertToNaverMobile(url);
+            console.log(`[Content Fetcher] Naver Blog detected, using mobile version: ${mobileUrl}`);
+
+            const naverResult = await extractWithJina(mobileUrl);
+
+            if (naverResult.rawText && naverResult.rawText.length > 50) {
+                console.log('[Content Fetcher] Naver Blog extraction succeeded');
+                const normalizedText = normalizeNaverBlog(naverResult.rawText);
+                console.log(`[Content Fetcher] Naver normalized: ${naverResult.rawText.length} -> ${normalizedText.length} chars`);
+                return {
+                    ...naverResult,
+                    rawText: normalizedText,
+                    finalUrl: url // Keep original URL for display
+                };
+            }
+
+            console.warn('[Content Fetcher] Naver Blog extraction weak, trying Puppeteer');
+            const puppeteerResult = await extractWithPuppeteer(mobileUrl);
+            if (puppeteerResult.rawText && puppeteerResult.rawText.length > 50) {
+                const normalizedText = normalizeNaverBlog(puppeteerResult.rawText);
+                return {
+                    ...puppeteerResult,
+                    rawText: normalizedText,
+                    finalUrl: url
+                };
+            }
+
+            console.warn('[Content Fetcher] Naver Blog extraction failed');
+            return {
+                ...naverResult,
+                rawText: normalizeNaverBlog(naverResult.rawText || ''),
+                finalUrl: url
+            };
+        }
+
+        // STRATEGY 3: General web → Jina Reader
         console.log('[Content Fetcher] Using Jina Reader');
         const jinaDirect = await extractWithJina(url);
 
