@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import svgPaths from "../imports/svg-7yby5ysznz";
 import ClipCard from './ClipCard';
 import {
@@ -37,6 +37,21 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [collections, setCollections] = useState<any[]>([]);
+
+  // Infinite scroll observer
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return;
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount(prev => prev + 6);
+      }
+    }, { threshold: 0.1 });
+
+    if (node) observerRef.current.observe(node);
+  }, [loading]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -471,15 +486,16 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
         ))}
       </div>
 
-      {/* Load More Button */}
+      {/* Infinite Scroll Sentinel */}
       {visibleCount < sortedClips.length && (
-        <div className="mt-12 flex justify-center">
-          <button
-            onClick={() => setVisibleCount(prev => prev + 6)}
-            className="px-8 py-3 rounded-full border border-[#21dba4] text-[#21dba4] font-medium hover:bg-[#21dba4] hover:text-white transition-colors shadow-sm"
-          >
-            Load More
-          </button>
+        <div
+          ref={loadMoreRef}
+          className="mt-8 h-20 flex items-center justify-center"
+        >
+          <div className="flex items-center gap-2 text-[#959595]">
+            <div className="w-5 h-5 border-2 border-[#21dba4] border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm">{language === 'KR' ? '불러오는 중...' : 'Loading...'}</span>
+          </div>
         </div>
       )}
 

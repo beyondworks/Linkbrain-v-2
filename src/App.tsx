@@ -308,7 +308,7 @@ const App = () => {
         onCreate={handleCreateCollection}
         language={language}
       />
-      <Toaster />
+      <Toaster position="bottom-right" offset={100} />
     </div>
   );
 };

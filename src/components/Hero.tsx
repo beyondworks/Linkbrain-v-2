@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFading, setIsFading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [user, setUser] = useState<any>(null);
 
@@ -23,25 +24,36 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
 
     if (!user) {
       toast.error(language === 'KR' ? "로그인이 필요합니다." : "Please login first.");
-      // In a real app, redirect to login
       return;
     }
 
+    const urlToAnalyze = inputValue;
     setIsProcessing(true);
     const toastId = toast.loading(language === 'KR' ? "링크를 분석하여 클립을 생성중입니다" : "Analyzing link and creating clip...");
+
+    // Start fade-out animation after 1.5 seconds, then clear after 2 seconds
+    setTimeout(() => {
+      setIsFading(true);
+    }, 1500);
+
+    setTimeout(() => {
+      setInputValue("");
+      setIsProcessing(false);
+      setIsFading(false);
+    }, 2000);
 
     try {
       // Get Firebase auth token
       const token = await user.getIdToken();
 
-      // Call Analysis API with authentication
+      // Call Analysis API in background (doesn't block input reset)
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ url: inputValue, language, userId: user.uid })
+        body: JSON.stringify({ url: urlToAnalyze, language, userId: user.uid })
       });
 
       if (!response.ok) {
@@ -49,26 +61,17 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
         throw new Error(errorData.error || `API returned ${response.status}`);
       }
 
-      const data = await response.json();
+      await response.json();
 
-      // Clip is already created by API, no need to save again
-      // The API returns the created clip with id
-
-      setInputValue("");
       toast.success(language === 'KR' ? "클립이 생성되었습니다" : "Clip created successfully", {
         id: toastId,
       });
-
-      // Note: No need to reload - Firestore real-time listener will auto-update UI
-
 
     } catch (error) {
       console.error("Error saving clip:", error);
       toast.error(language === 'KR' ? "오류가 발생했습니다." : "An error occurred.", {
         id: toastId,
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -124,7 +127,8 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={language === 'KR' ? "URL을 여기에 붙여넣으세요..." : "Paste any URL here..."}
-            className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5]"
+            className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] transition-opacity duration-500"
+            style={{ opacity: isFading ? 0 : 1 }}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             disabled={isProcessing}
           />
@@ -135,11 +139,11 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
             className="absolute right-3 top-1/2 -translate-y-1/2 w-[42px] h-[42px] md:w-[54px] md:h-[54px] flex items-center justify-center"
             disabled={isProcessing}
           >
-            <div className="relative w-full h-full group cursor-pointer">
+            <div className="relative w-full h-full group cursor-pointer flex items-center justify-center">
               <motion.div
                 className="absolute inset-[-15%] flex items-center justify-center"
-                animate={isProcessing ? { rotate: 360 } : { rotate: 0 }}
-                transition={isProcessing ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
+                animate={isProcessing ? { rotate: 720 } : { rotate: 0 }}
+                transition={isProcessing ? { duration: 2, ease: "linear" } : { duration: 0 }}
               >
                 <svg className="w-full h-full text-[#21DBA4] group-hover:text-[#1ec795] transition-colors" viewBox="0 0 80 80" fill="none">
                   <g filter="url(#filter0_d_button)">

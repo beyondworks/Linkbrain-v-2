@@ -16,6 +16,7 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
   const [isVisible, setIsVisible] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFading, setIsFading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
 
@@ -72,21 +73,33 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
       return;
     }
 
+    const urlToAnalyze = searchQuery;
     setIsProcessing(true);
     const toastId = toast.loading(language === 'KR' ? "링크를 분석하여 클립을 생성중입니다" : "Analyzing link and creating clip...");
+
+    // Start fade-out animation after 1.5 seconds, then clear after 2 seconds
+    setTimeout(() => {
+      setIsFading(true);
+    }, 1500);
+
+    setTimeout(() => {
+      setSearchQuery("");
+      setIsProcessing(false);
+      setIsFading(false);
+    }, 2000);
 
     try {
       // Get Firebase auth token
       const token = await user.getIdToken();
 
-      // Call Analysis API with authentication
+      // Call Analysis API in background (doesn't block input reset)
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ url: searchQuery, language, userId: user.uid })
+        body: JSON.stringify({ url: urlToAnalyze, language, userId: user.uid })
       });
 
       if (!response.ok) {
@@ -95,12 +108,6 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
       }
 
       const data = await response.json();
-
-      // Clip is already created by API, no need to save again
-      // The API returns the created clip with id
-
-      setSearchQuery("");
-      setIsSearchOpen(false);
 
       // Success feedback with title
       const successMessage = language === 'KR'
@@ -115,9 +122,6 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
         duration: 3000,
       });
 
-      // Note: No need to reload - Firestore real-time listener will auto-update UI
-
-
     } catch (error) {
       console.error("Error saving clip:", error);
       toast.error(language === 'KR' ? "오류가 발생했습니다" : "An error occurred", {
@@ -126,8 +130,6 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
           ? "클립 저장에 실패했습니다. 다시 시도해주세요."
           : "Failed to save clip. Please try again.",
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -221,7 +223,8 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
                     placeholder={language === 'KR' ? "URL을 입력하세요..." : "Paste any URL here..."}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] placeholder-[#c5c5c5]"
+                    className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] placeholder-[#c5c5c5] transition-opacity duration-500"
+                    style={{ opacity: isFading ? 0 : 1 }}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     disabled={isProcessing}
                   />
@@ -235,8 +238,8 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
                     <div className="relative w-full h-full group cursor-pointer">
                       <motion.div
                         className="absolute inset-[-15%] flex items-center justify-center"
-                        animate={isProcessing ? { rotate: 360 } : { rotate: 0 }}
-                        transition={isProcessing ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
+                        animate={isProcessing ? { rotate: 720 } : { rotate: 0 }}
+                        transition={isProcessing ? { duration: 2, ease: "linear" } : { duration: 0 }}
                       >
                         <svg className="w-full h-full text-[#21DBA4] group-hover:text-[#1ec795] transition-colors" viewBox="0 0 80 80" fill="none">
                           <g filter="url(#filter0_d_button_floating)">
