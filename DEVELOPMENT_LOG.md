@@ -1,5 +1,43 @@
 # Linkbrain v-2 개발 로그
 
+## 2025-12-05 세션: 이미지 추출 고도화 및 UI 개선
+
+### 목표
+1. **이미지 추출 정확도 향상**: Threads/Instagram에서 불필요한 이미지(프로필, 아이콘, 추천 게시물) 제거 및 고화질 이미지 추출
+2. **UI/UX 개선**: 썸네일 비율 통일(16:9), 리스트 보기 레이아웃 수정, 컬렉션 기능 일관성 확보
+3. **이미지 캐싱**: 외부 이미지 링크 만료 방지를 위한 Firebase Storage 캐싱 구현
+
+### 주요 변경 사항
+
+#### 1. 이미지 추출 로직 전면 개편
+**파일:** `api/lib/puppeteer-extractor.ts`, `api/lib/image-filter.ts`
+- **`srcset` 우선순위**: 고해상도 이미지(1080w 등) 우선 추출
+- **엄격한 필터링**:
+  - `getBoundingClientRect`로 뷰포트 하단(추천 게시물 등) 이미지 제외
+  - 최소 크기(200x200px) 제한으로 아이콘/프로필 사진 제외
+  - 파일명/클래스명 기반 필터링 (`avatar`, `icon`, `s150x150` 등 제외)
+- **DOM 스코핑**: 첫 번째 `<article>` 내부로 탐색 범위 제한
+
+#### 2. UI 레이아웃 및 디자인 수정
+**파일:** `src/components/ClipCard.tsx`
+- **썸네일 비율**: 그리드/리스트 뷰 모두 **16:9 (4:2.25)** 비율로 통일 (`aspect-[16/9]`)
+- **리스트 뷰 레이아웃**:
+  - 썸네일 너비 고정(`md:flex-[0_0_240px]`)으로 레이아웃 깨짐 방지
+  - 인라인 스타일(`style={{ aspectRatio: '16/9' }}`) 적용으로 렌더링 안정성 확보
+- **기능 추가**: 리스트 보기에도 '컬렉션에 추가' 버튼 도입 (그리드 뷰와 동일)
+
+#### 3. 이미지 캐싱 시스템
+**파일:** `api/lib/image-storage.ts`, `api/lib/clip-service.ts`
+- **Firebase Storage 연동**: 추출된 이미지를 자동으로 Firebase Storage에 업로드
+- **캐싱 전략**: 원본 URL 실패 시 캐시된 이미지 사용 (영구 보존)
+
+### 커밋 히스토리
+- `df2f41e` - feat: add collection button to list view
+- `eabaa08` - fix: adjust thumbnail aspect ratio to 16:9 and fix grid view visibility
+- `e456821` - feat: overhaul image extraction logic and update UI to square aspect ratio
+
+---
+
 ## 2025-12-05 세션: Threads 콘텐츠 추출 대폭 개선
 
 ### 목표
