@@ -1,76 +1,46 @@
-// Instagram Layout Component - Perfect 1:1 display with video exclusion
+// Instagram Layout Component - Caption and images clearly separated
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from "motion/react";
 import { Heart, MoreHorizontal, User, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => {
    // Get author information
-   const authorHandle = clip.authorHandle || 'Instagram User';
-   const authorName = clip.author || `@${authorHandle}`;
+   const authorHandle = clip.authorHandle || clip.author || 'Instagram User';
    const authorAvatar = clip.authorAvatar || null;
-   const actualCaption = clip.contentMarkdown || clip.summary || '';
 
-   // Get all images - filter OUT videos and UI elements
-   const allImages = useMemo(() => {
-      const images = [];
-      if (clip.image) images.push(clip.image);
-      if (clip.images && Array.isArray(clip.images)) {
-         images.push(...clip.images);
-      }
-      return images;
-   }, [clip.image, clip.images]);
+   // Get caption/text content
+   const caption = clip.contentMarkdown || clip.summary || '';
 
-   // Aggressively filter: ONLY static photos, NO videos
-   const photoOnlyImages = useMemo(() => {
-      return allImages.filter((img: string) => {
-         if (!img || typeof img !== 'string' || img.length < 20) return false;
-         
-         const lower = img.toLowerCase();
-         
-         // EXCLUDE: Video-related patterns
-         if (lower.includes('/video')) return false;
-         if (lower.includes('/reel')) return false;
-         if (lower.includes('_v/') || lower.includes('_video_')) return false;
-         if (lower.includes('video_id')) return false;
-         if (lower.includes('mp4') || lower.includes('webm') || lower.includes('mov')) return false;
-         if (lower.includes('vp9') || lower.includes('av1') || lower.includes('h264') || lower.includes('hevc')) return false;
-         if (lower.includes('video_thumbnail')) return false;
-         
-         // EXCLUDE: Small UI elements
-         if (lower.includes('16x16') || lower.includes('32x32') || lower.includes('64x64')) return false;
-         if (lower.includes('icon') || lower.includes('emoji') || lower.includes('placeholder')) return false;
-         if (lower.match(/[/_](\d{1,3})x(\d{1,3})[/_]/) && img.length < 100) return false; // Tiny images
-         
-         // ONLY accept Instagram/Facebook CDN photos
-         if (!lower.includes('instagram') && !lower.includes('fbcdn')) return false;
-         
-         // Sanity check: image file must be reasonably sized in URL
-         if (img.length < 50) return false;
-         
-         return true;
+   // Get valid images (exclude videos)
+   const allImages = clip.images && clip.images.length > 0
+      ? clip.images
+      : (clip.image ? [clip.image] : []);
+
+   // Filter out video URLs
+   const imageUrls = useMemo(() => {
+      return allImages.filter((url: string) => {
+         const lower = url.toLowerCase();
+         return !lower.includes('/v/') &&
+            !lower.includes('video') &&
+            !lower.match(/\\.(mp4|mov|avi|webm)$/);
       });
    }, [allImages]);
 
    // Carousel state
    const [currentIndex, setCurrentIndex] = useState(0);
 
-   // Get safe current index
-   const safeIndex = useMemo(() => {
-      if (photoOnlyImages.length === 0) return -1;
-      return Math.min(currentIndex, photoOnlyImages.length - 1);
-   }, [currentIndex, photoOnlyImages.length]);
-
-   const currentImage = safeIndex >= 0 ? photoOnlyImages[safeIndex] : null;
+   // Reset index if images change
+   useEffect(() => {
+      setCurrentIndex(0);
+   }, [imageUrls]);
 
    // Navigation
    const goToPrev = () => {
-      if (photoOnlyImages.length <= 1) return;
-      setCurrentIndex(prev => prev === 0 ? photoOnlyImages.length - 1 : prev - 1);
+      setCurrentIndex((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
    };
 
    const goToNext = () => {
-      if (photoOnlyImages.length <= 1) return;
-      setCurrentIndex(prev => prev === photoOnlyImages.length - 1 ? 0 : prev + 1);
+      setCurrentIndex((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
    };
 
    const goToIndex = (idx: number) => {
@@ -78,145 +48,128 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
    };
 
    return (
-      <div className="w-full max-w-[600px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#dbdbdb] dark:border-gray-800 shadow-sm overflow-hidden">
-         {/* Header */}
-         <div className="p-4 flex items-center justify-between border-b border-[#efefef] dark:border-gray-800">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-fuchsia-600 p-[2px] flex-shrink-0 overflow-hidden">
+      <div className="space-y-6">
+         {/* CAPTION SECTION */}
+         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm">
+            <div className="flex items-start gap-4 mb-4">
+               {/* Author Avatar */}
+               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {authorAvatar ? (
-                     <img 
-                        src={authorAvatar} 
-                        alt={authorName}
-                        className="w-full h-full rounded-full object-cover"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                     <img
+                        src={authorAvatar}
+                        alt={authorHandle}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                           e.currentTarget.style.display = 'none';
+                        }}
                      />
                   ) : (
-                     <div className="w-full h-full rounded-full bg-white dark:bg-[#1e1e1e] flex items-center justify-center">
-                        <User className="w-4 h-4 text-gray-400" />
+                     <User className="w-5 h-5 text-white" />
+                  )}
+               </div>
+
+               {/* Author Info */}
+               <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                     <div>
+                        <span className="text-[15px] font-semibold text-[#000000] dark:text-white block">
+                           {authorHandle}
+                        </span>
+                        <span className="text-[#999999] text-sm">{clip.date}</span>
+                     </div>
+                     <MoreHorizontal className="w-5 h-5 text-[#000000] dark:text-white" />
+                  </div>
+               </div>
+            </div>
+
+            {/* Caption Text */}
+            <div className="pl-14">
+               <p className="text-[15px] text-[#000000] dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {caption}
+               </p>
+            </div>
+         </div>
+
+         {/* IMAGE CAROUSEL SECTION */}
+         {imageUrls.length > 0 && (
+            <motion.div
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.1 }}
+               className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm"
+            >
+               {/* Gallery Header */}
+               <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                     <svg className="w-4 h-4 text-[#959595]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                     </svg>
+                     <h3 className="text-sm font-semibold text-[#959595] uppercase tracking-wider">
+                        이미지 ({imageUrls.length})
+                     </h3>
+                  </div>
+                  {imageUrls.length > 1 && (
+                     <span className="text-xs text-[#959595]">
+                        {currentIndex + 1} / {imageUrls.length}
+                     </span>
+                  )}
+               </div>
+
+               {/* Carousel Container */}
+               <div className="relative">
+                  {/* Main Image Display - 1:1 Aspect Ratio */}
+                  <div className="relative w-full aspect-square bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden">
+                     <img
+                        src={imageUrls[currentIndex]}
+                        alt={`Instagram image ${currentIndex + 1}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                           console.error('Image load error:', imageUrls[currentIndex]);
+                           e.currentTarget.style.display = 'none';
+                        }}
+                     />
+
+                     {/* Navigation Arrows (only if multiple images) */}
+                     {imageUrls.length > 1 && (
+                        <>
+                           <button
+                              onClick={goToPrev}
+                              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black transition-all"
+                              aria-label="Previous image"
+                           >
+                              <ChevronLeft className="w-5 h-5 text-[#000000] dark:text-white" />
+                           </button>
+                           <button
+                              onClick={goToNext}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black transition-all"
+                              aria-label="Next image"
+                           >
+                              <ChevronRight className="w-5 h-5 text-[#000000] dark:text-white" />
+                           </button>
+                        </>
+                     )}
+                  </div>
+
+                  {/* Thumbnail Dots/Indicators (if multiple images) */}
+                  {imageUrls.length > 1 && (
+                     <div className="flex items-center justify-center gap-2 mt-4">
+                        {imageUrls.map((_: any, idx: number) => (
+                           <button
+                              key={idx}
+                              onClick={() => goToIndex(idx)}
+                              className={`h-1.5 rounded-full transition-all ${idx === currentIndex
+                                    ? 'w-6 bg-[#21dba4]'
+                                    : 'w-1.5 bg-[#d0d0d0] dark:bg-[#404040] hover:bg-[#959595]'
+                                 }`}
+                              aria-label={`Go to image ${idx + 1}`}
+                           />
+                        ))}
                      </div>
                   )}
                </div>
-               <div className="flex flex-col min-w-0 flex-1">
-                  <span className="text-sm font-semibold text-[#262626] dark:text-white truncate">
-                     {authorHandle}
-                  </span>
-                  {authorHandle !== 'Instagram User' && (
-                     <span className="text-xs text-[#5a5a5a] dark:text-gray-400">Instagram</span>
-                  )}
-               </div>
-            </div>
-            <MoreHorizontal className="w-5 h-5 text-[#262626] dark:text-white flex-shrink-0" />
-         </div>
-
-         {/* Image Container - Perfect 1:1 aspect ratio */}
-         {photoOnlyImages.length > 0 && currentImage ? (
-            <div className="w-full relative group overflow-hidden" style={{ aspectRatio: '1 / 1', backgroundColor: '#000000' }}>
-               {/* Image with perfect crop - NO distortion */}
-               <img
-                  src={currentImage}
-                  alt={`Image ${safeIndex + 1}`}
-                  className="w-full h-full object-cover"
-                  style={{
-                     display: 'block',
-                     width: '100%',
-                     height: '100%'
-                  }}
-               />
-
-               {/* Left arrow */}
-               {photoOnlyImages.length > 1 && (
-                  <button
-                     onClick={goToPrev}
-                     className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                  >
-                     <ChevronLeft className="w-6 h-6" />
-                  </button>
-               )}
-
-               {/* Right arrow */}
-               {photoOnlyImages.length > 1 && (
-                  <button
-                     onClick={goToNext}
-                     className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                  >
-                     <ChevronRight className="w-6 h-6" />
-                  </button>
-               )}
-
-               {/* Counter badge */}
-               {photoOnlyImages.length > 1 && (
-                  <div className="absolute bottom-4 right-4 bg-black/70 px-3 py-1 rounded-full z-20">
-                     <span className="text-white text-xs font-semibold">
-                        {safeIndex + 1}/{photoOnlyImages.length}
-                     </span>
-                  </div>
-               )}
-
-               {/* Dot indicators */}
-               {photoOnlyImages.length > 1 && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-                     {photoOnlyImages.map((_, idx) => (
-                        <button
-                           key={idx}
-                           onClick={() => goToIndex(idx)}
-                           className={`rounded-full transition-all ${
-                              idx === safeIndex
-                                 ? 'bg-white w-6 h-1.5'
-                                 : 'bg-white/50 hover:bg-white/75 w-1.5 h-1.5'
-                           }`}
-                        />
-                     ))}
-                  </div>
-               )}
-
-               {/* Like animation */}
-               {isLiked && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                     <motion.div 
-                        initial={{ scale: 0 }} 
-                        animate={{ scale: 1.2, opacity: 0 }} 
-                        transition={{ duration: 0.8 }}
-                     >
-                        <Heart className="w-24 h-24 text-white fill-white drop-shadow-lg" />
-                     </motion.div>
-                  </div>
-               )}
-            </div>
-         ) : (
-            <div className="w-full bg-[#f0f0f0] dark:bg-[#252525] flex items-center justify-center" style={{ aspectRatio: '1 / 1' }}>
-               <div className="text-[#959595] font-medium text-lg">NO PHOTOS</div>
-            </div>
+            </motion.div>
          )}
-
-         {/* Caption */}
-         <div className="p-4">
-            <div className="text-sm font-semibold text-[#262626] dark:text-white mb-3">
-               {photoOnlyImages.length > 1 ? `${photoOnlyImages.length} photos` : 'Liked by others'}
-            </div>
-
-            {actualCaption ? (
-               <div className="space-y-2">
-                  <div className="text-sm text-[#262626] dark:text-white leading-relaxed">
-                     <span className="font-semibold">{authorHandle}</span>
-                     {' '}
-                     <span className="text-[#262626] dark:text-gray-300 whitespace-pre-wrap">
-                        {actualCaption}
-                     </span>
-                  </div>
-                  <div className="text-[#959595] text-xs uppercase tracking-wide pt-2">
-                     {clip.date}
-                  </div>
-               </div>
-            ) : (
-               <div className="text-sm text-[#959595]">{clip.title}</div>
-            )}
-
-            {photoOnlyImages.length > 1 && (
-               <div className="mt-3 pt-3 border-t border-[#efefef] dark:border-gray-800 text-xs text-[#959595]">
-                  {photoOnlyImages.length} photos in carousel
-               </div>
-            )}
-         </div>
       </div>
    );
 };

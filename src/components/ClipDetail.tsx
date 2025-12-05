@@ -348,76 +348,120 @@ const YoutubeLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) 
 
 
 
-const WebLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => (
-   <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#f0f0f0] dark:border-gray-800 shadow-sm">
-      {/* Browser Header */}
-      <div className="bg-[#f8f8f8] dark:bg-[#252525] px-4 py-3 border-b border-[#f0f0f0] dark:border-gray-800 flex items-center gap-4">
-         <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
-         </div>
-         <div className="flex-1 flex items-center justify-center">
-            <div className="bg-white dark:bg-[#1e1e1e] px-4 py-1.5 rounded-md flex items-center gap-2 w-full max-w-[400px] text-xs text-[#5a5a5a] dark:text-gray-400 shadow-sm border border-[#e0e0e0] dark:border-gray-700">
-               <Globe className="w-3 h-3" />
-               <span className="truncate">{clip.url}</span>
-            </div>
-         </div>
-         <div className="w-[60px]"></div>
-      </div>
+const WebLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => {
+   // Get images excluding hero image
+   const heroImage = clip.image || clip.images?.[0] || '/fallback-thumbnails/fallback-1.png';
+   const additionalImages = clip.images && clip.images.length > 1
+      ? clip.images.slice(1)
+      : [];
 
-      {/* Content */}
-      <div className="p-8 md:p-10">
-         {/* Article Header */}
-         <div className="mb-8">
-            <div className="flex flex-wrap gap-2 mb-4">
-               <span className={`px-2 py-1 rounded-md ${clip.categoryColor.bg} ${clip.categoryColor.text} text-xs font-medium`}>{clip.category}</span>
-               <span className="px-2 py-1 rounded-md bg-gray-100 dark:bg-[#252525] text-xs font-medium text-[#5a5a5a] dark:text-gray-400">{clip.date}</span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#3d3d3d] dark:text-white mb-6 leading-tight max-h-[5rem] overflow-hidden break-words">{clip.title}</h1>
-
-            {/* Hero Image with fallback */}
-            {(() => {
-               const imageUrl = clip.image || clip.images?.[0] || '/fallback-thumbnails/fallback-1.png';
-               return (
-                  <div className="w-full aspect-[21/9] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl mb-8 flex items-center justify-center overflow-hidden">
-                     <img src={imageUrl} alt={clip.title} className="w-full h-full object-cover" />
+   return (
+      <div className="space-y-6">
+         {/* Main Article Card */}
+         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#f0f0f0] dark:border-gray-800 shadow-sm">
+            {/* Browser Header */}
+            <div className="bg-[#f8f8f8] dark:bg-[#252525] px-4 py-3 border-b border-[#f0f0f0] dark:border-gray-800 flex items-center gap-4">
+               <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
+               </div>
+               <div className="flex-1 flex items-center justify-center">
+                  <div className="bg-white dark:bg-[#1e1e1e] px-4 py-1.5 rounded-md flex items-center gap-2 w-full max-w-[400px] text-xs text-[#5a5a5a] dark:text-gray-400 shadow-sm border border-[#e0e0e0] dark:border-gray-700">
+                     <Globe className="w-3 h-3" />
+                     <span className="truncate">{clip.url}</span>
                   </div>
-               );
-            })()}
+               </div>
+               <div className="w-[60px]"></div>
+            </div>
+
+            {/* Content */}
+            <div className="p-8 md:p-10">
+               {/* Article Header */}
+               <div className="mb-8">
+                  <div className="flex flex-wrap gap-2 mb-4">
+                     <span className={`px-2 py-1 rounded-md ${clip.categoryColor.bg} ${clip.categoryColor.text} text-xs font-medium`}>{clip.category}</span>
+                     <span className="px-2 py-1 rounded-md bg-gray-100 dark:bg-[#252525] text-xs font-medium text-[#5a5a5a] dark:text-gray-400">{clip.date}</span>
+                  </div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#3d3d3d] dark:text-white mb-6 leading-tight max-h-[5rem] overflow-hidden break-words">{clip.title}</h1>
+
+                  {/* Hero Image */}
+                  <div className="w-full aspect-[21/9] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl mb-8 flex items-center justify-center overflow-hidden">
+                     <img src={heroImage} alt={clip.title} className="w-full h-full object-cover" />
+                  </div>
+               </div>
+
+               {/* TEXT CONTENT SECTION */}
+               {clip.htmlContent ? (
+                  <div className="w-full h-[600px] border border-gray-200 rounded-lg overflow-hidden mb-8">
+                     <iframe
+                        srcDoc={clip.htmlContent}
+                        title="Archived Content"
+                        className="w-full h-full"
+                        sandbox="allow-scripts allow-same-origin"
+                     />
+                  </div>
+               ) : clip.contentMarkdown ? (
+                  <div className="prose prose-slate dark:prose-invert max-w-none mb-8">
+                     <div
+                        className="text-lg text-[#3d3d3d] dark:text-gray-200 leading-relaxed whitespace-pre-wrap"
+                        style={{ wordBreak: 'break-word' }}
+                     >
+                        {clip.contentMarkdown}
+                     </div>
+                  </div>
+               ) : (
+                  <div className="prose prose-slate dark:prose-invert max-w-none mb-8">
+                     <p className="text-lg text-[#5a5a5a] dark:text-gray-300 leading-relaxed mb-6 font-medium">
+                        {clip.summary}
+                     </p>
+                  </div>
+               )}
+            </div>
          </div>
 
-         {/* Archived Content - Priority: contentHtml > contentMarkdown > summary */}
-         {clip.htmlContent ? (
-            <div className="w-full h-[600px] border border-gray-200 rounded-lg overflow-hidden">
-               <iframe
-                  srcDoc={clip.htmlContent}
-                  title="Archived Content"
-                  className="w-full h-full"
-                  sandbox="allow-scripts allow-same-origin"
-               />
-            </div>
-         ) : clip.contentMarkdown ? (
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-               <div
-                  className="text-lg text-[#3d3d3d] dark:text-gray-200 leading-relaxed whitespace-pre-wrap"
-                  style={{ wordBreak: 'break-word' }}
-               >
-                  {clip.contentMarkdown}
+         {/* ADDITIONAL IMAGE GALLERY SECTION */}
+         {additionalImages.length > 0 && (
+            <motion.div
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.1 }}
+               className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm"
+            >
+               <div className="flex items-center gap-2 mb-4">
+                  <svg className="w-4 h-4 text-[#959595]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <h3 className="text-sm font-semibold text-[#959595] uppercase tracking-wider">
+                     추가 이미지 ({additionalImages.length})
+                  </h3>
                </div>
-            </div>
-         ) : (
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-               <p className="text-lg text-[#5a5a5a] dark:text-gray-300 leading-relaxed mb-6 font-medium">
-                  {clip.summary}
-               </p>
-               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center text-gray-500">
-                  No archived content available.
+
+               <div className={`gap-3 ${additionalImages.length === 1 ? 'block' :
+                  additionalImages.length === 2 ? 'grid grid-cols-2' :
+                     'grid grid-cols-2 md:grid-cols-3'
+                  }`}>
+                  {additionalImages.map((imgUrl: string, idx: number) => (
+                     <div
+                        key={idx}
+                        className="rounded-xl overflow-hidden bg-[#f0f0f0] dark:bg-[#252525]"
+                     >
+                        <img
+                           src={imgUrl}
+                           alt={`Additional image ${idx + 1}`}
+                           className="w-full h-auto object-cover"
+                           loading="lazy"
+                           onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                           }}
+                        />
+                     </div>
+                  ))}
                </div>
-            </div>
+            </motion.div>
          )}
       </div>
-   </div>
-);
+   );
+};
 
 export default ClipDetail;

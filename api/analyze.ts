@@ -12,6 +12,7 @@
 
 import { createClipFromContent, detectPlatform } from './lib/clip-service';
 import { fetchUrlContent } from './lib/url-content-fetcher';
+import { extractImages } from './lib/image-extractor';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
@@ -111,7 +112,15 @@ export default async function handler(req: any, res: any) {
 
         // 2. Fetch content from URL (server-side with Jina Reader or Puppeteer)
         const content = await fetchUrlContent(url);
-        console.log(`[URL Import] Fetched content: ${content.rawText.length} chars, ${content.images.length} images`);
+        console.log(`[URL Import] Fetched content: ${content.rawText.length} chars`);
+
+        // 2.5. Extract images separately using image-extractor
+        const extractedImages = await extractImages(url);
+        const imageUrls = extractedImages.map(img => img.url);
+        console.log(`[URL Import] Extracted images: ${imageUrls.length} images`);
+
+        // Merge images from both sources (deduplicate)
+        const allImages = [...new Set([...imageUrls])];
 
         // 3. Re-detect platform from final URL if available (handles redirects)
         if (content.finalUrl && content.finalUrl !== url) {
@@ -129,7 +138,7 @@ export default async function handler(req: any, res: any) {
             sourceType: sourceType as any,
             rawText: content.rawText,
             htmlContent: content.htmlContent,
-            images: content.images,
+            images: allImages,  // Use merged images from both extractors
             userId,
             author: content.author,
             authorAvatar: content.authorAvatar,
