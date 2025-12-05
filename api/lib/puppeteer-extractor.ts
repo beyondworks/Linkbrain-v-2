@@ -71,7 +71,7 @@ export const extractWithPuppeteer = async (url: string): Promise<{
                 // ===== Extract author handle and name =====
                 let authorHandle = '';
                 let authorName = '';
-                
+
                 // Try 1: Extract from og:title pattern "username (@handle) on Threads: ..."
                 if (ogTitle) {
                     // Pattern: "username (@handle) on Threads:"
@@ -115,9 +115,9 @@ export const extractWithPuppeteer = async (url: string): Promise<{
 
                 // ===== Extract main post content (author's own post only) =====
                 // Find the main article/post section
-                const mainArticle = document.querySelector('[role="main"] article') || 
-                                   document.querySelector('article[data-testid]') ||
-                                   document.querySelector('article');
+                const mainArticle = document.querySelector('[role="main"] article') ||
+                    document.querySelector('article[data-testid]') ||
+                    document.querySelector('article');
 
                 let postText = '';
                 if (mainArticle) {
@@ -127,7 +127,7 @@ export const extractWithPuppeteer = async (url: string): Promise<{
 
                     for (const el of textElements) {
                         const text = el.textContent?.trim() || '';
-                        
+
                         // Skip if too short or is UI element
                         if (text.length < 3) continue;
                         if (text.match(/^(like|reply|share|repost|view|follow|•|likes?|replies|reposts?|verified|ago|스레드|조회|회|댓글)$/i)) continue;
@@ -135,7 +135,7 @@ export const extractWithPuppeteer = async (url: string): Promise<{
                         if (text.match(/^(ago|week|day|month|year|hour|minute|second)s?$/i)) continue;
                         if (text.startsWith('http')) continue;
                         if (text.includes('조회') && text.includes('회') && text.length < 20) continue;
-                        
+
                         // Add substantial text
                         if (text.length > 10) {
                             contentLines.push(text);
@@ -158,13 +158,40 @@ export const extractWithPuppeteer = async (url: string): Promise<{
                     const imgs = Array.from(mainArticle.querySelectorAll('img'));
                     for (const img of imgs) {
                         const src = img.src || img.getAttribute('src');
-                        if (src && src.startsWith('http')) {
-                            const lower = src.toLowerCase();
-                            // Skip icons, emojis, SVGs
-                            if (!lower.includes('icon') && !lower.includes('emoji') && !lower.endsWith('.svg')) {
-                                imageSet.add(src);
-                            }
-                        }
+                        if (!src || !src.startsWith('http')) continue;
+
+                        const alt = (img.alt || '').toLowerCase();
+                        const className = (img.className || '').toLowerCase();
+                        const width = img.naturalWidth || img.width || 0;
+                        const height = img.naturalHeight || img.height || 0;
+                        const area = width * height;
+
+                        // Filter 1: Skip based on alt text
+                        if (alt.includes('profile picture') || alt.includes('프로필 사진')) continue;
+
+                        // Filter 2: Skip based on class name
+                        if (className.includes('avatar') || className.includes('profile') || className.includes('user')) continue;
+
+                        // Filter 3: Skip very small images (likely icons or emojis) - if dimensions are available
+                        // Increased threshold to 150x150 to avoid profile pics and small thumbnails
+                        if (area > 0 && area < 150 * 150) continue;
+
+                        // Filter 4: Skip specific URL patterns (redundant with backend filter but good for early optimization)
+                        const lower = src.toLowerCase();
+                        if (lower.includes('s150x150') || lower.includes('p50x50')) continue;
+                        if (lower.includes('emoji') || lower.endsWith('.svg')) continue;
+
+                        // Filter 5: Viewport position check (CRITICAL)
+                        // Exclude images that are too far down (likely recommended posts or comments)
+                        // Reduced to 1000px to be safer
+                        const rect = img.getBoundingClientRect();
+                        if (rect.top > 1000) continue;
+
+                        // Filter 6: Aspect ratio check (exclude extreme aspect ratios like banners)
+                        const ratio = width / height;
+                        if (ratio > 3 || ratio < 0.3) continue;
+
+                        imageSet.add(src);
                     }
                 }
 
@@ -196,7 +223,7 @@ export const extractWithPuppeteer = async (url: string): Promise<{
 
                 // ===== Extract handle more accurately from DOM and og:title =====
                 let authorHandle = '';
-                
+
                 // Try 1: Extract from DOM header (most reliable)
                 const headerLink = document.querySelector('header a[href^="/"]');
                 if (headerLink) {
@@ -247,17 +274,17 @@ export const extractWithPuppeteer = async (url: string): Promise<{
                 if (mainArticle) {
                     // Look for the actual caption text (usually in the first large text block after author)
                     const allDivs = Array.from(mainArticle.querySelectorAll('div[dir="auto"], span, p'));
-                    
+
                     for (const el of allDivs) {
                         const text = el.textContent?.trim() || '';
-                        
+
                         // Skip if too short or is UI element
                         if (text.length < 5) continue;
                         if (text.match(/^(like|comment|share|visit|view|profile|follow|message|comments?|likes?|shares?|view all|show more|hide|expand|save|send|report|copy link)$/i)) continue;
                         if (text.match(/^\d+\s*(likes?|comments?|shares?|saves?|views?)/i)) continue;
                         if (text.match(/^(ago|week|day|month|year|hour|minute|second)s?$/i)) continue;
                         if (text.includes('http')) continue;
-                        
+
                         // If we found substantial text, it's likely the caption
                         if (text.length > 20) {
                             caption = text;
@@ -282,7 +309,7 @@ export const extractWithPuppeteer = async (url: string): Promise<{
                             return text;
                         })
                         .filter(t => t.length > 0 && t.length < 500);
-                    
+
                     if (textBlocks.length > 0) {
                         caption = textBlocks.slice(0, 5).join('\n');
                     }
@@ -296,49 +323,74 @@ export const extractWithPuppeteer = async (url: string): Promise<{
                 console.log('[Instagram] Handle: ' + authorHandle + ', Caption: ' + caption.substring(0, 100));
 
                 // ===== Image extraction - ONLY MAIN POST IMAGES =====
-                // Key: Find ONLY images within the main post article, not from comments or other elements
                 const imageSet = new Set<string>();
-                
-                // CRITICAL: Only extract images from the main article/post area
+
+                // CRITICAL: Only extract images from the FIRST article (main post)
+                // This avoids capturing images from "More posts" or "Recommended" sections
+                // mainArticle is already defined above for caption extraction
+
                 if (mainArticle) {
+                    // Get all images in the main article
                     const imgs = Array.from(mainArticle.querySelectorAll('img'));
-                    
+
                     for (const img of imgs) {
-                        // Get src or srcset
-                        let imgUrl = '';
-                        
-                        // Try srcset first (high quality)
+                        // 1. Viewport Position Check (Stricter)
+                        // Main post images are always near the top.
+                        // Anything below 1200px is likely comments or recommended posts.
+                        const rect = img.getBoundingClientRect();
+                        if (rect.top > 1200) continue;
+                        if (rect.width < 200) continue; // Must be at least 200px wide (excludes profile pics)
+                        if (rect.height < 200) continue; // Must be at least 200px tall
+
+                        // 2. Srcset Check (High Resolution)
+                        // Main post images usually have srcset with high-res options
+                        let isHighRes = false;
+                        let bestUrl = '';
+
                         if (img.srcset) {
-                            const urls = img.srcset.split(',').map(s => s.trim().split(' ')[0]).filter(u => u);
-                            for (const u of urls) {
-                                if ((u.includes('instagram') || u.includes('fbcdn')) && !u.includes('icon')) {
-                                    imgUrl = u;
-                                    break;
+                            // Check if it has large variants (e.g., 640w, 1080w)
+                            if (img.srcset.includes('640w') || img.srcset.includes('720w') || img.srcset.includes('1080w')) {
+                                isHighRes = true;
+                                // Extract the largest URL from srcset
+                                const candidates = img.srcset.split(',')
+                                    .map(s => {
+                                        const parts = s.trim().split(' ');
+                                        return { url: parts[0], width: parseInt(parts[1] || '0') };
+                                    })
+                                    .sort((a, b) => b.width - a.width);
+
+                                if (candidates.length > 0) {
+                                    bestUrl = candidates[0].url;
                                 }
                             }
                         }
-                        
-                        // Fallback to src
-                        if (!imgUrl) {
-                            const src = img.src || img.getAttribute('src');
-                            if (src && (src.includes('instagram') || src.includes('fbcdn')) && !src.includes('icon')) {
-                                imgUrl = src;
-                            }
+
+                        // 3. Fallback to src if high res, or if it looks like a main image
+                        if (!bestUrl) {
+                            bestUrl = img.src || img.getAttribute('src') || '';
                         }
-                        
-                        if (imgUrl) {
-                            // Double check: exclude images with certain patterns (UI elements, buttons, icons)
-                            const lower = imgUrl.toLowerCase();
-                            if (!lower.includes('emoji') && !lower.includes('placeholder') && !lower.endsWith('.svg')) {
-                                imageSet.add(imgUrl);
-                            }
+
+                        // 4. Final Validation
+                        if (bestUrl && bestUrl.startsWith('http')) {
+                            const lower = bestUrl.toLowerCase();
+
+                            // Exclude known patterns
+                            if (lower.includes('profile') || lower.includes('avatar') || lower.includes('icon')) continue;
+                            if (lower.includes('s150x150') || lower.includes('p50x50')) continue;
+                            if (lower.endsWith('.svg') || lower.includes('emoji')) continue;
+
+                            // Exclude if alt text indicates profile
+                            const alt = (img.alt || '').toLowerCase();
+                            if (alt.includes('profile picture') || alt.includes('프로필 사진')) continue;
+
+                            imageSet.add(bestUrl);
                         }
                     }
                 }
 
-                // Only add og:image as first/primary image
+                // Only add og:image as first/primary image if no images found
                 let images = Array.from(imageSet);
-                if (ogImage && images.length === 0) {
+                if (images.length === 0 && ogImage) {
                     images = [ogImage];
                 }
 

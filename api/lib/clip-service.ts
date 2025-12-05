@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { cacheImagesWithFallback } from './image-storage';
+import { filterClipImages } from './image-filter';
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -313,12 +314,17 @@ export const createClipFromContent = async (
     const contentMarkdown = rawText || '';
     const contentHtml = htmlContent || '';
 
+    // Filter images to remove profile pics, icons, and UI elements
+    const rawImages = images || [];
+    const filteredImages = filterClipImages(rawImages);
+    console.log(`[Clip Service] Filtered images: ${rawImages.length} -> ${filteredImages.length}`);
+
     // Cache images to Firebase Storage for permanent access
     // This prevents image loss from expired CDN URLs (especially Instagram/Threads)
-    let clipImages: string[] = images || [];
-    if (images && images.length > 0) {
-        console.log(`[Clip Service] Caching ${images.length} images to Firebase Storage...`);
-        clipImages = await cacheImagesWithFallback(images, userId);
+    let clipImages: string[] = filteredImages;
+    if (filteredImages.length > 0) {
+        console.log(`[Clip Service] Caching ${filteredImages.length} images to Firebase Storage...`);
+        clipImages = await cacheImagesWithFallback(filteredImages, userId);
         console.log(`[Clip Service] - Cached images: ${clipImages.length}`);
     }
 
@@ -363,9 +369,9 @@ export const createClipFromContent = async (
         sentiment,
         type,
         image: thumbnailImage,
-        author: author || authorHandle || '',
+        author: author || '',
+        authorAvatar: authorAvatar || undefined, // Fix: Ensure undefined instead of null
         authorHandle: authorHandle || '',
-        authorAvatar: authorAvatar || null,
         authorProfile: authorAvatar ? {
             avatar: authorAvatar,
             handle: authorHandle || author || ''

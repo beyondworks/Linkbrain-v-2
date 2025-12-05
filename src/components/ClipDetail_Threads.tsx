@@ -278,18 +278,19 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
                <div className="relative">
                   {/* Main Image Display - click to navigate */}
                   <div
-                     className="relative w-full aspect-[4/3] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
+                     className="relative w-full aspect-square bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
                      onClick={() => displayImages.length > 1 && goToNext()}
                   >
                      <img
                         src={displayImages[currentIndex]}
                         alt={`Thread image ${currentIndex + 1}`}
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{ objectFit: 'cover' }}
                         loading="lazy"
                         onError={(e) => {
                            console.error(`[ThreadsImages] Failed to load:`, displayImages[currentIndex]?.substring(0, 80));
                            e.currentTarget.src = '/assets/platforms/threads.png';
-                           e.currentTarget.className = 'w-full h-full object-contain p-16';
+                           e.currentTarget.className = 'absolute inset-0 w-full h-full object-contain p-16';
                         }}
                      />
                   </div>
