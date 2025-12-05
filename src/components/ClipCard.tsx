@@ -136,7 +136,7 @@ const ClipCard = ({
                className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row group relative cursor-pointer"
             >
                {/* Thumbnail Section - Fixed height */}
-               <div className="relative w-full md:w-[320px] h-[180px] bg-[#d9d9d9] dark:bg-[#252525] flex-shrink-0 overflow-hidden">
+               <div className="relative w-full md:w-[320px] bg-[#d9d9d9] dark:bg-[#252525] flex-shrink-0 overflow-hidden" style={{ aspectRatio: '16/9' }}>
                   <div className="absolute top-4 left-4 flex gap-2 z-10">
                      <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
                         <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
@@ -223,7 +223,7 @@ const ClipCard = ({
             className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] overflow-hidden border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col group relative cursor-pointer"
          >
             {/* Thumbnail Section - Fixed height */}
-            <div className="relative w-full h-[180px] bg-[#d9d9d9] dark:bg-[#252525] overflow-hidden">
+            <div className="relative w-full bg-[#d9d9d9] dark:bg-[#252525] overflow-hidden" style={{ aspectRatio: '16/9' }}>
                <div className="absolute top-4 left-4 flex gap-2 z-10">
                   <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
                      <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
