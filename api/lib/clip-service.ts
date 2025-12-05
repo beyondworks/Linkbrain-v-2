@@ -3,6 +3,7 @@ import { OpenAI } from 'openai';
 import * as cheerio from 'cheerio';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { cacheImagesWithFallback } from './image-storage';
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -311,7 +312,15 @@ export const createClipFromContent = async (
     // INVARIANT: Store raw content exactly as provided
     const contentMarkdown = rawText || '';
     const contentHtml = htmlContent || '';
-    const clipImages = images || [];
+
+    // Cache images to Firebase Storage for permanent access
+    // This prevents image loss from expired CDN URLs (especially Instagram/Threads)
+    let clipImages: string[] = images || [];
+    if (images && images.length > 0) {
+        console.log(`[Clip Service] Caching ${images.length} images to Firebase Storage...`);
+        clipImages = await cacheImagesWithFallback(images, userId);
+        console.log(`[Clip Service] - Cached images: ${clipImages.length}`);
+    }
 
     // Try to generate AI metadata (only if rawText exists)
     let metadata: ClipMetadata | null = null;

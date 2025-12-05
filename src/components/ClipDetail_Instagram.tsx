@@ -16,13 +16,13 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
       ? clip.images
       : (clip.image ? [clip.image] : []);
 
-   // Filter out video URLs
+   // Filter out obvious video URLs (be less strict)
    const imageUrls = useMemo(() => {
       return allImages.filter((url: string) => {
+         if (!url) return false;
          const lower = url.toLowerCase();
-         return !lower.includes('/v/') &&
-            !lower.includes('video') &&
-            !lower.match(/\\.(mp4|mov|avi|webm)$/);
+         // Only filter out definite video file extensions
+         return !lower.match(/\.(mp4|mov|avi|webm|m3u8)$/i);
       });
    }, [allImages]);
 
@@ -117,8 +117,11 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
 
                {/* Carousel Container */}
                <div className="relative">
-                  {/* Main Image Display - 1:1 Aspect Ratio */}
-                  <div className="relative w-full aspect-square bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden">
+                  {/* Main Image Display - click to navigate */}
+                  <div
+                     className="relative w-full aspect-[4/3] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
+                     onClick={() => imageUrls.length > 1 && goToNext()}
+                  >
                      <img
                         src={imageUrls[currentIndex]}
                         alt={`Instagram image ${currentIndex + 1}`}
@@ -126,45 +129,59 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
                         loading="lazy"
                         onError={(e) => {
                            console.error('Image load error:', imageUrls[currentIndex]);
-                           e.currentTarget.style.display = 'none';
+                           e.currentTarget.src = '/assets/platforms/instagram.png';
+                           e.currentTarget.className = 'w-full h-full object-contain p-16';
                         }}
                      />
-
-                     {/* Navigation Arrows (only if multiple images) */}
-                     {imageUrls.length > 1 && (
-                        <>
-                           <button
-                              onClick={goToPrev}
-                              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black transition-all"
-                              aria-label="Previous image"
-                           >
-                              <ChevronLeft className="w-5 h-5 text-[#000000] dark:text-white" />
-                           </button>
-                           <button
-                              onClick={goToNext}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black transition-all"
-                              aria-label="Next image"
-                           >
-                              <ChevronRight className="w-5 h-5 text-[#000000] dark:text-white" />
-                           </button>
-                        </>
-                     )}
                   </div>
 
-                  {/* Thumbnail Dots/Indicators (if multiple images) */}
+                  {/* Progress Bar Pagination (if multiple images) */}
                   {imageUrls.length > 1 && (
-                     <div className="flex items-center justify-center gap-2 mt-4">
-                        {imageUrls.map((_: any, idx: number) => (
-                           <button
-                              key={idx}
-                              onClick={() => goToIndex(idx)}
-                              className={`h-1.5 rounded-full transition-all ${idx === currentIndex
-                                    ? 'w-6 bg-[#21dba4]'
-                                    : 'w-1.5 bg-[#d0d0d0] dark:bg-[#404040] hover:bg-[#959595]'
-                                 }`}
-                              aria-label={`Go to image ${idx + 1}`}
+                     <div className="mt-3">
+                        {/* Progress bar background */}
+                        <div className="w-full h-1 bg-[#e0e0e0] dark:bg-[#333333] rounded-full overflow-hidden">
+                           {/* Progress bar fill */}
+                           <div
+                              className="h-full bg-[#21dba4] rounded-full transition-all duration-300"
+                              style={{ width: `${((currentIndex + 1) / imageUrls.length) * 100}%` }}
                            />
-                        ))}
+                        </div>
+                        {/* Clickable segments for direct navigation */}
+                        <div className="flex mt-1">
+                           {imageUrls.length <= 10 ? (
+                              // Show dots for 10 or fewer images
+                              <div className="flex items-center justify-center w-full gap-1.5">
+                                 {imageUrls.map((_: any, idx: number) => (
+                                    <button
+                                       key={idx}
+                                       onClick={(e) => { e.stopPropagation(); goToIndex(idx); }}
+                                       className={`rounded-full transition-all ${idx === currentIndex
+                                          ? 'w-2 h-2 bg-[#21dba4]'
+                                          : 'w-1.5 h-1.5 bg-[#d0d0d0] dark:bg-[#404040] hover:bg-[#959595]'
+                                          }`}
+                                       aria-label={`Go to image ${idx + 1}`}
+                                    />
+                                 ))}
+                              </div>
+                           ) : (
+                              // Show prev/next text for many images
+                              <div className="flex items-center justify-between w-full text-xs text-[#959595]">
+                                 <button
+                                    onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+                                    className="hover:text-[#21dba4] transition-colors"
+                                 >
+                                    ← 이전
+                                 </button>
+                                 <span>{currentIndex + 1} / {imageUrls.length}</span>
+                                 <button
+                                    onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                                    className="hover:text-[#21dba4] transition-colors"
+                                 >
+                                    다음 →
+                                 </button>
+                              </div>
+                           )}
+                        </div>
                      </div>
                   )}
                </div>

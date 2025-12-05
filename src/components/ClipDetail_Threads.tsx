@@ -1,7 +1,7 @@
-// Threads Layout Component - Clean parsing with deduplication
-import React from 'react';
+// Threads Layout Component - Clean parsing with carousel gallery
+import React, { useState, useEffect } from 'react';
 import { motion } from "motion/react";
-import { MoreHorizontal, User } from 'lucide-react';
+import { MoreHorizontal, User, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // ============================================================================
 // Parser - marker-based splitting + smart fallback + deduplication
@@ -132,10 +132,40 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
    const authorName = clip.author || `@${authorHandle}`;
    const authorAvatar = clip.authorAvatar || null;
 
-   // Get images
-   const displayImages = clip.images && clip.images.length > 0
-      ? clip.images
-      : (clip.image ? [clip.image] : []);
+   // Get images - filter out empty/invalid URLs
+   const displayImages = React.useMemo(() => {
+      const allImages = clip.images && clip.images.length > 0
+         ? clip.images
+         : (clip.image ? [clip.image] : []);
+
+      return allImages.filter((url: string) => {
+         if (!url || typeof url !== 'string') return false;
+         // Filter out obvious non-image URLs
+         const lower = url.toLowerCase();
+         return !lower.match(/\.(mp4|mov|avi|webm|m3u8)$/i);
+      });
+   }, [clip.images, clip.image]);
+
+   // Carousel state
+   const [currentIndex, setCurrentIndex] = useState(0);
+
+   // Reset index when images change
+   useEffect(() => {
+      setCurrentIndex(0);
+   }, [displayImages]);
+
+   // Navigation
+   const goToPrev = () => {
+      setCurrentIndex((prev) => (prev === 0 ? displayImages.length - 1 : prev - 1));
+   };
+
+   const goToNext = () => {
+      setCurrentIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1));
+   };
+
+   const goToIndex = (idx: number) => {
+      setCurrentIndex(idx);
+   };
 
    // Parse content - NO normalization, just marker parsing + dedup
    const { mainText, comments } = React.useMemo(() => {
@@ -219,7 +249,7 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
             )}
          </div>
 
-         {/* IMAGE GALLERY SECTION */}
+         {/* IMAGE CAROUSEL SECTION - Slide format like Instagram */}
          {displayImages.length > 0 && (
             <motion.div
                initial={{ opacity: 0, y: 10 }}
@@ -227,36 +257,92 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
                transition={{ delay: 0.1 }}
                className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm"
             >
-               <div className="flex items-center gap-2 mb-4">
-                  <svg className="w-4 h-4 text-[#959595]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <h3 className="text-sm font-semibold text-[#959595] uppercase tracking-wider">
-                     이미지 ({displayImages.length})
-                  </h3>
+               {/* Gallery Header */}
+               <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                     <svg className="w-4 h-4 text-[#959595]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                     </svg>
+                     <h3 className="text-sm font-semibold text-[#959595] uppercase tracking-wider">
+                        이미지 ({displayImages.length})
+                     </h3>
+                  </div>
+                  {displayImages.length > 1 && (
+                     <span className="text-xs text-[#959595]">
+                        {currentIndex + 1} / {displayImages.length}
+                     </span>
+                  )}
                </div>
 
-               <div className={`gap-3 ${displayImages.length === 1 ? 'block' :
-                  displayImages.length === 2 ? 'grid grid-cols-2' :
-                     'grid grid-cols-2'
-                  }`}>
-                  {displayImages.map((imgUrl: string, idx: number) => (
-                     <div
-                        key={idx}
-                        className={`rounded-xl overflow-hidden bg-[#f0f0f0] dark:bg-[#252525] ${displayImages.length === 1 ? 'w-full' : ''
-                           }`}
-                     >
-                        <img
-                           src={imgUrl}
-                           alt={`Thread image ${idx + 1}`}
-                           className="w-full h-auto object-cover"
-                           loading="lazy"
-                           onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                           }}
-                        />
+               {/* Carousel Container */}
+               <div className="relative">
+                  {/* Main Image Display - click to navigate */}
+                  <div
+                     className="relative w-full aspect-[4/3] bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
+                     onClick={() => displayImages.length > 1 && goToNext()}
+                  >
+                     <img
+                        src={displayImages[currentIndex]}
+                        alt={`Thread image ${currentIndex + 1}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                           console.error(`[ThreadsImages] Failed to load:`, displayImages[currentIndex]?.substring(0, 80));
+                           e.currentTarget.src = '/assets/platforms/threads.png';
+                           e.currentTarget.className = 'w-full h-full object-contain p-16';
+                        }}
+                     />
+                  </div>
+
+                  {/* Progress Bar Pagination (if multiple images) */}
+                  {displayImages.length > 1 && (
+                     <div className="mt-3">
+                        {/* Progress bar background */}
+                        <div className="w-full h-1 bg-[#e0e0e0] dark:bg-[#333333] rounded-full overflow-hidden">
+                           {/* Progress bar fill */}
+                           <div
+                              className="h-full bg-[#21dba4] rounded-full transition-all duration-300"
+                              style={{ width: `${((currentIndex + 1) / displayImages.length) * 100}%` }}
+                           />
+                        </div>
+                        {/* Clickable segments for direct navigation */}
+                        <div className="flex mt-1">
+                           {displayImages.length <= 10 ? (
+                              // Show dots for 10 or fewer images
+                              <div className="flex items-center justify-center w-full gap-1.5">
+                                 {displayImages.map((_: any, idx: number) => (
+                                    <button
+                                       key={idx}
+                                       onClick={(e) => { e.stopPropagation(); goToIndex(idx); }}
+                                       className={`rounded-full transition-all ${idx === currentIndex
+                                          ? 'w-2 h-2 bg-[#21dba4]'
+                                          : 'w-1.5 h-1.5 bg-[#d0d0d0] dark:bg-[#404040] hover:bg-[#959595]'
+                                          }`}
+                                       aria-label={`Go to image ${idx + 1}`}
+                                    />
+                                 ))}
+                              </div>
+                           ) : (
+                              // Show prev/next text for many images
+                              <div className="flex items-center justify-between w-full text-xs text-[#959595]">
+                                 <button
+                                    onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+                                    className="hover:text-[#21dba4] transition-colors"
+                                 >
+                                    ← 이전
+                                 </button>
+                                 <span>{currentIndex + 1} / {displayImages.length}</span>
+                                 <button
+                                    onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                                    className="hover:text-[#21dba4] transition-colors"
+                                 >
+                                    다음 →
+                                 </button>
+                              </div>
+                           )}
+                        </div>
                      </div>
-                  ))}
+                  )}
                </div>
             </motion.div>
          )}
