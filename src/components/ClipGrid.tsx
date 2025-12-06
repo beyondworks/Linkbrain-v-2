@@ -22,11 +22,12 @@ interface ClipGridProps {
   onClipClick?: (clip: any) => void;
   language: 'KR' | 'EN';
   showThumbnails?: boolean;
+  searchQuery?: string;
 }
 
 import { getCategoryColor } from '../lib/categoryColors';
 
-const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSourceChange, onClipClick, language, showThumbnails = true }: ClipGridProps) => {
+const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSourceChange, onClipClick, language, showThumbnails = true, searchQuery = '' }: ClipGridProps) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [visibleCount, setVisibleCount] = useState(6);
@@ -121,7 +122,16 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
   const filteredClips = clips.filter(clip => {
     const categoryMatch = !selectedCategory || selectedCategory === 'All' || clip.category === selectedCategory;
     const sourceMatch = !selectedSource || selectedSource === 'All Sources' || clip.source.toLowerCase() === selectedSource.toLowerCase();
-    return categoryMatch && sourceMatch;
+
+    // Search filter - match title, summary, keywords, or URL
+    const query = searchQuery.toLowerCase().trim();
+    const searchMatch = !query ||
+      clip.title?.toLowerCase().includes(query) ||
+      clip.summary?.toLowerCase().includes(query) ||
+      clip.url?.toLowerCase().includes(query) ||
+      clip.keywords?.some((kw: string) => kw.toLowerCase().includes(query));
+
+    return categoryMatch && sourceMatch && searchMatch;
   });
 
   const sortedClips = [...filteredClips].sort((a, b) => {
@@ -323,9 +333,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           {!isSelectMode && <div className="flex items-center gap-3">
             {/* Sort Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#959595] text-[#959595] text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full border border-[#959595] text-[#959595] text-xs md:text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
                 <DropdownMenuItem
@@ -345,9 +355,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
             {/* Category Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#959595] text-[#959595] text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full border border-[#959595] text-[#959595] text-xs md:text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{selectedCategory && selectedCategory !== 'All' ? selectedCategory : (language === 'KR' ? '카테고리' : 'Category')}</span>
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
                 <DropdownMenuItem
@@ -370,9 +380,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
             {/* Source Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#959595] text-[#959595] text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full border border-[#959595] text-[#959595] text-xs md:text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{selectedSource && selectedSource !== 'All Sources' ? selectedSource : (language === 'KR' ? '출처' : 'Source')}</span>
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
                 <DropdownMenuItem

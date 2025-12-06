@@ -1,13 +1,59 @@
 # Linkbrain v-2 개발 로그
 
+## 2025-12-06 세션 3: 5대 기능 구현
+
+### 목표
+1. **사이드바 검색 기능 활성화**
+2. **사용자 정의 카테고리 편집** (추가/수정/삭제)
+3. **모바일 카테고리 필터 크기 축소**
+4. **상세페이지 모바일 레이아웃 최적화**
+5. **민감한 작업 시 비밀번호 재인증**
+
+### 주요 변경 사항
+
+#### 1. 사이드바 검색 기능 (`Sidebar.tsx`, `ClipGrid.tsx`, `App.tsx`)
+- **onSearch 콜백**: 300ms 디바운스로 실시간 검색
+- **필터링 로직**: 제목, 요약, URL, 키워드 매칭
+- **상태 관리**: App.tsx에서 searchQuery 상태 관리
+
+#### 2. 카테고리 편집 (`CategoryManagement.tsx`, `SettingsPage.tsx`)
+- **신규 컴포넌트**: CategoryManagement.tsx 생성
+- **Firestore 연동**: 'categories' 컬렉션 CRUD 작업
+- **프리셋 색상**: 9개 Notion 스타일 파스텔 색상
+- **삭제 확인**: DeleteConfirmationDialog 활용
+
+#### 3. 모바일 필터 크기 축소 (`ClipGrid.tsx`)
+- **반응형 클래스**: `text-xs px-2.5 py-1` (모바일) / `text-sm px-4 py-1.5` (데스크톱)
+- **아이콘 크기**: `w-2.5 h-2.5` (모바일) / `w-3 h-3` (데스크톱)
+
+#### 4. 모바일 상세 레이아웃 (`ClipDetail.tsx`)
+- **패딩 축소**: `px-4` (모바일) / `px-6` (데스크톱)
+- **헤더 컴팩트**: `py-3` (모바일) / `py-4` (데스크톱)
+- **버튼 크기**: `w-8 h-8` (모바일) / `w-10 h-10` (데스크톱)
+- **제목 크기**: `text-[16px]` (모바일) / `text-[24px]` (데스크톱)
+- **메타데이터**: 모바일에서 source/date 숨김
+
+#### 5. 비밀번호 재인증 (`ReauthDialog.tsx`, `SecurityPage.tsx`)
+- **ReauthDialog**: 비밀번호 재입력 다이얼로그 컴포넌트
+- **Firebase 연동**: reauthenticateWithCredential + updatePassword
+- **에러 처리**: 잘못된 비밀번호, 약한 비밀번호, 시도 제한 등
+- **계정 삭제**: deleteUser 전 재인증 요구
+
+### 파일 변경 목록
+- `src/App.tsx` - searchQuery 상태 및 Sidebar/ClipGrid 연결
+- `src/components/Sidebar.tsx` - onSearch 콜백, 검색 입력 연결
+- `src/components/ClipGrid.tsx` - searchQuery 필터링, 모바일 필터 크기
+- `src/components/CategoryManagement.tsx` - 카테고리 CRUD UI (신규)
+- `src/components/SettingsPage.tsx` - CategoryManagement 통합
+- `src/components/ClipDetail.tsx` - 모바일 반응형 레이아웃
+- `src/components/ReauthDialog.tsx` - 비밀번호 재인증 다이얼로그 (신규)
+- `src/components/SecurityPage.tsx` - 실제 비밀번호 변경 및 계정 삭제 연동
+
+---
+
 ## 2025-12-06 세션 2: UI/UX 개선 - 썸네일 토글 및 네비게이션
 
 ### 목표
-1. **썸네일 표시 토글**: 설정에서 썸네일 보기/끄기 기능 추가
-2. **뒤로가기 버튼**: 설정, 컬렉션 페이지에 뒤로가기 버튼 추가
-3. **칩 표시 개선**: 썸네일 숨김 시에도 카테고리/출처 칩 표시
-
-### 주요 변경 사항
 
 #### 1. 썸네일 표시 토글 (`App.tsx`, `SettingsPage.tsx`, `ClipGrid.tsx`, `ClipCard.tsx`)
 - **설정 페이지**: 환경설정 > "썸네일 표시" 토글 추가 (Image 아이콘)

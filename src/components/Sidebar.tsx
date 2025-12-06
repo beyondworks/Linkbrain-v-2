@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User } from 'lucide-react';
+import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ interface SidebarProps {
   onCreateCollection?: () => void;
   onCollectionSelect?: (collection: any) => void;
   onSourceSelect?: (source: string | null) => void;
+  onSearch?: (query: string) => void;
   onLogout?: () => void;
   onSettingsClick?: () => void;
   onProfileClick?: () => void;
@@ -30,15 +31,26 @@ interface SidebarProps {
   user?: any;
 }
 
-const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectionSelect, onSourceSelect, onLogout, onSettingsClick, onProfileClick, currentView, language = 'KR', user }: SidebarProps) => {
+const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectionSelect, onSourceSelect, onSearch, onLogout, onSettingsClick, onProfileClick, currentView, language = 'KR', user }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMyClipOpen, setIsMyClipOpen] = useState(true);
   const [isSourceOpen, setIsSourceOpen] = useState(true);
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(true);
   const [collections, setCollections] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [tags, setTags] = useState<{ name: string, color: { bg: string, text: string } }[]>([]);
   const [sources, setSources] = useState<{ name: string, icon: React.ReactNode }[]>([]);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onSearch) {
+        onSearch(searchQuery);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, onSearch]);
 
   React.useEffect(() => {
     if (!user) {
@@ -379,6 +391,8 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                 </div>
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={language === 'KR' ? "검색어를 입력하세요..." : "Search Keywords..."}
                   className="w-full bg-transparent outline-none text-[18px] text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] dark:placeholder-gray-600"
                 />

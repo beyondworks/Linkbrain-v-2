@@ -29,6 +29,7 @@ const App = () => {
   const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Mobile Sidebar State (Persists during session, resets on reload)
   const [mobileMenuState, setMobileMenuState] = useState({
@@ -58,6 +59,18 @@ const App = () => {
       return newValue;
     });
   };
+
+  // Keyboard shortcut: Command + ' to toggle thumbnails
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey && e.key === "'") {
+        e.preventDefault();
+        toggleThumbnails();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -184,6 +197,7 @@ const App = () => {
           onCreateCollection={() => setIsCreateCollectionOpen(true)}
           onCollectionSelect={handleCollectionClick}
           onSourceSelect={handleSourceSelect}
+          onSearch={setSearchQuery}
           onLogout={handleLogout}
           onSettingsClick={() => setCurrentView('settings')}
           onProfileClick={() => setCurrentView('profile')}
@@ -242,6 +256,7 @@ const App = () => {
                 onClipClick={handleClipClick}
                 language={language}
                 showThumbnails={showThumbnails}
+                searchQuery={searchQuery}
               />
             </>
           )}
@@ -286,6 +301,7 @@ const App = () => {
               toggleLanguage={toggleLanguage}
               showThumbnails={showThumbnails}
               toggleThumbnails={toggleThumbnails}
+              user={user}
             />
           )}
 

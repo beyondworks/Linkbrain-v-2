@@ -108,38 +108,38 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
          exit={{ opacity: 0, y: 20 }}
-         className="w-full max-w-[1000px] mx-auto px-6 pb-20"
+         className="w-full max-w-[1000px] mx-auto px-4 md:px-6 pb-20"
       >
          {/* Fixed Header */}
-         <div className="fixed top-0 left-0 md:left-[100px] right-0 z-40 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-sm py-4 px-6 border-b border-gray-100 dark:border-gray-800">
-            <div className="max-w-[1000px] mx-auto flex items-center justify-between">
-               <div className="flex items-center gap-4 flex-1 min-w-0">
+         <div className="fixed top-0 left-0 md:left-[100px] right-0 z-40 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-sm py-3 md:py-4 px-4 md:px-6 border-b border-gray-100 dark:border-gray-800">
+            <div className="max-w-[1000px] mx-auto flex items-center justify-between gap-3">
+               <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
                   <button
                      onClick={onBack}
-                     className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 flex items-center justify-center text-[#5a5a5a] dark:text-gray-400 hover:border-[#21dba4] hover:text-[#21dba4] dark:hover:text-[#21dba4] transition-all shadow-sm flex-shrink-0"
+                     className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 flex items-center justify-center text-[#5a5a5a] dark:text-gray-400 hover:border-[#21dba4] hover:text-[#21dba4] dark:hover:text-[#21dba4] transition-all shadow-sm flex-shrink-0"
                   >
-                     <ArrowLeft className="w-5 h-5" />
+                     <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                   <div className="min-w-0">
-                     <div className="flex items-center gap-2 text-[#959595] text-sm mb-1">
+                     <div className="hidden md:flex items-center gap-2 text-[#959595] text-sm mb-1">
                         <span className="capitalize">{clip.source}</span>
                         <span>•</span>
                         <span>{clip.date}</span>
                      </div>
-                     <h1 className="text-[20px] md:text-[24px] font-bold text-[#3d3d3d] dark:text-white line-clamp-1 break-words leading-tight">
+                     <h1 className="text-[16px] md:text-[24px] font-bold text-[#3d3d3d] dark:text-white line-clamp-1 break-words leading-tight">
                         {clip.title}
                      </h1>
                   </div>
                </div>
 
                {/* Actions & Archived Badge */}
-               <div className="flex items-center gap-3 flex-shrink-0">
+               <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                   <button
                      onClick={() => setIsDeleteDialogOpen(true)}
-                     className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 flex items-center justify-center text-[#959595] dark:text-gray-400 hover:border-red-200 hover:text-red-500 dark:hover:border-red-900/30 dark:hover:text-red-400 transition-all shadow-sm"
+                     className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 flex items-center justify-center text-[#959595] dark:text-gray-400 hover:border-red-200 hover:text-red-500 dark:hover:border-red-900/30 dark:hover:text-red-400 transition-all shadow-sm"
                      title={language === 'KR' ? '클립 삭제' : 'Delete clip'}
                   >
-                     <Trash2 className="w-5 h-5" />
+                     <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                   <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-full">
                      <div className="w-2 h-2 rounded-full bg-[#21DBA4] animate-pulse"></div>
@@ -152,7 +152,7 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
          </div>
 
          {/* Spacer for fixed header */}
-         <div className="h-20"></div>
+         <div className="h-16 md:h-20"></div>
 
          {/* Main Content */}
          <div className="flex flex-col lg:flex-row gap-8">
