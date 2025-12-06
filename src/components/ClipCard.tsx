@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import svgPaths from "../imports/svg-7yby5ysznz";
 import { Instagram, Youtube, Globe, Link as LinkIcon, AtSign } from 'lucide-react';
 import SelectCollectionDialog from './SelectCollectionDialog';
+import CategoryChangeDialog from './CategoryChangeDialog';
 
 interface ClipCardProps {
+   id: string;
    category: string;
    categoryColor: { bg: string, text: string };
    collection?: string;
@@ -52,6 +54,7 @@ const PlatformLogo = ({ source, className = '' }: { source: string, className?: 
 };
 
 const ClipCard = ({
+   id,
    category,
    categoryColor,
    collection,
@@ -74,6 +77,7 @@ const ClipCard = ({
 }: ClipCardProps) => {
    const isList = variant === 'list';
    const [isCollectionDialogOpen, setIsCollectionDialogOpen] = useState(false);
+   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
    const [imageError, setImageError] = useState(false);
 
    // Get thumbnail image - prefer image, then first of images array
@@ -141,9 +145,12 @@ const ClipCard = ({
                {showThumbnail && (
                   <div className="relative w-full md:w-[320px] bg-[#d9d9d9] dark:bg-[#252525] flex-shrink-0 overflow-hidden" style={{ aspectRatio: '16/9' }}>
                      <div className="absolute top-4 left-4 flex gap-2 z-10">
-                        <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                        <button
+                           onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
+                           className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                        >
                            <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
-                        </div>
+                        </button>
                         <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                            {getSourceIcon(source)}
                            <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
@@ -158,9 +165,12 @@ const ClipCard = ({
                   {/* Category & Source Chips - shown when thumbnail hidden */}
                   {!showThumbnail && (
                      <div className="flex gap-2 mb-1">
-                        <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                        <button
+                           onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
+                           className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                        >
                            <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
-                        </div>
+                        </button>
                         <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                            {getSourceIcon(source)}
                            <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
@@ -252,9 +262,12 @@ const ClipCard = ({
             {showThumbnail && (
                <div className="relative w-full bg-[#d9d9d9] dark:bg-[#252525] overflow-hidden" style={{ aspectRatio: '16/9' }}>
                   <div className="absolute top-4 left-4 flex gap-2 z-10">
-                     <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                     <button
+                        onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
+                        className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                     >
                         <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
-                     </div>
+                     </button>
                      <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                         {getSourceIcon(source)}
                         <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
@@ -268,9 +281,12 @@ const ClipCard = ({
                {/* Category & Source Chips - shown when thumbnail hidden */}
                {!showThumbnail && (
                   <div className="flex gap-2 mb-1">
-                     <div className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg}`}>
+                     <button
+                        onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
+                        className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                     >
                         <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
-                     </div>
+                     </button>
                      <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                         {getSourceIcon(source)}
                         <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
@@ -348,6 +364,13 @@ const ClipCard = ({
                language={language}
             />
          )}
+         <CategoryChangeDialog
+            isOpen={isCategoryDialogOpen}
+            onClose={() => setIsCategoryDialogOpen(false)}
+            clipId={id}
+            currentCategory={category}
+            language={language}
+         />
       </>
    );
 };

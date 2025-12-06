@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { User, Bell, Moon, Shield, ChevronRight, LogOut, Globe, Image, ArrowLeft } from 'lucide-react';
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
-import CategoryManagement from './CategoryManagement';
 
 interface SettingsPageProps {
   onLogout: () => void;
@@ -126,9 +125,6 @@ const SettingsPage = ({ onLogout, onNavigate, onBack, isDarkMode, toggleDarkMode
             </div>
           </div>
         ))}
-
-        {/* Category Management */}
-        {user && <CategoryManagement user={user} language={language} />}
 
         {/* Logout Section */}
         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#E0E0E0] dark:border-gray-800 overflow-hidden mt-8">
