@@ -27,6 +27,11 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
   - 모바일: 필터(왼쪽) + 선택 버튼(오른쪽 정렬)
   - 데스크톱: 기존 레이아웃 유지
   - 모바일 하단 고정 액션 바 (취소/전체선택/삭제)
+- [x] **모바일 ClipDetail 반응형 최적화** (2025-12-07)
+  - Threads/Instagram 레이아웃을 YouTube 스타일로 통일 (`flex flex-col gap-4`, `p-6`)
+  - overflow-hidden 추가로 콘텐츠 넘침 방지
+  - URL 및 텍스트에 word-break 인라인 스타일 적용
+  - 풀스크린 이미지 모달 추가 (Threads, Instagram)
 
 #### 2. 서버 측 DOM 렌더링 구현
 - [x] 공통 클립 서비스 추출 (`api/lib/clip-service.ts`)
