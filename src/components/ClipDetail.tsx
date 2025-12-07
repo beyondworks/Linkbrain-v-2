@@ -108,7 +108,7 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
          exit={{ opacity: 0, y: 20 }}
-         className="w-full max-w-[1000px] mx-auto px-4 md:px-6 pb-20"
+         className="w-full max-w-[1000px] mx-auto px-4 md:px-6 pb-20 overflow-hidden"
       >
          {/* Fixed Header */}
          <div className="fixed top-0 left-0 md:left-[100px] right-0 z-40 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-sm py-3 md:py-4 px-4 md:px-6 border-b border-gray-100 dark:border-gray-800">
@@ -162,7 +162,7 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
             </div>
 
             {/* Linkbrain Sidebar (AI Analysis & Notes) - Sticky */}
-            <div className="w-full lg:w-[320px] flex-shrink-0 h-fit sticky top-8 flex flex-col gap-6">
+            <div className="w-full lg:w-[320px] flex-shrink-0 h-fit sticky top-8 flex flex-col gap-6 overflow-hidden">
 
                {/* AI Summary Card */}
                <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 shadow-sm border border-[#f0f0f0] dark:border-gray-800">
@@ -246,7 +246,7 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
 
                      <div className="flex flex-col gap-1">
                         <span className="text-xs text-[#959595] font-medium uppercase tracking-wider">Original URL</span>
-                        <a href={clip.url.startsWith('http') ? clip.url : `https://${clip.url}`} target="_blank" rel="noreferrer" className="text-[#21dba4] text-sm truncate hover:underline">
+                        <a href={clip.url.startsWith('http') ? clip.url : `https://${clip.url}`} target="_blank" rel="noreferrer" className="text-[#21dba4] text-sm hover:underline" style={{ wordBreak: 'break-all' }}>
                            {clip.url}
                         </a>
                         <span className="text-[10px] text-[#959595]">

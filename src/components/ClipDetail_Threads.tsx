@@ -148,6 +148,7 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
 
    // Carousel state
    const [currentIndex, setCurrentIndex] = useState(0);
+   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
    // Reset index when images change
    useEffect(() => {
@@ -190,9 +191,9 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
    }, [clip.contentMarkdown]);
 
    return (
-      <div className="space-y-6">
+      <div className="flex flex-col gap-4 overflow-hidden">
          {/* MAIN CONTENT CARD */}
-         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm">
+         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm overflow-hidden">
             {/* Header with author info */}
             <div className="flex items-center justify-between mb-4">
                <div className="flex items-center gap-3">
@@ -222,8 +223,11 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
             </h3>
             <div className="h-px bg-gray-200 dark:bg-gray-700 mb-4" />
 
-            {/* 본문 텍스트 */}
-            <p className="text-[15px] text-[#000000] dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+            {/* 본문 텍스트 - 모바일에서 줄 간격 개선 */}
+            <p
+               className="text-[15px] text-[#000000] dark:text-gray-300 whitespace-pre-wrap leading-relaxed"
+               style={{ lineHeight: 1.8, overflowWrap: 'break-word', wordBreak: 'break-word' }}
+            >
                {mainText}
             </p>
 
@@ -249,7 +253,7 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
             )}
          </div>
 
-         {/* IMAGE CAROUSEL SECTION - Slide format like Instagram */}
+         {/* IMAGE CAROUSEL SECTION */}
          {displayImages.length > 0 && (
             <motion.div
                initial={{ opacity: 0, y: 10 }}
@@ -276,21 +280,21 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
 
                {/* Carousel Container */}
                <div className="relative">
-                  {/* Main Image Display - click to navigate */}
+                  {/* Main Image Display - tap to view fullscreen */}
                   <div
-                     className="relative w-full aspect-square bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
-                     onClick={() => displayImages.length > 1 && goToNext()}
+                     className="relative w-full bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
+                     onClick={() => setFullscreenImage(displayImages[currentIndex])}
                   >
                      <img
                         src={displayImages[currentIndex]}
                         alt={`Thread image ${currentIndex + 1}`}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{ objectFit: 'cover' }}
+                        className="w-full h-auto object-contain"
+                        style={{ maxHeight: '60vh' }}
                         loading="lazy"
                         onError={(e) => {
                            console.error(`[ThreadsImages] Failed to load:`, displayImages[currentIndex]?.substring(0, 80));
                            e.currentTarget.src = '/assets/platforms/threads.png';
-                           e.currentTarget.className = 'absolute inset-0 w-full h-full object-contain p-16';
+                           e.currentTarget.className = 'w-full h-auto object-contain p-16';
                         }}
                      />
                   </div>
@@ -346,6 +350,62 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
                   )}
                </div>
             </motion.div>
+         )}
+
+         {/* Fullscreen Image Modal */}
+         {fullscreenImage && (
+            <div
+               className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
+               onClick={() => setFullscreenImage(null)}
+            >
+               <button
+                  className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                  onClick={() => setFullscreenImage(null)}
+               >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+               </button>
+               <img
+                  src={fullscreenImage}
+                  alt="Fullscreen view"
+                  className="max-w-full max-h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+               />
+               {/* Navigation arrows for multiple images */}
+               {displayImages.length > 1 && (
+                  <>
+                     <button
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           const prevIndex = currentIndex === 0 ? displayImages.length - 1 : currentIndex - 1;
+                           setCurrentIndex(prevIndex);
+                           setFullscreenImage(displayImages[prevIndex]);
+                        }}
+                     >
+                        <ChevronLeft className="w-6 h-6" />
+                     </button>
+                     <button
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           const nextIndex = currentIndex === displayImages.length - 1 ? 0 : currentIndex + 1;
+                           setCurrentIndex(nextIndex);
+                           setFullscreenImage(displayImages[nextIndex]);
+                        }}
+                     >
+                        <ChevronRight className="w-6 h-6" />
+                     </button>
+                  </>
+               )}
+               {/* Image counter */}
+               {displayImages.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-sm">
+                     {currentIndex + 1} / {displayImages.length}
+                  </div>
+               )}
+            </div>
          )}
       </div>
    );

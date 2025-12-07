@@ -28,6 +28,7 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
 
    // Carousel state
    const [currentIndex, setCurrentIndex] = useState(0);
+   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
    // Reset index if images change
    useEffect(() => {
@@ -48,9 +49,9 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
    };
 
    return (
-      <div className="space-y-6">
+      <div className="flex flex-col gap-4 overflow-hidden">
          {/* CAPTION SECTION */}
-         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm">
+         <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#f0f0f0] dark:border-gray-800 p-6 shadow-sm overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
                {/* Author Avatar */}
                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -84,7 +85,10 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
 
             {/* Caption Text */}
             <div className="pl-14">
-               <p className="text-[15px] text-[#000000] dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+               <p
+                  className="text-[15px] text-[#000000] dark:text-gray-300 whitespace-pre-wrap"
+                  style={{ lineHeight: 1.8, overflowWrap: 'break-word', wordBreak: 'break-word' }}
+               >
                   {caption}
                </p>
             </div>
@@ -117,21 +121,21 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
 
                {/* Carousel Container */}
                <div className="relative">
-                  {/* Main Image Display - click to navigate */}
+                  {/* Main Image Display - tap to view fullscreen */}
                   <div
-                     className="relative w-full aspect-square bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
-                     onClick={() => imageUrls.length > 1 && goToNext()}
+                     className="relative w-full bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
+                     onClick={() => setFullscreenImage(imageUrls[currentIndex])}
                   >
                      <img
                         src={imageUrls[currentIndex]}
                         alt={`Instagram image ${currentIndex + 1}`}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{ objectFit: 'cover' }}
+                        className="w-full h-auto object-contain"
+                        style={{ maxHeight: '60vh' }}
                         loading="lazy"
                         onError={(e) => {
                            console.error('Image load error:', imageUrls[currentIndex]);
                            e.currentTarget.src = '/assets/platforms/instagram.png';
-                           e.currentTarget.className = 'absolute inset-0 w-full h-full object-contain p-16';
+                           e.currentTarget.className = 'w-full h-auto object-contain p-16';
                         }}
                      />
                   </div>
@@ -187,6 +191,62 @@ export const InstagramLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved
                   )}
                </div>
             </motion.div>
+         )}
+
+         {/* Fullscreen Image Modal */}
+         {fullscreenImage && (
+            <div
+               className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
+               onClick={() => setFullscreenImage(null)}
+            >
+               <button
+                  className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                  onClick={() => setFullscreenImage(null)}
+               >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+               </button>
+               <img
+                  src={fullscreenImage}
+                  alt="Fullscreen view"
+                  className="max-w-full max-h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+               />
+               {/* Navigation arrows for multiple images */}
+               {imageUrls.length > 1 && (
+                  <>
+                     <button
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           const prevIndex = currentIndex === 0 ? imageUrls.length - 1 : currentIndex - 1;
+                           setCurrentIndex(prevIndex);
+                           setFullscreenImage(imageUrls[prevIndex]);
+                        }}
+                     >
+                        <ChevronLeft className="w-6 h-6" />
+                     </button>
+                     <button
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           const nextIndex = currentIndex === imageUrls.length - 1 ? 0 : currentIndex + 1;
+                           setCurrentIndex(nextIndex);
+                           setFullscreenImage(imageUrls[nextIndex]);
+                        }}
+                     >
+                        <ChevronRight className="w-6 h-6" />
+                     </button>
+                  </>
+               )}
+               {/* Image counter */}
+               {imageUrls.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-sm">
+                     {currentIndex + 1} / {imageUrls.length}
+                  </div>
+               )}
+            </div>
          )}
       </div>
    );
