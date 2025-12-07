@@ -308,7 +308,8 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
+        {/* Desktop: Original Layout */}
+        <div className="hidden md:flex flex-wrap items-center gap-4">
           {/* Selection & Deletion Actions */}
           {isSelectMode && (
             <div className="flex items-center gap-2">
@@ -333,9 +334,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           {!isSelectMode && <div className="flex items-center gap-3">
             {/* Sort Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full border border-[#959595] text-[#959595] text-xs md:text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#959595] text-[#959595] text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
-                <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
                 <DropdownMenuItem
@@ -355,9 +356,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
             {/* Category Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full border border-[#959595] text-[#959595] text-xs md:text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#959595] text-[#959595] text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{selectedCategory && selectedCategory !== 'All' ? selectedCategory : (language === 'KR' ? '카테고리' : 'Category')}</span>
-                <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
                 <DropdownMenuItem
@@ -380,9 +381,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
             {/* Source Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full border border-[#959595] text-[#959595] text-xs md:text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#959595] text-[#959595] text-sm hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{selectedSource && selectedSource !== 'All Sources' ? selectedSource : (language === 'KR' ? '출처' : 'Source')}</span>
-                <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
                 <DropdownMenuItem
@@ -406,7 +407,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
 
           {/* View Toggle */}
-          <div className="hidden md:flex items-center gap-2 ml-4 border-l border-gray-200 pl-4">
+          <div className="flex items-center gap-2 ml-4 border-l border-gray-200 pl-4">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 transition-colors ${viewMode === 'grid' ? 'text-[#21dba4]' : 'text-[#959595] hover:text-[#21dba4]'}`}
@@ -425,11 +426,11 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
             </button>
           </div>
 
-          {/* Selection Mode Toggle */}
+          {/* Selection Mode Toggle - Desktop */}
           {!isSelectMode && (
             <button
               onClick={() => setIsSelectMode(true)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-sm font-medium transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-sm font-medium transition-colors"
               title={language === 'KR' ? '선택 모드' : 'Selection mode'}
             >
               <input
@@ -437,6 +438,101 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 checked={selectedClips.size > 0 && selectedClips.size === visibleClips.length}
                 readOnly
                 className="w-4 h-4 cursor-pointer"
+              />
+              <span>{language === 'KR' ? '선택' : 'Select'}</span>
+            </button>
+          )}
+        </div>
+
+        {/* Mobile: Filters with Right-Aligned Selection Button */}
+        <div className="flex md:hidden w-full items-center justify-between gap-3">
+          {/* Filter Buttons (Dropdowns) */}
+          {!isSelectMode && <div className="flex items-center gap-2">
+            {/* Sort Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+                <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
+                <ChevronDown className="w-2.5 h-2.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  onClick={() => setSortOrder('newest')}
+                >
+                  {language === 'KR' ? '최신순' : 'Newest'}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  onClick={() => setSortOrder('oldest')}
+                >
+                  {language === 'KR' ? '오래된순' : 'Oldest'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Category Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+                <span>{selectedCategory && selectedCategory !== 'All' ? selectedCategory : (language === 'KR' ? '카테고리' : 'Category')}</span>
+                <ChevronDown className="w-2.5 h-2.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                  onClick={() => onCategoryChange && onCategoryChange('All')}
+                >
+                  All
+                </DropdownMenuItem>
+                {uniqueCategories.map(category => (
+                  <DropdownMenuItem
+                    key={category}
+                    className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                    onClick={() => onCategoryChange && onCategoryChange(category)}
+                  >
+                    {category}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Source Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+                <span>{selectedSource && selectedSource !== 'All Sources' ? selectedSource : (language === 'KR' ? '출처' : 'Source')}</span>
+                <ChevronDown className="w-2.5 h-2.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                  onClick={() => onSourceChange && onSourceChange('All Sources')}
+                >
+                  All Sources
+                </DropdownMenuItem>
+                {uniqueSources.map(source => (
+                  <DropdownMenuItem
+                    key={source}
+                    className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                    onClick={() => onSourceChange && onSourceChange(source)}
+                  >
+                    {source.charAt(0).toUpperCase() + source.slice(1)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>}
+
+          {/* Mobile Selection Button - Right Aligned */}
+          {!isSelectMode && (
+            <button
+              onClick={() => setIsSelectMode(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-xs font-medium transition-colors"
+              title={language === 'KR' ? '선택 모드' : 'Selection mode'}
+            >
+              <input
+                type="checkbox"
+                checked={false}
+                readOnly
+                className="w-3.5 h-3.5 cursor-pointer"
               />
               <span>{language === 'KR' ? '선택' : 'Select'}</span>
             </button>
@@ -508,6 +604,48 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           <div className="flex items-center gap-2 text-[#959595]">
             <div className="w-5 h-5 border-2 border-[#21dba4] border-t-transparent rounded-full animate-spin" />
             <span className="text-sm">{language === 'KR' ? '불러오는 중...' : 'Loading...'}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Selection Action Bar */}
+      {isSelectMode && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-[#1a1a1a] border-t border-gray-200 dark:border-gray-800 px-4 py-3 z-50 shadow-lg">
+          <div className="flex items-center justify-between gap-3">
+            {/* Left: Cancel Button */}
+            <button
+              onClick={() => {
+                setIsSelectMode(false);
+                setSelectedClips(new Set());
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[#959595] hover:text-[#3d3d3d] dark:hover:text-gray-300 text-sm font-medium transition-colors"
+            >
+              <X className="w-4 h-4" />
+              <span>{language === 'KR' ? '취소' : 'Cancel'}</span>
+            </button>
+
+            {/* Center: Selection Count & Select All */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-[#21dba4]">
+                {selectedClips.size}{language === 'KR' ? '개' : ''}
+              </span>
+              <button
+                onClick={toggleSelectAll}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-xs font-medium transition-colors"
+              >
+                {selectedClips.size === visibleClips.length ? (language === 'KR' ? '전체 해제' : 'Deselect') : (language === 'KR' ? '전체 선택' : 'Select All')}
+              </button>
+            </div>
+
+            {/* Right: Delete Button */}
+            <button
+              onClick={() => setIsDeleteDialogOpen(true)}
+              disabled={selectedClips.size === 0 || isDeleting}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm font-medium transition-colors disabled:cursor-not-allowed"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>{isDeleting ? (language === 'KR' ? '삭제 중' : '...') : (language === 'KR' ? '삭제' : 'Delete')}</span>
+            </button>
           </div>
         </div>
       )}
