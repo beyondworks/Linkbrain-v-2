@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Bell, Moon, Shield, ChevronRight, LogOut, Globe, Image, ArrowLeft } from 'lucide-react';
+import { User, Bell, Moon, Shield, ChevronRight, LogOut, Globe, Image, ChevronLeft } from 'lucide-react';
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
 
@@ -75,13 +75,13 @@ const SettingsPage = ({ onLogout, onNavigate, onBack, isDarkMode, toggleDarkMode
     <div className="w-full px-6 md:px-10 pb-20 max-w-4xl mx-auto pt-8">
       {/* Header with Back Button */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-4 mb-2">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#959595]" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
           )}
           <h2 className="text-[#3d3d3d] dark:text-white text-[28px] font-bold">{language === 'KR' ? '설정' : 'Settings'}</h2>

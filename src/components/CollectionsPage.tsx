@@ -10,7 +10,7 @@ import {
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 interface CollectionsPageProps {
     onCollectionClick: (collection: any) => void;
@@ -99,13 +99,13 @@ const CollectionsPage = ({ onCollectionClick, onCreateClick, onBack, language = 
 
             {/* Header Section with Back Button */}
             <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     {onBack && (
                         <button
                             onClick={onBack}
-                            className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-[#959595]" />
+                            <ChevronLeft className="w-6 h-6" />
                         </button>
                     )}
                     <h2 className="text-[#3d3d3d] dark:text-white text-[28px] font-bold">

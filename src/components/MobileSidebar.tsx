@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search } from 'lucide-react';
+import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -58,6 +58,63 @@ const MobileSidebar = ({
     const [sources, setSources] = React.useState<{ name: string, icon: React.ReactNode }[]>([]);
     const [collections, setCollections] = React.useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // === UX Enhancement States (shared with desktop via localStorage) ===
+    const [categoryFilter, setCategoryFilter] = useState('');
+    const [collectionFilter, setCollectionFilter] = useState('');
+    const [categoryViewMode, setCategoryViewMode] = useState<'list' | 'cloud'>(() => {
+        const saved = localStorage.getItem('sidebar_categoryViewMode');
+        return (saved === 'cloud' ? 'cloud' : 'list') as 'list' | 'cloud';
+    });
+    const [favoriteCategories, setFavoriteCategories] = useState<string[]>(() => {
+        try {
+            const saved = localStorage.getItem('sidebar_favoriteCategories');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
+    const [recentCategories, setRecentCategories] = useState<string[]>(() => {
+        try {
+            const saved = localStorage.getItem('sidebar_recentCategories');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
+
+    // Persist view mode
+    useEffect(() => {
+        localStorage.setItem('sidebar_categoryViewMode', categoryViewMode);
+    }, [categoryViewMode]);
+
+    // Persist favorites
+    useEffect(() => {
+        localStorage.setItem('sidebar_favoriteCategories', JSON.stringify(favoriteCategories));
+    }, [favoriteCategories]);
+
+    // Persist recent
+    useEffect(() => {
+        localStorage.setItem('sidebar_recentCategories', JSON.stringify(recentCategories));
+    }, [recentCategories]);
+
+    // Toggle favorite
+    const toggleFavorite = (categoryName: string) => {
+        setFavoriteCategories(prev =>
+            prev.includes(categoryName)
+                ? prev.filter(c => c !== categoryName)
+                : [...prev, categoryName]
+        );
+    };
+
+    // Track recent category usage
+    const handleCategorySelect = (categoryName: string | null) => {
+        if (categoryName && categoryName !== 'All') {
+            setRecentCategories(prev => {
+                const filtered = prev.filter(c => c !== categoryName);
+                const updated = [categoryName, ...filtered].slice(0, 5);
+                localStorage.setItem('sidebar_recentCategories', JSON.stringify(updated));
+                return updated;
+            });
+        }
+        onCategorySelect && onCategorySelect(categoryName);
+    };
 
     // Debounced search - matches desktop Sidebar behavior
     useEffect(() => {
@@ -184,8 +241,6 @@ const MobileSidebar = ({
                                 onMenuToggle && onMenuToggle('isMyClipOpen');
                             } else {
                                 handleLinkClick(() => onNavigate && onNavigate('clips'));
-                                // If users want to open it when navigating, we would need a way to force true.
-                                // But per requirements "preserve state", we don't force open.
                             }
                         }}
                     >
@@ -197,12 +252,24 @@ const MobileSidebar = ({
                             </div>
                             <span className="text-[#3d3d3d] dark:text-white text-[16px] font-medium group-hover:text-[#21DBA4] transition-colors">My Clip</span>
                         </div>
-                        <motion.div
-                            animate={{ rotate: menuState.isMyClipOpen ? 180 : 0 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <ChevronUp className="w-4 h-4 text-[#959595]" />
-                        </motion.div>
+                        <div className="flex items-center gap-2">
+                            {/* View Mode Toggle */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCategoryViewMode(prev => prev === 'list' ? 'cloud' : 'list');
+                                }}
+                                className="w-5 h-5 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] transition-colors"
+                            >
+                                {categoryViewMode === 'list' ? <LayoutGrid className="w-3.5 h-3.5" /> : <List className="w-3.5 h-3.5" />}
+                            </button>
+                            <motion.div
+                                animate={{ rotate: menuState.isMyClipOpen ? 180 : 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <ChevronUp className="w-4 h-4 text-[#959595]" />
+                            </motion.div>
+                        </div>
                     </div>
 
                     <AnimatePresence initial={false}>
@@ -215,21 +282,75 @@ const MobileSidebar = ({
                                 className="overflow-hidden"
                             >
                                 <div className="pl-[44px] pt-1 flex flex-col gap-2">
-                                    <button
-                                        onClick={() => handleLinkClick(() => onCategorySelect && onCategorySelect('All'))}
-                                        className="bg-[#e0e0e0] dark:bg-[#333] h-[28px] px-3 rounded-[8px] self-start flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left"
-                                    >
-                                        <span className="text-[#5a5a5a] dark:text-gray-300 text-[14px] font-medium">All</span>
-                                    </button>
-                                    {tags.map(tag => (
+                                    {/* Category Filter (if > 3 tags) */}
+                                    {tags.length > 3 && (
+                                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#252525] rounded-[8px] px-2 py-1.5 mb-1 mr-4">
+                                            <Search className="w-3 h-3 text-[#959595]" />
+                                            <input
+                                                type="text"
+                                                value={categoryFilter}
+                                                onChange={(e) => setCategoryFilter(e.target.value)}
+                                                placeholder={language === 'KR' ? "카테고리 검색..." : "Filter..."}
+                                                className="w-full bg-transparent outline-none text-[13px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Cloud or List View */}
+                                    <div className={categoryViewMode === 'cloud' ? 'flex flex-wrap gap-1.5 pr-4' : 'flex flex-col gap-2'}>
                                         <button
-                                            key={tag.name}
-                                            onClick={() => handleLinkClick(() => onCategorySelect && onCategorySelect(tag.name))}
-                                            className={`${tag.color.bg} h-[28px] px-3 rounded-[8px] self-start flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left`}
+                                            onClick={() => handleLinkClick(() => handleCategorySelect('All'))}
+                                            className="bg-[#e0e0e0] dark:bg-[#333] h-[28px] px-3 rounded-[8px] self-start flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left"
                                         >
-                                            <span className={`${tag.color.text} text-[14px] font-medium`}>{tag.name}</span>
+                                            <span className="text-[#5a5a5a] dark:text-gray-300 text-[14px] font-medium">All</span>
                                         </button>
-                                    ))}
+
+                                        {/* Sorted and Filtered Tags */}
+                                        {(() => {
+                                            const filteredTags = tags.filter(tag =>
+                                                !categoryFilter || tag.name.toLowerCase().includes(categoryFilter.toLowerCase())
+                                            );
+
+                                            const sortedTags = [...filteredTags].sort((a, b) => {
+                                                const aFav = favoriteCategories.includes(a.name) ? 0 : 1;
+                                                const bFav = favoriteCategories.includes(b.name) ? 0 : 1;
+                                                if (aFav !== bFav) return aFav - bFav;
+
+                                                const aRecent = recentCategories.indexOf(a.name);
+                                                const bRecent = recentCategories.indexOf(b.name);
+                                                if (aRecent !== -1 && bRecent !== -1) return aRecent - bRecent;
+                                                if (aRecent !== -1) return -1;
+                                                if (bRecent !== -1) return 1;
+
+                                                return a.name.localeCompare(b.name);
+                                            });
+
+                                            return sortedTags.map(tag => (
+                                                <div key={tag.name} className="group/tag relative self-start flex items-center">
+                                                    <button
+                                                        onClick={() => handleLinkClick(() => handleCategorySelect(tag.name))}
+                                                        className={`${tag.color.bg} h-[28px] px-3 rounded-[8px] flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left`}
+                                                    >
+                                                        {favoriteCategories.includes(tag.name) && (
+                                                            <Star className="w-2.5 h-2.5 mr-1 fill-current" />
+                                                        )}
+                                                        <span className={`${tag.color.text} text-[14px] font-medium`}>{tag.name}</span>
+                                                    </button>
+                                                    {/* Favorite Toggle */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleFavorite(tag.name);
+                                                        }}
+                                                        className="absolute -right-5 opacity-0 group-hover/tag:opacity-100 transition-opacity p-0.5"
+                                                    >
+                                                        <Star className={`w-3 h-3 ${favoriteCategories.includes(tag.name) ? 'fill-yellow-400 text-yellow-400' : 'text-[#959595]'}`} />
+                                                    </button>
+                                                </div>
+                                            ));
+                                        })()}
+                                    </div>
                                 </div>
                             </motion.div>
                         )}
@@ -343,17 +464,46 @@ const MobileSidebar = ({
                                 className="overflow-hidden"
                             >
                                 <div className="pl-[44px] pt-1 flex flex-col gap-2">
-                                    {collections.map(collection => (
-                                        <button
-                                            key={collection.id}
-                                            onClick={() => handleLinkClick(() => onCollectionSelect && onCollectionSelect(collection))}
-                                            className="bg-gray-100 dark:bg-[#333] h-[28px] px-3 rounded-[8px] self-start flex items-center hover:bg-gray-200 dark:hover:bg-[#444] transition-colors cursor-pointer text-left group/item"
-                                        >
-                                            <span className="text-[#5a5a5a] dark:text-gray-300 text-[14px] font-medium whitespace-nowrap group-hover/item:text-[#21dba4] transition-colors">
-                                                {collection.name}
-                                            </span>
-                                        </button>
-                                    ))}
+                                    {/* Collection Filter (if > 3) */}
+                                    {collections.length > 3 && (
+                                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#252525] rounded-[8px] px-2 py-1.5 mb-1 mr-4">
+                                            <Search className="w-3 h-3 text-[#959595]" />
+                                            <input
+                                                type="text"
+                                                value={collectionFilter}
+                                                onChange={(e) => setCollectionFilter(e.target.value)}
+                                                placeholder={language === 'KR' ? "컬렉션 검색..." : "Filter..."}
+                                                className="w-full bg-transparent outline-none text-[13px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Filtered Collections */}
+                                    {(() => {
+                                        const filteredCollections = collections.filter(c =>
+                                            !collectionFilter || c.name.toLowerCase().includes(collectionFilter.toLowerCase())
+                                        );
+
+                                        return filteredCollections.length > 0 ? filteredCollections.map(collection => (
+                                            <button
+                                                key={collection.id}
+                                                onClick={() => handleLinkClick(() => onCollectionSelect && onCollectionSelect(collection))}
+                                                className="bg-gray-100 dark:bg-[#333] h-[28px] px-3 rounded-[8px] self-start flex items-center hover:bg-gray-200 dark:hover:bg-[#444] transition-colors cursor-pointer text-left group/item"
+                                            >
+                                                <span className="text-[#5a5a5a] dark:text-gray-300 text-[14px] font-medium whitespace-nowrap group-hover/item:text-[#21dba4] transition-colors">
+                                                    {collection.name}
+                                                </span>
+                                            </button>
+                                        )) : (
+                                            <div className="text-xs text-gray-400">
+                                                {collectionFilter
+                                                    ? (language === 'KR' ? '검색 결과 없음' : 'No results')
+                                                    : (language === 'KR' ? '컬렉션 없음' : 'None')
+                                                }
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </motion.div>
                         )}

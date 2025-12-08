@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search } from 'lucide-react';
+import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +41,72 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
 
   const [tags, setTags] = useState<{ name: string, color: { bg: string, text: string } }[]>([]);
   const [sources, setSources] = useState<{ name: string, icon: React.ReactNode }[]>([]);
+
+  // === NEW: Sidebar UX Enhancement States ===
+  // Category filter (local search within category list)
+  const [categoryFilter, setCategoryFilter] = useState('');
+  // Collection filter
+  const [collectionFilter, setCollectionFilter] = useState('');
+  // View mode: list or cloud (wrap)
+  const [categoryViewMode, setCategoryViewMode] = useState<'list' | 'cloud'>(() => {
+    const saved = localStorage.getItem('sidebar_categoryViewMode');
+    return (saved === 'cloud' ? 'cloud' : 'list') as 'list' | 'cloud';
+  });
+  // Favorite categories (stored in localStorage)
+  const [favoriteCategories, setFavoriteCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('sidebar_favoriteCategories');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  // Recent categories (stored in localStorage, max 5)
+  const [recentCategories, setRecentCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('sidebar_recentCategories');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  // Persist view mode
+  useEffect(() => {
+    localStorage.setItem('sidebar_categoryViewMode', categoryViewMode);
+  }, [categoryViewMode]);
+
+  // Persist favorites
+  useEffect(() => {
+    localStorage.setItem('sidebar_favoriteCategories', JSON.stringify(favoriteCategories));
+  }, [favoriteCategories]);
+
+  // Persist recent
+  useEffect(() => {
+    localStorage.setItem('sidebar_recentCategories', JSON.stringify(recentCategories));
+  }, [recentCategories]);
+
+  // Toggle favorite
+  const toggleFavorite = (categoryName: string) => {
+    setFavoriteCategories(prev =>
+      prev.includes(categoryName)
+        ? prev.filter(c => c !== categoryName)
+        : [...prev, categoryName]
+    );
+  };
+
+  // Track recent category usage
+  const trackRecentCategory = (categoryName: string) => {
+    if (categoryName === 'All') return; // Don't track "All"
+    setRecentCategories(prev => {
+      const filtered = prev.filter(c => c !== categoryName);
+      return [categoryName, ...filtered].slice(0, 5);
+    });
+  };
+
+  // Handle category selection with tracking
+  const handleCategorySelect = (categoryName: string | null) => {
+    if (categoryName && categoryName !== 'All') {
+      trackRecentCategory(categoryName);
+    }
+    onCategorySelect && onCategorySelect(categoryName);
+  };
 
   // Debounced search
   useEffect(() => {
@@ -186,12 +252,25 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                   </div>
                   <span className="text-[#3d3d3d] dark:text-white text-[20px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">My Clip</span>
                 </div>
-                <motion.div
-                  animate={{ rotate: isMyClipOpen ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ChevronUp className="w-5 h-5 text-[#959595]" />
-                </motion.div>
+                <div className="flex items-center gap-2">
+                  {/* View Mode Toggle */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCategoryViewMode(prev => prev === 'list' ? 'cloud' : 'list');
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] transition-colors"
+                    title={categoryViewMode === 'list' ? '클라우드 뷰' : '리스트 뷰'}
+                  >
+                    {categoryViewMode === 'list' ? <LayoutGrid className="w-4 h-4" /> : <List className="w-4 h-4" />}
+                  </button>
+                  <motion.div
+                    animate={{ rotate: isMyClipOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronUp className="w-5 h-5 text-[#959595]" />
+                  </motion.div>
+                </div>
               </div>
 
               {/* Categories (Tags) */}
@@ -205,21 +284,79 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                     className="overflow-hidden"
                   >
                     <div className="pl-[60px] pt-2 flex flex-col gap-[10px]">
-                      <button
-                        onClick={() => onCategorySelect && onCategorySelect('All')}
-                        className="bg-[#e0e0e0] dark:bg-[#333] h-[30px] px-4 rounded-[10px] self-start flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left"
-                      >
-                        <span className="text-[#5a5a5a] dark:text-gray-300 text-[16px] font-medium whitespace-nowrap">All</span>
-                      </button>
-                      {tags.map(tag => (
+                      {/* Category Filter Input */}
+                      {tags.length > 3 && (
+                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#252525] rounded-[10px] px-3 py-1.5 mb-1">
+                          <Search className="w-3.5 h-3.5 text-[#959595]" />
+                          <input
+                            type="text"
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            placeholder={language === 'KR' ? "카테고리 검색..." : "Filter..."}
+                            className="w-full bg-transparent outline-none text-[14px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                      )}
+
+                      {/* Cloud or List View */}
+                      <div className={categoryViewMode === 'cloud' ? 'flex flex-wrap gap-2' : 'flex flex-col gap-[10px]'}>
+                        {/* All Button */}
                         <button
-                          key={tag.name}
-                          onClick={() => onCategorySelect && onCategorySelect(tag.name)}
-                          className={`${tag.color.bg} h-[30px] px-4 rounded-[10px] self-start flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left`}
+                          onClick={() => handleCategorySelect('All')}
+                          className="bg-[#e0e0e0] dark:bg-[#333] h-[30px] px-4 rounded-[10px] self-start flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left"
                         >
-                          <span className={`${tag.color.text} text-[16px] font-medium whitespace-nowrap`}>{tag.name}</span>
+                          <span className="text-[#5a5a5a] dark:text-gray-300 text-[16px] font-medium whitespace-nowrap">All</span>
                         </button>
-                      ))}
+
+                        {/* Sorted and Filtered Tags */}
+                        {(() => {
+                          // Filter tags
+                          const filteredTags = tags.filter(tag =>
+                            !categoryFilter || tag.name.toLowerCase().includes(categoryFilter.toLowerCase())
+                          );
+
+                          // Sort: favorites first, then recent, then alphabetical
+                          const sortedTags = [...filteredTags].sort((a, b) => {
+                            const aFav = favoriteCategories.includes(a.name) ? 0 : 1;
+                            const bFav = favoriteCategories.includes(b.name) ? 0 : 1;
+                            if (aFav !== bFav) return aFav - bFav;
+
+                            const aRecent = recentCategories.indexOf(a.name);
+                            const bRecent = recentCategories.indexOf(b.name);
+                            const aRecentScore = aRecent === -1 ? 999 : aRecent;
+                            const bRecentScore = bRecent === -1 ? 999 : bRecent;
+                            if (aRecentScore !== bRecentScore) return aRecentScore - bRecentScore;
+
+                            return a.name.localeCompare(b.name);
+                          });
+
+                          return sortedTags.map(tag => (
+                            <div key={tag.name} className="group/tag relative self-start flex items-center">
+                              <button
+                                onClick={() => handleCategorySelect(tag.name)}
+                                className={`${tag.color.bg} h-[30px] px-4 rounded-[10px] flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left`}
+                              >
+                                {favoriteCategories.includes(tag.name) && (
+                                  <Star className="w-3 h-3 mr-1.5 fill-current" />
+                                )}
+                                <span className={`${tag.color.text} text-[16px] font-medium whitespace-nowrap`}>{tag.name}</span>
+                              </button>
+                              {/* Favorite Toggle (on hover) */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleFavorite(tag.name);
+                                }}
+                                className="absolute -right-6 opacity-0 group-hover/tag:opacity-100 transition-opacity p-1"
+                                title={favoriteCategories.includes(tag.name) ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+                              >
+                                <Star className={`w-3.5 h-3.5 ${favoriteCategories.includes(tag.name) ? 'fill-yellow-400 text-yellow-400' : 'text-[#959595] hover:text-yellow-400'}`} />
+                              </button>
+                            </div>
+                          ));
+                        })()}
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -346,19 +483,46 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                     className="overflow-hidden"
                   >
                     <div className="pl-[60px] pt-2 flex flex-col gap-[10px]">
-                      {collections.length > 0 ? collections.map(collection => (
-                        <button
-                          key={collection.id}
-                          onClick={() => onCollectionSelect && onCollectionSelect(collection)}
-                          className="bg-gray-100 dark:bg-[#333] h-[30px] px-4 rounded-[10px] self-start flex items-center hover:bg-gray-200 dark:hover:bg-[#444] transition-colors cursor-pointer text-left group/item"
-                        >
-                          <span className="text-[#5a5a5a] dark:text-gray-300 text-[16px] font-medium whitespace-nowrap group-hover/item:text-[#21dba4] transition-colors">
-                            {collection.name}
-                          </span>
-                        </button>
-                      )) : (
-                        <div className="text-sm text-gray-400 pl-2">{language === 'KR' ? '컬렉션이 없습니다' : 'No collections'}</div>
+                      {/* Collection Filter Input */}
+                      {collections.length > 3 && (
+                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#252525] rounded-[10px] px-3 py-1.5 mb-1">
+                          <Search className="w-3.5 h-3.5 text-[#959595]" />
+                          <input
+                            type="text"
+                            value={collectionFilter}
+                            onChange={(e) => setCollectionFilter(e.target.value)}
+                            placeholder={language === 'KR' ? "컬렉션 검색..." : "Filter..."}
+                            className="w-full bg-transparent outline-none text-[14px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
                       )}
+
+                      {/* Filtered Collections */}
+                      {(() => {
+                        const filteredCollections = collections.filter(c =>
+                          !collectionFilter || c.name.toLowerCase().includes(collectionFilter.toLowerCase())
+                        );
+
+                        return filteredCollections.length > 0 ? filteredCollections.map(collection => (
+                          <button
+                            key={collection.id}
+                            onClick={() => onCollectionSelect && onCollectionSelect(collection)}
+                            className="bg-gray-100 dark:bg-[#333] h-[30px] px-4 rounded-[10px] self-start flex items-center hover:bg-gray-200 dark:hover:bg-[#444] transition-colors cursor-pointer text-left group/item"
+                          >
+                            <span className="text-[#5a5a5a] dark:text-gray-300 text-[16px] font-medium whitespace-nowrap group-hover/item:text-[#21dba4] transition-colors">
+                              {collection.name}
+                            </span>
+                          </button>
+                        )) : (
+                          <div className="text-sm text-gray-400 pl-2">
+                            {collectionFilter
+                              ? (language === 'KR' ? '검색 결과가 없습니다' : 'No results')
+                              : (language === 'KR' ? '컬렉션이 없습니다' : 'No collections')
+                            }
+                          </div>
+                        );
+                      })()}
                     </div>
                   </motion.div>
                 )}

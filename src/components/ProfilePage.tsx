@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Lock, Camera, Save, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Camera, Save, ChevronLeft } from 'lucide-react';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { auth } from '../lib/firebase';
@@ -53,9 +53,9 @@ const ProfilePage = ({ onBack, language = 'KR', user }: ProfilePageProps) => {
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-[#959595] hover:bg-[#21DBA4] hover:text-white transition-colors"
+          className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ChevronLeft className="w-6 h-6" />
         </button>
         <div>
           <h2 className="text-[#3d3d3d] dark:text-white text-[28px] font-bold">
