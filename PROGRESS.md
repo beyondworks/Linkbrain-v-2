@@ -55,6 +55,11 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
   - 고정 헤더 즉시 렌더링 (motion.div 밖으로 분리)
   - 상세페이지 진입 시 최상단 스크롤 자동 적용
   - 카테고리 표시 칩(Chip) 형태로 변경 (ClipCard와 일관성)
+- [x] **모바일 카테고리 변경 기능** (2025-12-08)
+  - ClipDetail/ClipCard에서 카테고리 칩 터치 시 변경 다이얼로그 표시
+  - 카테고리 변경 시 UI 즉시 업데이트 (onCategoryChange 콜백)
+  - list 뷰에 CategoryChangeDialog 누락 버그 수정
+  - 터치 영역 확대 및 onTouchEnd 핸들러 추가
 
 #### 2. 서버 측 DOM 렌더링 구현
 - [x] 공통 클립 서비스 추출 (`api/lib/clip-service.ts`)
