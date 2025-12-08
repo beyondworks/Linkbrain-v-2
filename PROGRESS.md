@@ -51,6 +51,10 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
   - ChevronLeft 아이콘 (w-6 h-6)
   - hover:text-[#21DBA4] hover:border-[#21DBA4]
   - 적용 페이지: ProfilePage, SettingsPage, CollectionsPage, SecurityPage, NotificationsPage
+- [x] **ClipDetail 상세페이지 UX 개선** (2025-12-08)
+  - 고정 헤더 즉시 렌더링 (motion.div 밖으로 분리)
+  - 상세페이지 진입 시 최상단 스크롤 자동 적용
+  - 카테고리 표시 칩(Chip) 형태로 변경 (ClipCard와 일관성)
 
 #### 2. 서버 측 DOM 렌더링 구현
 - [x] 공통 클립 서비스 추출 (`api/lib/clip-service.ts`)
