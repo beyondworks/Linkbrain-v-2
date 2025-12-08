@@ -76,16 +76,23 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center pt-32 pb-20 px-4 text-center relative overflow-hidden">
+    <div className="w-full flex flex-col items-center justify-center pt-24 md:pt-32 pb-20 px-4 text-center relative overflow-hidden">
 
       {/* Main Headings */}
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="text-4xl md:text-[64px] font-extrabold text-[#21DBA4] mb-8 leading-tight"
+        className="text-[48px] md:text-[64px] font-extrabold italic text-[#21DBA4] mb-6 leading-[1.1] tracking-tight"
       >
-        Collect. Connect. Create.
+        {/* Mobile: separate lines */}
+        <span className="md:hidden flex flex-col items-center">
+          <span>COLLECT</span>
+          <span>CONNECT</span>
+          <span>CREATE</span>
+        </span>
+        {/* Desktop: single line */}
+        <span className="hidden md:inline">Collect. Connect. Create.</span>
       </motion.h1>
 
       <motion.div

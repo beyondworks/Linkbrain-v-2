@@ -298,9 +298,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-[20px] md:px-6 pb-20">
+    <div className="w-full max-w-[1400px] mx-auto px-[32px] md:px-6 pb-20">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-2">
         <div className="flex flex-col flex-1">
           {isSelectMode ? (
             <div className="flex items-center gap-3">
@@ -320,7 +320,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
             </div>
           ) : (
             <>
-              <h2 className="text-[28px] font-bold text-[#21dba4]">
+              <h2 className="text-[24px] md:text-[28px] font-bold text-[#21dba4]">
                 My Clip
                 {selectedCategory && selectedCategory !== 'All' ? <span className="text-[#3d3d3d]"> - {selectedCategory}</span> : ''}
               </h2>

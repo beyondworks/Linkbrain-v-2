@@ -49,7 +49,7 @@ const MobileHeader = (props: MobileHeaderProps) => {
             </Sheet>
 
             <span
-               className="text-[#21dba4] text-xl font-bold tracking-tight cursor-pointer"
+               className="text-[#21dba4] text-2xl font-bold tracking-tight cursor-pointer"
                onClick={() => props.onNavigate && props.onNavigate('clips')}
             >
                Linkbrain
@@ -60,7 +60,7 @@ const MobileHeader = (props: MobileHeaderProps) => {
             {/* Search Button Removed */}
             <button
                onClick={props.onProfileClick}
-               className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center ml-1"
+               className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center ml-1"
             >
                {props.user?.photoURL ? (
                   <img src={props.user.photoURL} alt="Profile" className="w-full h-full object-cover" />

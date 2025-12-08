@@ -4388,3 +4388,45 @@ html {
 body {
   background-color: #121212;
 }
+.text-\[52px\] {
+  font-size: 52px !important;
+}
+
+.leading-\[1\.1\] {
+  line-height: 1.1 !important;
+}
+
+.text-\[36px\] {
+  font-size: 36px !important;
+}
+
+.text-\[32px\] {
+  font-size: 32px !important;
+}
+
+.text-\[24px\] {
+  font-size: 24px !important;
+}
+
+.text-\[48px\] {
+  font-size: 48px !important;
+}
+
+.px-\[32px\] {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+}
+
+.pt-24 {
+  padding-top: 6rem !important;
+}
+
+.pt-20 {
+  padding-top: 5rem !important;
+}
+
+@media (min-width: 768px) {
+  .md\:inline {
+    display: inline !important;
+  }
+}
