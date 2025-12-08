@@ -1,6 +1,6 @@
 # Linkbrain v-2 개발 진행 상황
 
-**마지막 업데이트:** 2025-12-07
+**마지막 업데이트:** 2025-12-08
 
 ## 📋 프로젝트 개요
 
@@ -14,7 +14,7 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
 - Firebase/Firestore 기반 데이터 저장
 - 다양한 플랫폼 지원 (Instagram, Threads, YouTube, 일반 웹)
 
-## 🚀 현재 상태 (2025-12-07)
+## 🚀 현재 상태 (2025-12-08)
 
 ### ✅ 완료된 작업
 
@@ -31,7 +31,12 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
   - Threads/Instagram 레이아웃을 YouTube 스타일로 통일 (`flex flex-col gap-4`, `p-6`)
   - overflow-hidden 추가로 콘텐츠 넘침 방지
   - URL 및 텍스트에 word-break 인라인 스타일 적용
-  - 풀스크린 이미지 모달 추가 (Threads, Instagram)
+- [x] **이미지 캐러셀 UX 개선** (2025-12-08)
+  - 전체화면 모달 제거
+  - 드래그/스와이프 네비게이션 추가 (터치/마우스)
+  - 바(bar) 형태 페이지네이션으로 변경
+  - 헤더에 `< 1/10 >` 형태 네비게이션 화살표 배치
+  - 원본 이미지 비율 유지 (maxHeight 제한 제거)
 
 #### 2. 서버 측 DOM 렌더링 구현
 - [x] 공통 클립 서비스 추출 (`api/lib/clip-service.ts`)

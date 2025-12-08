@@ -1,7 +1,7 @@
 // Threads Layout Component - Clean parsing with carousel gallery
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from "motion/react";
-import { MoreHorizontal, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, User } from 'lucide-react';
 
 // ============================================================================
 // Parser - marker-based splitting + smart fallback + deduplication
@@ -148,7 +148,12 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
 
    // Carousel state
    const [currentIndex, setCurrentIndex] = useState(0);
-   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+
+   // Drag/swipe state
+   const containerRef = useRef<HTMLDivElement>(null);
+   const [isDragging, setIsDragging] = useState(false);
+   const [startX, setStartX] = useState(0);
+   const [translateX, setTranslateX] = useState(0);
 
    // Reset index when images change
    useEffect(() => {
@@ -166,6 +171,63 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
 
    const goToIndex = (idx: number) => {
       setCurrentIndex(idx);
+   };
+
+   // Drag handlers
+   const handleDragStart = (clientX: number) => {
+      setIsDragging(true);
+      setStartX(clientX);
+      setTranslateX(0);
+   };
+
+   const handleDragMove = (clientX: number) => {
+      if (!isDragging) return;
+      const diff = clientX - startX;
+      setTranslateX(diff);
+   };
+
+   const handleDragEnd = () => {
+      if (!isDragging) return;
+      setIsDragging(false);
+
+      const threshold = 50; // minimum drag distance to trigger navigation
+      if (translateX > threshold && displayImages.length > 1) {
+         goToPrev();
+      } else if (translateX < -threshold && displayImages.length > 1) {
+         goToNext();
+      }
+      setTranslateX(0);
+   };
+
+   // Mouse events
+   const handleMouseDown = (e: React.MouseEvent) => {
+      e.preventDefault();
+      handleDragStart(e.clientX);
+   };
+
+   const handleMouseMove = (e: React.MouseEvent) => {
+      handleDragMove(e.clientX);
+   };
+
+   const handleMouseUp = () => {
+      handleDragEnd();
+   };
+
+   const handleMouseLeave = () => {
+      if (isDragging) handleDragEnd();
+   };
+
+   // Touch events
+   const handleTouchStart = (e: React.TouchEvent) => {
+      handleDragStart(e.touches[0].clientX);
+   };
+
+   const handleTouchMove = (e: React.TouchEvent) => {
+      handleDragMove(e.touches[0].clientX);
+   };
+
+   const handleTouchEnd = () => {
+      handleDragEnd();
    };
 
    // Parse content - NO normalization, just marker parsing + dedup
@@ -272,143 +334,92 @@ export const ThreadsLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }
                      </h3>
                   </div>
                   {displayImages.length > 1 && (
-                     <span className="text-xs text-[#959595]">
-                        {currentIndex + 1} / {displayImages.length}
-                     </span>
-                  )}
-               </div>
-
-               {/* Carousel Container */}
-               <div className="relative">
-                  {/* Main Image Display - tap to view fullscreen */}
-                  <div
-                     className="relative w-full bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden cursor-pointer"
-                     onClick={() => setFullscreenImage(displayImages[currentIndex])}
-                  >
-                     <img
-                        src={displayImages[currentIndex]}
-                        alt={`Thread image ${currentIndex + 1}`}
-                        className="w-full h-auto object-contain"
-                        style={{ maxHeight: '60vh' }}
-                        loading="lazy"
-                        onError={(e) => {
-                           console.error(`[ThreadsImages] Failed to load:`, displayImages[currentIndex]?.substring(0, 80));
-                           e.currentTarget.src = '/assets/platforms/threads.png';
-                           e.currentTarget.className = 'w-full h-auto object-contain p-16';
-                        }}
-                     />
-                  </div>
-
-                  {/* Progress Bar Pagination (if multiple images) */}
-                  {displayImages.length > 1 && (
-                     <div className="mt-3">
-                        {/* Progress bar background */}
-                        <div className="w-full h-1 bg-[#e0e0e0] dark:bg-[#333333] rounded-full overflow-hidden">
-                           {/* Progress bar fill */}
-                           <div
-                              className="h-full bg-[#21dba4] rounded-full transition-all duration-300"
-                              style={{ width: `${((currentIndex + 1) / displayImages.length) * 100}%` }}
-                           />
-                        </div>
-                        {/* Clickable segments for direct navigation */}
-                        <div className="flex mt-1">
-                           {displayImages.length <= 10 ? (
-                              // Show dots for 10 or fewer images
-                              <div className="flex items-center justify-center w-full gap-1.5">
-                                 {displayImages.map((_: any, idx: number) => (
-                                    <button
-                                       key={idx}
-                                       onClick={(e) => { e.stopPropagation(); goToIndex(idx); }}
-                                       className={`rounded-full transition-all ${idx === currentIndex
-                                          ? 'w-2 h-2 bg-[#21dba4]'
-                                          : 'w-1.5 h-1.5 bg-[#d0d0d0] dark:bg-[#404040] hover:bg-[#959595]'
-                                          }`}
-                                       aria-label={`Go to image ${idx + 1}`}
-                                    />
-                                 ))}
-                              </div>
-                           ) : (
-                              // Show prev/next text for many images
-                              <div className="flex items-center justify-between w-full text-xs text-[#959595]">
-                                 <button
-                                    onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-                                    className="hover:text-[#21dba4] transition-colors"
-                                 >
-                                    ← 이전
-                                 </button>
-                                 <span>{currentIndex + 1} / {displayImages.length}</span>
-                                 <button
-                                    onClick={(e) => { e.stopPropagation(); goToNext(); }}
-                                    className="hover:text-[#21dba4] transition-colors"
-                                 >
-                                    다음 →
-                                 </button>
-                              </div>
-                           )}
-                        </div>
+                     <div className="flex items-center gap-2 text-[#959595]">
+                        <button
+                           onClick={goToPrev}
+                           className="hover:text-[#3d3d3d] transition-colors p-1"
+                           aria-label="Previous image"
+                        >
+                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                           </svg>
+                        </button>
+                        <span className="text-xs min-w-[40px] text-center">
+                           {currentIndex + 1} / {displayImages.length}
+                        </span>
+                        <button
+                           onClick={goToNext}
+                           className="hover:text-[#3d3d3d] transition-colors p-1"
+                           aria-label="Next image"
+                        >
+                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                           </svg>
+                        </button>
                      </div>
                   )}
                </div>
-            </motion.div>
-         )}
 
-         {/* Fullscreen Image Modal */}
-         {fullscreenImage && (
-            <div
-               className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
-               onClick={() => setFullscreenImage(null)}
-            >
-               <button
-                  className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
-                  onClick={() => setFullscreenImage(null)}
-               >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-               </button>
-               <img
-                  src={fullscreenImage}
-                  alt="Fullscreen view"
-                  className="max-w-full max-h-full object-contain"
-                  onClick={(e) => e.stopPropagation()}
-               />
-               {/* Navigation arrows for multiple images */}
-               {displayImages.length > 1 && (
-                  <>
-                     <button
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
-                        onClick={(e) => {
-                           e.stopPropagation();
-                           const prevIndex = currentIndex === 0 ? displayImages.length - 1 : currentIndex - 1;
-                           setCurrentIndex(prevIndex);
-                           setFullscreenImage(displayImages[prevIndex]);
+               {/* Carousel Container with drag support */}
+               <div className="relative">
+                  <div
+                     ref={containerRef}
+                     className="relative w-full bg-[#f0f0f0] dark:bg-[#252525] rounded-xl overflow-hidden select-none"
+                     style={{ cursor: displayImages.length > 1 ? 'grab' : 'default' }}
+                     onMouseDown={displayImages.length > 1 ? handleMouseDown : undefined}
+                     onMouseMove={displayImages.length > 1 ? handleMouseMove : undefined}
+                     onMouseUp={displayImages.length > 1 ? handleMouseUp : undefined}
+                     onMouseLeave={displayImages.length > 1 ? handleMouseLeave : undefined}
+                     onTouchStart={displayImages.length > 1 ? handleTouchStart : undefined}
+                     onTouchMove={displayImages.length > 1 ? handleTouchMove : undefined}
+                     onTouchEnd={displayImages.length > 1 ? handleTouchEnd : undefined}
+                  >
+                     <div
+                        className="transition-transform duration-200 ease-out"
+                        style={{
+                           transform: isDragging ? `translateX(${translateX}px)` : 'translateX(0)',
                         }}
                      >
-                        <ChevronLeft className="w-6 h-6" />
-                     </button>
-                     <button
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
-                        onClick={(e) => {
-                           e.stopPropagation();
-                           const nextIndex = currentIndex === displayImages.length - 1 ? 0 : currentIndex + 1;
-                           setCurrentIndex(nextIndex);
-                           setFullscreenImage(displayImages[nextIndex]);
-                        }}
-                     >
-                        <ChevronRight className="w-6 h-6" />
-                     </button>
-                  </>
-               )}
-               {/* Image counter */}
+                        <img
+                           src={displayImages[currentIndex]}
+                           alt={`Thread image ${currentIndex + 1}`}
+                           className="w-full h-auto pointer-events-none"
+                           loading="lazy"
+                           draggable={false}
+                           onError={(e) => {
+                              console.error(`[ThreadsImages] Failed to load:`, displayImages[currentIndex]?.substring(0, 80));
+                              e.currentTarget.src = '/assets/platforms/threads.png';
+                              e.currentTarget.className = 'w-full h-auto p-16 pointer-events-none';
+                           }}
+                        />
+                     </div>
+                  </div>
+               </div>
+
+               {/* Bar Pagination (if multiple images) */}
                {displayImages.length > 1 && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-sm">
-                     {currentIndex + 1} / {displayImages.length}
+                  <div className="mt-3">
+                     {/* Segmented bar pagination */}
+                     <div className="flex gap-1">
+                        {displayImages.map((_: any, idx: number) => (
+                           <button
+                              key={idx}
+                              onClick={() => goToIndex(idx)}
+                              className={`h-1 flex-1 rounded-full transition-all duration-300 ${idx === currentIndex
+                                 ? 'bg-[#21dba4]'
+                                 : 'bg-[#e0e0e0] dark:bg-[#333333] hover:bg-[#c0c0c0] dark:hover:bg-[#444444]'
+                                 }`}
+                              aria-label={`Go to image ${idx + 1}`}
+                           />
+                        ))}
+                     </div>
                   </div>
                )}
-            </div>
+            </motion.div>
          )}
       </div>
    );
 };
 
 export default ThreadsLayout;
+
