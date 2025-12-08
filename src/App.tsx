@@ -60,17 +60,31 @@ const App = () => {
     });
   };
 
-  // Keyboard shortcut: Command + ' to toggle thumbnails
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  const toggleLanguage = () => setLanguage(prev => prev === 'KR' ? 'EN' : 'KR');
+
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === "'") {
+      // Toggle Thumbnails/View Mode: Cmd/Ctrl + '
+      if ((e.metaKey || e.ctrlKey) && e.key === "'") {
         e.preventDefault();
         toggleThumbnails();
+      }
+      // Toggle Language: Cmd/Ctrl + /
+      if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+        e.preventDefault();
+        toggleLanguage();
+      }
+      // Toggle Dark Mode: Cmd/Ctrl + .
+      if ((e.metaKey || e.ctrlKey) && e.key === ".") {
+        e.preventDefault();
+        toggleDarkMode();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [toggleThumbnails, toggleLanguage, toggleDarkMode]); // Dependencies needed if functions use closure state, but they use setState actions which is fine. Added for safety or better standard.
 
   useEffect(() => {
     if (isDarkMode) {
@@ -88,8 +102,7 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-  const toggleLanguage = () => setLanguage(prev => prev === 'KR' ? 'EN' : 'KR');
+  // toggleDarkMode and toggleLanguage moved up
 
   // Store previous view to return to it
   const [previousView, setPreviousView] = useState<'clips' | 'collections' | 'collection-detail'>('clips');
@@ -208,6 +221,10 @@ const App = () => {
           }
           language={language}
           user={user}
+          toggleDarkMode={toggleDarkMode}
+          toggleLanguage={toggleLanguage}
+          toggleThumbnails={toggleThumbnails}
+          showThumbnails={showThumbnails}
         />
       </div>
 

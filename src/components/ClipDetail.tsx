@@ -445,7 +445,7 @@ const WebLayout = ({ clip, isLiked, setIsLiked, isSaved, setIsSaved }: any) => {
                ) : clip.contentMarkdown ? (
                   <div className="prose prose-slate dark:prose-invert max-w-none mb-8">
                      <div
-                        className="text-lg text-[#3d3d3d] dark:text-gray-200 leading-relaxed whitespace-pre-wrap"
+                        className="text-lg text-[#3d3d3d] dark:text-gray-300 !dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
                         style={{ wordBreak: 'break-word' }}
                      >
                         {clip.contentMarkdown}

@@ -274,3 +274,12 @@ curl -X POST http://localhost:3000/api/dom-import \
 **마지막 커밋 정보:**
 - 날짜: 2025-12-03
 - 주요 변경: 제로 할루시네이션 정책 구현, 서버 측 DOM 렌더링 완성
+
+#### 5. UI Color & Visibility Fixes (2025-12-08)
+- [x] Clip Source Chip 다크모드 가시성 개선 (Thumbnail View)
+  - Light Mode: bg-white/90 (기존 디자인 유지)
+  - Dark Mode: bg-gray-800 (opacity 100) + text-white (명암비 개선)
+  - Tailwind 투명도 충돌 문제 해결을 위해 Light/Dark 스타일 명시적 분리
+- [x] Collection Detail UI 정리
+  - Header 폴더 아이콘 완전히 제거 (사용자 요청)
+  - 제목과 메타데이터만 깔끔하게 표시하여 가독성 향상

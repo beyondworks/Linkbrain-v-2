@@ -155,9 +155,9 @@ const ClipCard = ({
                         >
                            <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
                         </button>
-                        <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                        <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-gray-800 dark:bg-opacity-100 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                            {getSourceIcon(source)}
-                           <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                           <span className="text-[#5a5a5a] dark:text-white font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
                         </div>
                      </div>
                      {renderThumbnail()}
@@ -188,7 +188,7 @@ const ClipCard = ({
                         </button>
                         <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                            {getSourceIcon(source)}
-                           <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                           <span className="text-[#5a5a5a] !dark:text-white font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
                         </div>
                      </div>
                   )}
@@ -290,9 +290,9 @@ const ClipCard = ({
                      >
                         <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
                      </button>
-                     <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                     <div className="px-2 py-[2px] rounded-[6px] bg-white/90 dark:bg-gray-800 dark:bg-opacity-100 backdrop-blur-sm border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                         {getSourceIcon(source)}
-                        <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                        <span className="text-[#5a5a5a] dark:text-white font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
                      </div>
                   </div>
                   {renderThumbnail()}
@@ -311,7 +311,7 @@ const ClipCard = ({
                      </button>
                      <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                         {getSourceIcon(source)}
-                        <span className="text-[#5a5a5a] dark:text-gray-300 font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
+                        <span className="text-[#5a5a5a] dark:text-white font-medium text-[10px] md:text-xs">{getSourceLabel(source)}</span>
                      </div>
                   </div>
                )}

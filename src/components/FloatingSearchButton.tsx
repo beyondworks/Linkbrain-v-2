@@ -216,14 +216,14 @@ const FloatingSearchButton = ({ currentView, language = 'KR' }: FloatingSearchBu
                 }
                 className="w-full relative rounded-full"
               >
-                <div className="relative w-full h-[60px] md:h-[76px] bg-white rounded-full flex items-center px-4 md:px-8 overflow-visible">
+                <div className="relative w-full h-[60px] md:h-[76px] bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-full flex items-center px-4 md:px-8 overflow-visible">
                   <input
                     type="text"
                     autoFocus
                     placeholder={language === 'KR' ? "URL을 입력하세요..." : "Paste any URL here..."}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] placeholder-[#c5c5c5] transition-opacity duration-500"
+                    className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] transition-opacity duration-500"
                     style={{ opacity: isFading ? 0 : 1 }}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     disabled={isProcessing}

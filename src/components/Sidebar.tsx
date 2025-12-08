@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List } from 'lucide-react';
+import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List, Moon, Sun, Image as ImageIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,9 +29,13 @@ interface SidebarProps {
   currentView: 'clips' | 'collections' | 'collection-detail' | 'settings' | 'profile';
   language?: 'KR' | 'EN';
   user?: any;
+  toggleDarkMode?: () => void;
+  toggleLanguage?: () => void;
+  toggleThumbnails?: () => void;
+  showThumbnails?: boolean;
 }
 
-const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectionSelect, onSourceSelect, onSearch, onLogout, onSettingsClick, onProfileClick, currentView, language = 'KR', user }: SidebarProps) => {
+const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectionSelect, onSourceSelect, onSearch, onLogout, onSettingsClick, onProfileClick, currentView, language = 'KR', user, toggleDarkMode, toggleLanguage, toggleThumbnails, showThumbnails }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMyClipOpen, setIsMyClipOpen] = useState(true);
   const [isSourceOpen, setIsSourceOpen] = useState(true);
@@ -578,6 +582,52 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                 <DropdownMenuContent side="top" align="center" className="w-[330px] mb-2 rounded-[20px] p-2 bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-gray-800">
                   <DropdownMenuLabel className="text-[#959595]">{language === 'KR' ? '내 계정' : 'My Account'}</DropdownMenuLabel>
                   <DropdownMenuSeparator className="dark:bg-gray-800" />
+
+                  {/* Language Toggle */}
+                  <DropdownMenuItem
+                    onClick={() => toggleLanguage && toggleLanguage()}
+                    className="cursor-pointer py-3 rounded-[12px] focus:bg-gray-50 dark:focus:bg-[#252525] text-[#3d3d3d] dark:text-white flex justify-between items-center"
+                  >
+                    <div className="flex items-center">
+                      <Globe className="mr-2 h-4 w-4" />
+                      <span>{language === 'KR' ? '언어 변경 (English)' : 'Change Language (한국어)'}</span>
+                    </div>
+                    <span className="text-xs text-gray-400 font-mono tracking-tighter ml-2 bg-gray-100 dark:bg-[#333] px-1.5 py-0.5 rounded">
+                      {navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : 'Ctrl'}/
+                    </span>
+                  </DropdownMenuItem>
+
+                  {/* Dark Mode Toggle */}
+                  <DropdownMenuItem
+                    onClick={() => toggleDarkMode && toggleDarkMode()}
+                    className="cursor-pointer py-3 rounded-[12px] focus:bg-gray-50 dark:focus:bg-[#252525] text-[#3d3d3d] dark:text-white flex justify-between items-center"
+                  >
+                    <div className="flex items-center">
+                      <Moon className="mr-2 h-4 w-4 block dark:hidden" />
+                      <Sun className="mr-2 h-4 w-4 hidden dark:block" />
+                      <span>{language === 'KR' ? '다크 모드' : 'Dark Mode'}</span>
+                    </div>
+                    <span className="text-xs text-gray-400 font-mono tracking-tighter ml-2 bg-gray-100 dark:bg-[#333] px-1.5 py-0.5 rounded">
+                      {navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : 'Ctrl'}.
+                    </span>
+                  </DropdownMenuItem>
+
+                  {/* Thumbnail Toggle */}
+                  <DropdownMenuItem
+                    onClick={() => toggleThumbnails && toggleThumbnails()}
+                    className="cursor-pointer py-3 rounded-[12px] focus:bg-gray-50 dark:focus:bg-[#252525] text-[#3d3d3d] dark:text-white flex justify-between items-center"
+                  >
+                    <div className="flex items-center">
+                      <ImageIcon className="mr-2 h-4 w-4" />
+                      <span>{language === 'KR' ? (showThumbnails ? '썸네일 끄기' : '썸네일 켜기') : (showThumbnails ? 'Hide Thumbnails' : 'Show Thumbnails')}</span>
+                    </div>
+                    <span className="text-xs text-gray-400 font-mono tracking-tighter ml-2 bg-gray-100 dark:bg-[#333] px-1.5 py-0.5 rounded">
+                      {navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : 'Ctrl'}'
+                    </span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="dark:bg-gray-800" />
+
                   <DropdownMenuItem onClick={() => onProfileClick && onProfileClick()} className="cursor-pointer py-3 rounded-[12px] focus:bg-gray-50 dark:focus:bg-[#252525] text-[#3d3d3d] dark:text-white">
                     <User className="mr-2 h-4 w-4" />
                     <span>{language === 'KR' ? '프로필' : 'Profile'}</span>

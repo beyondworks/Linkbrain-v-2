@@ -51,9 +51,9 @@ const DeleteConfirmationDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-white sm:max-w-[425px] rounded-2xl border-gray-100 shadow-xl">
+      <DialogContent className="bg-white dark:bg-[#1e1e1e] sm:max-w-[425px] rounded-2xl border-gray-100 dark:border-gray-800 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-[#3d3d3d] text-xl font-bold">
+          <DialogTitle className="text-[#3d3d3d] dark:text-white text-xl font-bold">
             {title || defaultTitle}
           </DialogTitle>
           <DialogDescription className="text-[#959595]">
@@ -74,7 +74,7 @@ const DeleteConfirmationDialog = ({
 
         <div className="grid gap-4 py-4">
           <div>
-            <label htmlFor="password" className="text-sm font-medium text-[#3d3d3d] block mb-4">
+            <label htmlFor="password" className="text-sm font-medium text-[#3d3d3d] dark:text-gray-300 block mb-4">
               {language === 'KR' ? '비밀번호' : 'Password'}
             </label>
             <Input
@@ -86,7 +86,7 @@ const DeleteConfirmationDialog = ({
                 if (error) setError("");
               }}
               placeholder={language === 'KR' ? "비밀번호를 입력하세요" : "Enter your password"}
-              className={`rounded-xl border-gray-200 focus-visible:ring-[#21dba4] ${error ? "border-red-500" : ""}`}
+              className={`rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252525] text-[#3d3d3d] dark:text-white focus-visible:ring-[#21dba4] ${error ? "border-red-500" : ""}`}
             />
             {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </div>
@@ -96,7 +96,7 @@ const DeleteConfirmationDialog = ({
           <Button
             variant="outline"
             onClick={onClose}
-            className="rounded-full border-gray-200 hover:bg-gray-50 text-[#3d3d3d]"
+            className="rounded-full border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#252525] text-[#3d3d3d] dark:text-gray-300"
             disabled={isLoading}
           >
             {language === 'KR' ? '취소' : 'Cancel'}

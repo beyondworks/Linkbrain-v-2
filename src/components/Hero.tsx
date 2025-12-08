@@ -92,7 +92,7 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        className="text-base md:text-[24px] text-[#3d3d3d] max-w-2xl leading-snug mb-16"
+        className="text-base md:text-[24px] text-[#3d3d3d] dark:text-gray-300 max-w-2xl leading-snug mb-16"
       >
         <p>{language === 'KR' ? "스크랩을 더 쉽게 - 정리는 더 똑똑하게" : "Your internet brain, reimaged."}</p>
         <p>{language === 'KR' ? "링크 하나면 충분해요 나머진 우리가 할게요" : "Save links with full context and let AI do the heavy lifting."}</p>

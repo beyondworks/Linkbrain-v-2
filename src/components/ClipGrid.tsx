@@ -361,15 +361,15 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
                 <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+              <DropdownMenuContent align="end" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                   onClick={() => setSortOrder('newest')}
                 >
                   {language === 'KR' ? '최신순' : 'Newest'}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                   onClick={() => setSortOrder('oldest')}
                 >
                   {language === 'KR' ? '오래된순' : 'Oldest'}
@@ -383,9 +383,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 <span>{selectedCategory && selectedCategory !== 'All' ? selectedCategory : (language === 'KR' ? '카테고리' : 'Category')}</span>
                 <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+              <DropdownMenuContent align="end" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                   onClick={() => onCategoryChange && onCategoryChange('All')}
                 >
                   All
@@ -393,7 +393,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 {uniqueCategories.map(category => (
                   <DropdownMenuItem
                     key={category}
-                    className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                    className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                     onClick={() => onCategoryChange && onCategoryChange(category)}
                   >
                     {category}
@@ -408,9 +408,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 <span>{selectedSource && selectedSource !== 'All Sources' ? selectedSource : (language === 'KR' ? '출처' : 'Source')}</span>
                 <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+              <DropdownMenuContent align="end" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                   onClick={() => onSourceChange && onSourceChange('All Sources')}
                 >
                   All Sources
@@ -418,7 +418,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 {uniqueSources.map(source => (
                   <DropdownMenuItem
                     key={source}
-                    className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                    className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                     onClick={() => onSourceChange && onSourceChange(source)}
                   >
                     {source.charAt(0).toUpperCase() + source.slice(1)}
@@ -453,14 +453,14 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           {!isSelectMode && (
             <button
               onClick={() => setIsSelectMode(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-sm font-medium transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-300 text-sm font-medium transition-colors"
               title={language === 'KR' ? '선택 모드' : 'Selection mode'}
             >
               <input
                 type="checkbox"
                 checked={selectedClips.size > 0 && selectedClips.size === visibleClips.length}
                 readOnly
-                className="w-4 h-4 cursor-pointer"
+                className="w-4 h-4 cursor-pointer accent-[#21dba4] dark:accent-[#21dba4]"
               />
               <span>{language === 'KR' ? '선택' : 'Select'}</span>
             </button>
@@ -477,15 +477,15 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
                 <ChevronDown className="w-2.5 h-2.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+              <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                   onClick={() => setSortOrder('newest')}
                 >
                   {language === 'KR' ? '최신순' : 'Newest'}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                   onClick={() => setSortOrder('oldest')}
                 >
                   {language === 'KR' ? '오래된순' : 'Oldest'}
@@ -499,9 +499,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 <span>{selectedCategory && selectedCategory !== 'All' ? selectedCategory : (language === 'KR' ? '카테고리' : 'Category')}</span>
                 <ChevronDown className="w-2.5 h-2.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+              <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                   onClick={() => onCategoryChange && onCategoryChange('All')}
                 >
                   All
@@ -509,7 +509,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 {uniqueCategories.map(category => (
                   <DropdownMenuItem
                     key={category}
-                    className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                    className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                     onClick={() => onCategoryChange && onCategoryChange(category)}
                   >
                     {category}
@@ -524,9 +524,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 <span>{selectedSource && selectedSource !== 'All Sources' ? selectedSource : (language === 'KR' ? '출처' : 'Source')}</span>
                 <ChevronDown className="w-2.5 h-2.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+              <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                   onClick={() => onSourceChange && onSourceChange('All Sources')}
                 >
                   All Sources
@@ -534,7 +534,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
                 {uniqueSources.map(source => (
                   <DropdownMenuItem
                     key={source}
-                    className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2"
+                    className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2"
                     onClick={() => onSourceChange && onSourceChange(source)}
                   >
                     {source.charAt(0).toUpperCase() + source.slice(1)}

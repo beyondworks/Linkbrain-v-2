@@ -104,6 +104,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
     }
   };
 
+
   const filteredClips = clips.filter(clip => {
     const categoryMatch = selectedCategory === 'All' || clip.category === selectedCategory;
     const sourceMatch = selectedSource === 'All Sources' || clip.source.toLowerCase() === selectedSource.toLowerCase().replace('all sources', '');
@@ -174,11 +175,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
           </button>
 
           <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center text-white`} style={{ backgroundColor: colData.color }}>
-              <svg className="w-6 h-6" viewBox="0 0 40 40" fill="none">
-                <path d={svgPathsOpen.p18756800} fill="currentColor" />
-              </svg>
-            </div>
+
             <div className="flex items-center gap-3">
               <h2 className="text-[#3d3d3d] dark:text-white text-[24px] font-bold leading-none">{colData.name}</h2>
               <span className="text-[#959595] text-[14px]">{clips.length} clips</span>
@@ -189,15 +186,15 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
         <div className="flex items-center gap-3">
           {/* Category Filter */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E0E0E0] rounded-[12px] text-[#959595] text-[14px] hover:border-[#21DBA4] hover:text-[#21DBA4] transition-colors focus:outline-none">
+            <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 rounded-[12px] text-[#959595] dark:text-gray-300 text-[14px] hover:border-[#21DBA4] hover:text-[#21DBA4] transition-colors focus:outline-none">
               <span>{selectedCategory === 'All' ? (language === 'KR' ? '카테고리' : 'Category') : selectedCategory}</span>
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+            <DropdownMenuContent align="end" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
               <DropdownMenuItem
-                className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                 onClick={() => setSelectedCategory('All')}
               >
                 All
@@ -205,7 +202,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
               {uniqueCategories.map((category) => (
                 <DropdownMenuItem
                   key={category}
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                   onClick={() => setSelectedCategory(category)}
                 >
                   {category}
@@ -216,15 +213,15 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
 
           {/* Source Filter */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E0E0E0] rounded-[12px] text-[#959595] text-[14px] hover:border-[#21DBA4] hover:text-[#21DBA4] transition-colors focus:outline-none">
+            <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 rounded-[12px] text-[#959595] dark:text-gray-300 text-[14px] hover:border-[#21DBA4] hover:text-[#21DBA4] transition-colors focus:outline-none">
               <span>{selectedSource === 'All Sources' ? (language === 'KR' ? '출처' : 'Source') : selectedSource}</span>
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+            <DropdownMenuContent align="end" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
               <DropdownMenuItem
-                className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                 onClick={() => setSelectedSource('All Sources')}
               >
                 All Sources
@@ -232,7 +229,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
               {uniqueSources.map((source) => (
                 <DropdownMenuItem
                   key={source}
-                  className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                  className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                   onClick={() => setSelectedSource(source)}
                 >
                   {source.charAt(0).toUpperCase() + source.slice(1)}
@@ -243,21 +240,21 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
 
           {/* Sort Button */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E0E0E0] rounded-[12px] text-[#959595] text-[14px] hover:border-[#21DBA4] hover:text-[#21DBA4] transition-colors focus:outline-none">
+            <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 rounded-[12px] text-[#959595] dark:text-gray-300 text-[14px] hover:border-[#21DBA4] hover:text-[#21DBA4] transition-colors focus:outline-none">
               <span>{sortOrder === 'newest' ? 'Newest' : 'Oldest'}</span>
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 bg-white rounded-xl border border-gray-100 shadow-lg p-1">
+            <DropdownMenuContent align="end" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
               <DropdownMenuItem
-                className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                 onClick={() => setSortOrder('newest')}
               >
                 Newest
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="cursor-pointer rounded-lg hover:bg-gray-50 text-sm text-gray-600 px-3 py-2 focus:text-[#21dba4]"
+                className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
                 onClick={() => setSortOrder('oldest')}
               >
                 Oldest
