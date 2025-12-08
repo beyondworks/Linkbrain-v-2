@@ -60,6 +60,11 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
   - 카테고리 변경 시 UI 즉시 업데이트 (onCategoryChange 콜백)
   - list 뷰에 CategoryChangeDialog 누락 버그 수정
   - 터치 영역 확대 및 onTouchEnd 핸들러 추가
+- [x] **ClipDetail 레이아웃 구조 개선** (2025-12-08)
+  - 전체 화면 fixed 컨테이너로 변경 (독립적 레이아웃)
+  - 헤더를 sticky로 변경 (스크롤 컨테이너 내 고정)
+  - 모바일/데스크톱 위치 정확히 조정
+  - App.tsx pt-8 래퍼 제거
 
 #### 2. 서버 측 DOM 렌더링 구현
 - [x] 공통 클립 서비스 추출 (`api/lib/clip-service.ts`)
