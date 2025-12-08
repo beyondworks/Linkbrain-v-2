@@ -6,6 +6,7 @@ import { doc, updateDoc, collection, query, where, onSnapshot, deleteDoc } from 
 import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'sonner';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import CategoryChangeDialog from './CategoryChangeDialog';
 import { InstagramLayout } from './ClipDetail_Instagram';
 import { ThreadsLayout } from './ClipDetail_Threads';
 
@@ -47,6 +48,17 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
    const [user, setUser] = useState<any>(null);
    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
    const [isDeleting, setIsDeleting] = useState(false);
+   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+
+   // Local category state for real-time updates
+   const [currentCategory, setCurrentCategory] = useState(clip.category);
+   const [currentCategoryColor, setCurrentCategoryColor] = useState(clip.categoryColor);
+
+   // Handle category change from dialog
+   const handleCategoryChange = (newCategory: string, newColor: { bg: string; text: string }) => {
+      setCurrentCategory(newCategory);
+      setCurrentCategoryColor(newColor as any);
+   };
 
    // Scroll to top on mount
    useEffect(() => {
@@ -204,13 +216,16 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
                               {language === 'KR' ? '카테고리' : 'Category'}
                            </span>
                            {(() => {
-                              const color = clip.categoryColor as any;
+                              const color = currentCategoryColor as any;
                               const bgClass = typeof color === 'object' && color?.bg ? color.bg : 'bg-gray-100 dark:bg-gray-800';
                               const textClass = typeof color === 'object' && color?.text ? color.text : 'text-gray-700 dark:text-gray-300';
                               return (
-                                 <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium w-fit ${bgClass} ${textClass}`}>
-                                    {clip.category}
-                                 </span>
+                                 <button
+                                    onClick={() => setIsCategoryDialogOpen(true)}
+                                    className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium w-fit ${bgClass} ${textClass} hover:ring-2 hover:ring-[#21DBA4] hover:ring-offset-1 transition-all cursor-pointer`}
+                                 >
+                                    {currentCategory}
+                                 </button>
                               );
                            })()}
                         </div>
@@ -295,6 +310,16 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
                   : [`Are you sure you want to delete "${clip.title}"?`, "This action cannot be undone."]}
                isLoading={isDeleting}
                language={language}
+            />
+
+            {/* Category Change Dialog */}
+            <CategoryChangeDialog
+               isOpen={isCategoryDialogOpen}
+               onClose={() => setIsCategoryDialogOpen(false)}
+               clipId={clip.id}
+               currentCategory={currentCategory}
+               language={language}
+               onCategoryChange={handleCategoryChange}
             />
          </motion.div>
       </>

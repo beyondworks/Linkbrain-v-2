@@ -146,8 +146,12 @@ const ClipCard = ({
                   <div className="relative w-full md:w-[320px] bg-[#d9d9d9] dark:bg-[#252525] flex-shrink-0 overflow-hidden" style={{ aspectRatio: '16/9' }}>
                      <div className="absolute top-4 left-4 flex gap-2 z-10">
                         <button
-                           onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
-                           className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                           onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('[DEBUG] Category chip clicked, opening dialog for clip:', id);
+                              setIsCategoryDialogOpen(true);
+                           }}
+                           className={`px-3 py-1 min-h-[28px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer active:scale-95`}
                         >
                            <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
                         </button>
@@ -166,10 +170,21 @@ const ClipCard = ({
                   {!showThumbnail && (
                      <div className="flex gap-2 mb-1">
                         <button
-                           onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
-                           className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                           onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              console.log('[DEBUG] Category chip (no thumb) clicked:', id);
+                              setIsCategoryDialogOpen(true);
+                           }}
+                           onTouchEnd={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              console.log('[DEBUG] Category chip (no thumb) touched:', id);
+                              setIsCategoryDialogOpen(true);
+                           }}
+                           className={`px-3 py-1 min-h-[28px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer active:scale-95 relative z-20`}
                         >
-                           <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
+                           <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs pointer-events-none`}>{category}</span>
                         </button>
                         <div className="px-2 py-[2px] rounded-[6px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                            {getSourceIcon(source)}
@@ -248,6 +263,13 @@ const ClipCard = ({
                   language={language}
                />
             )}
+            <CategoryChangeDialog
+               isOpen={isCategoryDialogOpen}
+               onClose={() => setIsCategoryDialogOpen(false)}
+               clipId={id}
+               currentCategory={category}
+               language={language}
+            />
          </>
       );
    }
@@ -264,7 +286,7 @@ const ClipCard = ({
                   <div className="absolute top-4 left-4 flex gap-2 z-10">
                      <button
                         onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
-                        className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                        className={`px-3 py-1 min-h-[28px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer active:scale-95`}
                      >
                         <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
                      </button>
@@ -283,7 +305,7 @@ const ClipCard = ({
                   <div className="flex gap-2 mb-1">
                      <button
                         onClick={(e) => { e.stopPropagation(); setIsCategoryDialogOpen(true); }}
-                        className={`px-2 py-[2px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer`}
+                        className={`px-3 py-1 min-h-[28px] rounded-[6px] ${categoryColor.bg} hover:ring-2 hover:ring-[#21dba4] hover:ring-offset-1 transition-all cursor-pointer active:scale-95`}
                      >
                         <span className={`${categoryColor.text} font-medium text-[10px] md:text-xs`}>{category}</span>
                      </button>

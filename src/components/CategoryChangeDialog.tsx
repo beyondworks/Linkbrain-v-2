@@ -14,6 +14,7 @@ interface CategoryChangeDialogProps {
     clipId: string;
     currentCategory: string;
     language: 'KR' | 'EN';
+    onCategoryChange?: (newCategory: string, newColor: { bg: string; text: string }) => void;
 }
 
 const PRESET_COLORS = [
@@ -39,7 +40,8 @@ const CategoryChangeDialog = ({
     onClose,
     clipId,
     currentCategory,
-    language
+    language,
+    onCategoryChange
 }: CategoryChangeDialogProps) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [existingCategories, setExistingCategories] = useState<string[]>([]);
@@ -150,6 +152,15 @@ const CategoryChangeDialog = ({
                 category: selectedCategory
             });
             toast.success(language === 'KR' ? '카테고리가 변경되었습니다' : 'Category updated');
+
+            // Call callback to update parent component
+            if (onCategoryChange) {
+                const categoryData = categories.find(c => c.name === selectedCategory);
+                const colorIndex = categoryData?.colorIndex ?? 0;
+                const color = PRESET_COLORS[colorIndex % PRESET_COLORS.length];
+                onCategoryChange(selectedCategory, { bg: color.bg, text: color.text });
+            }
+
             onClose();
         } catch (error) {
             console.error('Error updating category:', error);
@@ -161,8 +172,13 @@ const CategoryChangeDialog = ({
 
     const hasChanges = selectedCategory !== currentCategory;
 
+    // Debug: log when dialog open state changes
+    useEffect(() => {
+        console.log('[CategoryChangeDialog] isOpen changed to:', isOpen, 'for clip:', clipId);
+    }, [isOpen, clipId]);
+
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
             <DialogContent
                 className="sm:max-w-[425px] bg-white dark:bg-[#1e1e1e] text-[#3d3d3d] dark:text-white"
                 onPointerDownOutside={(e: Event) => e.preventDefault()}
