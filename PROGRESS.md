@@ -37,6 +37,20 @@ Linkbrain v-2는 URL과 웹 콘텐츠를 아카이브하고 AI로 메타데이�
   - 바(bar) 형태 페이지네이션으로 변경
   - 헤더에 `< 1/10 >` 형태 네비게이션 화살표 배치
   - 원본 이미지 비율 유지 (maxHeight 제한 제거)
+- [x] **모바일 검색 실시간 필터링** (2025-12-08)
+  - MobileSidebar에 onSearch prop 및 debounce 로직 추가
+  - 데스크톱 Sidebar와 동일한 검색 UX 구현
+- [x] **사이드바 UX 개선** (2025-12-08)
+  - 카테고리/컬렉션 필터 검색 추가 (4개 이상일 때 표시)
+  - 리스트/클라우드 뷰 모드 토글 추가
+  - 즐겨찾기(★) 기능 추가 (localStorage 저장)
+  - 최근 사용 카테고리 자동 정렬 (최대 5개)
+  - 정렬 순서: 즐겨찾기 → 최근 사용 → 알파벳순
+- [x] **뒤로가기 버튼 UI 통일** (2025-12-08)
+  - 모든 페이지 동일 스타일 적용: w-10 h-10, rounded-full, border
+  - ChevronLeft 아이콘 (w-6 h-6)
+  - hover:text-[#21DBA4] hover:border-[#21DBA4]
+  - 적용 페이지: ProfilePage, SettingsPage, CollectionsPage, SecurityPage, NotificationsPage
 
 #### 2. 서버 측 DOM 렌더링 구현
 - [x] 공통 클립 서비스 추출 (`api/lib/clip-service.ts`)
