@@ -221,6 +221,7 @@ const App = () => {
           onCreateCollection={() => setIsCreateCollectionOpen(true)}
           onCollectionSelect={handleCollectionClick}
           onSourceSelect={handleSourceSelect}
+          onSearch={setSearchQuery}
           onLogout={handleLogout}
           onSettingsClick={() => setCurrentView('settings')}
           onProfileClick={() => setCurrentView('profile')}

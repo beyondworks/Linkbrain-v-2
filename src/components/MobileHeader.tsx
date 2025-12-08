@@ -10,6 +10,7 @@ interface MobileHeaderProps {
    onCreateCollection?: () => void;
    onCollectionSelect?: (collection: any) => void;
    onSourceSelect?: (source: string | null) => void;
+   onSearch?: (query: string) => void;
    onLogout?: () => void;
    onSettingsClick?: () => void;
    onProfileClick?: () => void;

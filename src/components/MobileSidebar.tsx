@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "motion/react";
 import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search } from 'lucide-react';
 import {
@@ -20,6 +20,7 @@ interface MobileSidebarProps {
     onCreateCollection?: () => void;
     onCollectionSelect?: (collection: any) => void;
     onSourceSelect?: (source: string | null) => void;
+    onSearch?: (query: string) => void;
     onLogout?: () => void;
     onSettingsClick?: () => void;
     onProfileClick?: () => void;
@@ -41,6 +42,7 @@ const MobileSidebar = ({
     onCreateCollection,
     onCollectionSelect,
     onSourceSelect,
+    onSearch,
     onLogout,
     onSettingsClick,
     onProfileClick,
@@ -55,6 +57,17 @@ const MobileSidebar = ({
     const [tags, setTags] = React.useState<{ name: string, color: { bg: string, text: string } }[]>([]);
     const [sources, setSources] = React.useState<{ name: string, icon: React.ReactNode }[]>([]);
     const [collections, setCollections] = React.useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Debounced search - matches desktop Sidebar behavior
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (onSearch) {
+                onSearch(searchQuery);
+            }
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, onSearch]);
 
     React.useEffect(() => {
         if (!user) {
@@ -154,6 +167,8 @@ const MobileSidebar = ({
                         <Search className="w-4 h-4 text-[#959595]" />
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={language === 'KR' ? "검색..." : "Search..."}
                             className="w-full bg-transparent outline-none text-[15px] text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5]"
                         />
