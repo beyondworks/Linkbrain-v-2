@@ -127,14 +127,48 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
   const uniqueSources = Array.from(new Set(clips.map(clip => clip.source))).filter(Boolean).sort();
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-6 pb-20 pt-8">
+    <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 pb-20 pt-8">
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      {/* Mobile Header */}
+      <div className="flex flex-col gap-4 mb-6 md:hidden">
+        {/* Title Row */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors flex-shrink-0"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <h2 className="text-[#3d3d3d] dark:text-white text-[20px] font-bold leading-tight truncate">{colData.name}</h2>
+            <span className="text-[#959595] text-[12px] flex-shrink-0">{clips.length} clips</span>
+          </div>
+          {/* Mobile Options Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-[#252525] flex items-center justify-center text-[#959595] transition-colors focus:outline-none">
+              <MoreHorizontal className="w-5 h-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
+              <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2">
+                {language === 'KR' ? '컬렉션 수정' : 'Edit Collection'}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-500 px-3 py-2"
+                onClick={() => setIsDeleteDialogOpen(true)}
+              >
+                {language === 'KR' ? '컬렉션 삭제' : 'Delete Collection'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Desktop Header */}
+      <div className="hidden md:flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white border border-[#E0E0E0] flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
+            className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -145,8 +179,8 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
                 <path d={svgPathsOpen.p18756800} fill="currentColor" />
               </svg>
             </div>
-            <div>
-              <h2 className="text-[#3d3d3d] text-[24px] font-bold leading-none">{colData.name}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-[#3d3d3d] dark:text-white text-[24px] font-bold leading-none">{colData.name}</h2>
               <span className="text-[#959595] text-[14px]">{clips.length} clips</span>
             </div>
           </div>
@@ -271,11 +305,104 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-[#E0E0E0] mb-8"></div>
+      {/* Mobile Filter Bar - matching ClipGrid pattern */}
+      <div className="flex md:hidden w-full items-center gap-2 mb-4">
+        {/* Sort Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+            <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
+            <svg width="8" height="5" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
+            <DropdownMenuItem
+              className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
+              onClick={() => setSortOrder('newest')}
+            >
+              {language === 'KR' ? '최신순' : 'Newest'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
+              onClick={() => setSortOrder('oldest')}
+            >
+              {language === 'KR' ? '오래된순' : 'Oldest'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-      {/* Content Grid */}
-      <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+        {/* Category Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+            <span>{selectedCategory === 'All' ? (language === 'KR' ? '카테고리' : 'Category') : selectedCategory}</span>
+            <svg width="8" height="5" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
+            <DropdownMenuItem
+              className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
+              onClick={() => setSelectedCategory('All')}
+            >
+              All
+            </DropdownMenuItem>
+            {uniqueCategories.map((category) => (
+              <DropdownMenuItem
+                key={category}
+                className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Source Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+            <span>{selectedSource === 'All Sources' ? (language === 'KR' ? '출처' : 'Source') : selectedSource}</span>
+            <svg width="8" height="5" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
+            <DropdownMenuItem
+              className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
+              onClick={() => setSelectedSource('All Sources')}
+            >
+              {language === 'KR' ? '전체' : 'All Sources'}
+            </DropdownMenuItem>
+            {uniqueSources.map((source) => (
+              <DropdownMenuItem
+                key={source}
+                className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] text-sm text-gray-600 dark:text-gray-300 px-3 py-2 focus:text-[#21dba4]"
+                onClick={() => setSelectedSource(source)}
+              >
+                {source.charAt(0).toUpperCase() + source.slice(1)}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Divider */}
+      <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-700 mb-6 md:mb-8"></div>
+
+      {/* Mobile List View (Always List) */}
+      <div className="grid gap-4 grid-cols-1 md:hidden">
+        {sortedClips.map(clip => (
+          <ClipCard
+            key={clip.id}
+            {...clip}
+            variant="list"
+            onClick={() => onClipClick && onClipClick(clip)}
+          />
+        ))}
+      </div>
+
+      {/* Desktop View (Grid/List Toggleable) */}
+      <div className={`hidden md:grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
         {sortedClips.map(clip => (
           <ClipCard
             key={clip.id}
