@@ -298,7 +298,7 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-6 pb-20">
+    <div className="w-full max-w-[1400px] mx-auto px-[20px] md:px-6 pb-20">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
         <div className="flex flex-col flex-1">

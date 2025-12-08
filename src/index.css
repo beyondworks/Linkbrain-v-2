@@ -1,7 +1,11 @@
 /*! tailwindcss v4.1.3 | MIT License | https://tailwindcss.com */
 @layer properties {
   @supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
-    *, :before, :after, ::backdrop {
+
+    *,
+    :before,
+    :after,
+    ::backdrop {
       --tw-translate-x: 0;
       --tw-translate-y: 0;
       --tw-translate-z: 0;
@@ -67,7 +71,9 @@
 }
 
 @layer theme {
-  :root, :host {
+
+  :root,
+  :host {
     --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --color-red-50: oklch(.971 .013 17.38);
@@ -150,7 +156,11 @@
 }
 
 @layer base {
-  *, :after, :before, ::backdrop {
+
+  *,
+  :after,
+  :before,
+  ::backdrop {
     box-sizing: border-box;
     border: 0 solid;
     margin: 0;
@@ -164,13 +174,12 @@
     padding: 0;
   }
 
-  html, :host {
+  html,
+  :host {
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
     line-height: 1.5;
-    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
-    font-feature-settings: var(--default-font-feature-settings, normal);
-    font-variation-settings: var(--default-font-variation-settings, normal);
+    font-family: 'Pretendard', sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -189,7 +198,12 @@
     text-decoration: underline dotted;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-size: inherit;
     font-weight: inherit;
   }
@@ -201,11 +215,15 @@
     text-decoration: inherit;
   }
 
-  b, strong {
+  b,
+  strong {
     font-weight: bolder;
   }
 
-  code, kbd, samp, pre {
+  code,
+  kbd,
+  samp,
+  pre {
     font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
     font-feature-settings: var(--default-mono-font-feature-settings, normal);
     font-variation-settings: var(--default-mono-font-variation-settings, normal);
@@ -216,7 +234,8 @@
     font-size: 80%;
   }
 
-  sub, sup {
+  sub,
+  sup {
     vertical-align: baseline;
     font-size: 75%;
     line-height: 0;
@@ -249,21 +268,35 @@
     display: list-item;
   }
 
-  ol, ul, menu {
+  ol,
+  ul,
+  menu {
     list-style: none;
   }
 
-  img, svg, video, canvas, audio, iframe, embed, object {
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
     vertical-align: middle;
     display: block;
   }
 
-  img, video {
+  img,
+  video {
     max-width: 100%;
     height: auto;
   }
 
-  button, input, select, optgroup, textarea {
+  button,
+  input,
+  select,
+  optgroup,
+  textarea {
     font: inherit;
     font-feature-settings: inherit;
     font-variation-settings: inherit;
@@ -369,7 +402,8 @@
     box-shadow: none;
   }
 
-  button, input:where([type="button"], [type="reset"], [type="submit"]) {
+  button,
+  input:where([type="button"], [type="reset"], [type="submit"]) {
     appearance: button;
   }
 
@@ -446,7 +480,8 @@
     line-height: 1.5;
   }
 
-  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) label, :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) button {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) label,
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) button {
     font-size: var(--text-base);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
@@ -1134,7 +1169,8 @@
     flex: 1;
   }
 
-  .flex-shrink-0, .shrink-0 {
+  .flex-shrink-0,
+  .shrink-0 {
     flex-shrink: 0;
   }
 
@@ -1393,15 +1429,15 @@
   }
 
   .rounded-md {
-    border-radius: calc(var(--radius)  - 2px);
+    border-radius: calc(var(--radius) - 2px);
   }
 
   .rounded-sm {
-    border-radius: calc(var(--radius)  - 4px);
+    border-radius: calc(var(--radius) - 4px);
   }
 
   .rounded-xl {
-    border-radius: calc(var(--radius)  + 4px);
+    border-radius: calc(var(--radius) + 4px);
   }
 
   .rounded-xs {
@@ -2250,7 +2286,8 @@
     color: #5a5a5a;
   }
 
-  .text-\[\#21DBA4\], .text-\[\#21dba4\] {
+  .text-\[\#21DBA4\],
+  .text-\[\#21dba4\] {
     color: #21dba4;
   }
 
@@ -2671,11 +2708,13 @@
     opacity: .5;
   }
 
-  .selection\:bg-primary ::selection, .selection\:bg-primary::selection {
+  .selection\:bg-primary ::selection,
+  .selection\:bg-primary::selection {
     background-color: var(--primary);
   }
 
-  .selection\:text-primary-foreground ::selection, .selection\:text-primary-foreground::selection {
+  .selection\:text-primary-foreground ::selection,
+  .selection\:text-primary-foreground::selection {
     color: var(--primary-foreground);
   }
 
@@ -3046,15 +3085,15 @@
     opacity: .5;
   }
 
-  .has-\[\>svg\]\:px-2\.5:has( > svg) {
+  .has-\[\>svg\]\:px-2\.5:has(> svg) {
     padding-inline: calc(var(--spacing) * 2.5);
   }
 
-  .has-\[\>svg\]\:px-3:has( > svg) {
+  .has-\[\>svg\]\:px-3:has(> svg) {
     padding-inline: calc(var(--spacing) * 3);
   }
 
-  .has-\[\>svg\]\:px-4:has( > svg) {
+  .has-\[\>svg\]\:px-4:has(> svg) {
     padding-inline: calc(var(--spacing) * 4);
   }
 
@@ -3218,55 +3257,55 @@
     color: var(--destructive);
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:max-w-\[425px\] {
       max-width: 425px;
     }
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:max-w-lg {
       max-width: var(--container-lg);
     }
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:max-w-sm {
       max-width: var(--container-sm);
     }
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:flex-row {
       flex-direction: row;
     }
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:justify-end {
       justify-content: flex-end;
     }
   }
 
-  @media (width >= 40rem) {
+  @media (width >=40rem) {
     .sm\:text-left {
       text-align: left;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:ml-\[100px\] {
       margin-left: 100px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:line-clamp-3 {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
@@ -3275,191 +3314,191 @@
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:block {
       display: block;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:flex {
       display: flex;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:grid {
       display: grid;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:hidden {
       display: none;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:aspect-auto {
       aspect-ratio: auto;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:h-\[54px\] {
       height: 54px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:h-\[76px\] {
       height: 76px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:w-\[54px\] {
       width: 54px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:w-\[100px\] {
       width: 100px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:w-\[320px\] {
       width: 320px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:flex-row {
       flex-direction: row;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:items-center {
       align-items: center;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:items-end {
       align-items: flex-end;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:gap-3 {
       gap: calc(var(--spacing) * 3);
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:p-10 {
       padding: calc(var(--spacing) * 10);
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:p-12 {
       padding: calc(var(--spacing) * 12);
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:px-8 {
       padding-inline: calc(var(--spacing) * 8);
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:px-10 {
       padding-inline: calc(var(--spacing) * 10);
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-4xl {
       font-size: var(--text-4xl);
       line-height: var(--tw-leading, var(--text-4xl--line-height));
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-sm {
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-xl {
       font-size: var(--text-xl);
       line-height: var(--tw-leading, var(--text-xl--line-height));
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-xs {
       font-size: var(--text-xs);
       line-height: var(--tw-leading, var(--text-xs--line-height));
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-\[11px\] {
       font-size: 11px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-\[24px\] {
       font-size: 24px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-\[32px\] {
       font-size: 32px;
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >=48rem) {
     .md\:text-\[64px\] {
       font-size: 64px;
     }
   }
 
-  @media (width >= 64rem) {
+  @media (width >=64rem) {
     .lg\:w-\[320px\] {
       width: 320px;
     }
   }
 
-  @media (width >= 64rem) {
+  @media (width >=64rem) {
     .lg\:grid-cols-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (width >= 64rem) {
+  @media (width >=64rem) {
     .lg\:flex-row {
       flex-direction: row;
     }
   }
 
-  @media (width >= 80rem) {
+  @media (width >=80rem) {
     .xl\:grid-cols-4 {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
@@ -4255,21 +4294,97 @@ html {
 }
 
 /* Custom Category Colors - Manually added because Tailwind JIT is not active */
-.bg-\[\#E8E8E8\] { background-color: #E8E8E8; }
-.text-\[\#5A5A5A\] { color: #5A5A5A; }
-.bg-\[\#E0D5CA\] { background-color: #E0D5CA; }
-.text-\[\#6B5A47\] { color: #6B5A47; }
-.bg-\[\#FCDDC4\] { background-color: #FCDDC4; }
-.text-\[\#C77844\] { color: #C77844; }
-.bg-\[\#F9EAC8\] { background-color: #F9EAC8; }
-.text-\[\#B08B3A\] { color: #B08B3A; }
-.bg-\[\#D4E9D4\] { background-color: #D4E9D4; }
-.text-\[\#5B8C5B\] { color: #5B8C5B; }
-.bg-\[\#D1E7F0\] { background-color: #D1E7F0; }
-.text-\[\#5B8DAF\] { color: #5B8DAF; }
-.bg-\[\#E3D9EC\] { background-color: #E3D9EC; }
-.text-\[\#8B6B9E\] { color: #8B6B9E; }
-.bg-\[\#F4D9E2\] { background-color: #F4D9E2; }
-.text-\[\#B8698D\] { color: #B8698D; }
-.bg-\[\#FADBD8\] { background-color: #FADBD8; }
-.text-\[\#C75F5A\] { color: #C75F5A; }
+.bg-\[\#E8E8E8\] {
+  background-color: #E8E8E8;
+}
+
+.text-\[\#5A5A5A\] {
+  color: #5A5A5A;
+}
+
+.bg-\[\#E0D5CA\] {
+  background-color: #E0D5CA;
+}
+
+.text-\[\#6B5A47\] {
+  color: #6B5A47;
+}
+
+.bg-\[\#FCDDC4\] {
+  background-color: #FCDDC4;
+}
+
+.text-\[\#C77844\] {
+  color: #C77844;
+}
+
+.bg-\[\#F9EAC8\] {
+  background-color: #F9EAC8;
+}
+
+.text-\[\#B08B3A\] {
+  color: #B08B3A;
+}
+
+.bg-\[\#D4E9D4\] {
+  background-color: #D4E9D4;
+}
+
+.text-\[\#5B8C5B\] {
+  color: #5B8C5B;
+}
+
+.bg-\[\#D1E7F0\] {
+  background-color: #D1E7F0;
+}
+
+.text-\[\#5B8DAF\] {
+  color: #5B8DAF;
+}
+
+.bg-\[\#E3D9EC\] {
+  background-color: #E3D9EC;
+}
+
+.text-\[\#8B6B9E\] {
+  color: #8B6B9E;
+}
+
+.bg-\[\#F4D9E2\] {
+  background-color: #F4D9E2;
+}
+
+.text-\[\#B8698D\] {
+  color: #B8698D;
+}
+
+.bg-\[\#FADBD8\] {
+  background-color: #FADBD8;
+}
+
+.text-\[\#C75F5A\] {
+  color: #C75F5A;
+}
+
+/* === CUSTOM MOBILE LAYOUT CLASSES (Added manually) === */
+.h-\[90px\] {
+  height: 90px !important;
+}
+
+.min-h-\[90px\] {
+  min-height: 90px !important;
+}
+
+.px-\[20px\] {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* === GLOBAL 85% UI SCALE (font-size based, safe for popups) === */
+html {
+  font-size: 85%;
+}
+
+body {
+  background-color: #121212;
+}

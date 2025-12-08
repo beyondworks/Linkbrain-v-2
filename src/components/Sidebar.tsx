@@ -579,7 +579,7 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                     <ChevronUp className="w-5 h-5 text-[#959595] group-hover:text-[#21DBA4] transition-colors" />
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="center" className="w-[330px] mb-2 rounded-[20px] p-2 bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-gray-800">
+                <DropdownMenuContent side="top" align="center" sideOffset={8} className="w-[330px] rounded-[20px] p-2 bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-gray-800">
                   <DropdownMenuLabel className="text-[#959595]">{language === 'KR' ? '내 계정' : 'My Account'}</DropdownMenuLabel>
                   <DropdownMenuSeparator className="dark:bg-gray-800" />
 

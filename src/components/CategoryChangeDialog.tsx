@@ -180,7 +180,7 @@ const CategoryChangeDialog = ({
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
             <DialogContent
-                className="sm:max-w-[425px] bg-white dark:bg-[#1e1e1e] text-[#3d3d3d] dark:text-white"
+                className="w-[90%] sm:w-full sm:max-w-[425px] rounded-2xl bg-white dark:bg-[#1e1e1e] text-[#3d3d3d] dark:text-white"
                 onPointerDownOutside={(e: Event) => e.preventDefault()}
                 onInteractOutside={(e: Event) => e.preventDefault()}
             >

@@ -536,7 +536,7 @@ const MobileSidebar = ({
                             <ChevronUp className="w-4 h-4 text-[#959595]" />
                         </div>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" align="center" className="w-[260px] mb-2 rounded-[16px] bg-white dark:bg-[#1e1e1e]">
+                    <DropdownMenuContent side="top" align="center" sideOffset={8} className="w-[260px] rounded-[16px] bg-white dark:bg-[#1e1e1e]">
                         <DropdownMenuItem onClick={() => handleLinkClick(() => onProfileClick && onProfileClick())} className="cursor-pointer py-2.5">
                             <User className="mr-2 h-4 w-4" />
                             <span>Profile</span>

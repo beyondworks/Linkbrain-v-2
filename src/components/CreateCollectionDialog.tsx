@@ -45,7 +45,7 @@ const CreateCollectionDialog = ({ isOpen, onClose, onCreate, language = 'KR' }: 
       }}
     >
       <DialogContent
-        className="sm:max-w-[425px] bg-white text-[#3d3d3d]"
+        className="w-[90%] sm:w-full sm:max-w-[425px] rounded-2xl bg-white dark:bg-[#1e1e1e] text-[#3d3d3d] dark:text-white border dark:border-gray-800"
         onPointerDownOutside={(e: Event) => e.preventDefault()}
         onInteractOutside={(e: Event) => e.preventDefault()}
       >
@@ -72,7 +72,7 @@ const CreateCollectionDialog = ({ isOpen, onClose, onCreate, language = 'KR' }: 
               onClick={(e) => e.stopPropagation()}
               onFocus={(e) => e.stopPropagation()}
               placeholder={language === 'KR' ? "예: 디자인 영감" : "e.g., Design Inspiration"}
-              className="border-[#E0E0E0] focus-visible:ring-[#21DBA4]"
+              className="bg-white dark:bg-[#252525] border-[#E0E0E0] dark:border-gray-700 text-[#3d3d3d] dark:text-white focus-visible:ring-[#21DBA4]"
             />
           </div>
 
@@ -109,7 +109,7 @@ const CreateCollectionDialog = ({ isOpen, onClose, onCreate, language = 'KR' }: 
                 e.stopPropagation();
                 onClose();
               }}
-              className="border-none shadow-none hover:bg-gray-50 text-[#959595]"
+              className="border-none shadow-none hover:bg-gray-50 dark:hover:bg-[#333] text-[#959595]"
             >
               {language === 'KR' ? "취소" : "Cancel"}
             </Button>
