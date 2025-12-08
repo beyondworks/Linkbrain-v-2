@@ -282,13 +282,11 @@ const App = () => {
           )}
 
           {currentView === 'clip-detail' && selectedClip && (
-            <div className="pt-8">
-              <ClipDetail
-                clip={selectedClip}
-                onBack={handleBackFromDetail}
-                language={language}
-              />
-            </div>
+            <ClipDetail
+              clip={selectedClip}
+              onBack={handleBackFromDetail}
+              language={language}
+            />
           )}
 
           {currentView === 'settings' && (

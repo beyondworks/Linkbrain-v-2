@@ -120,9 +120,9 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
    };
 
    return (
-      <>
-         {/* Fixed Header - Outside motion for instant render */}
-         <div className="fixed top-0 left-0 md:left-[100px] right-0 z-40 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-sm py-3 px-4 md:px-6 border-b border-gray-100 dark:border-gray-800">
+      <div className="fixed inset-0 top-[60px] md:top-0 md:left-[100px] z-30 bg-white dark:bg-[#121212] overflow-y-auto">
+         {/* Fixed Header - sticky within the scrollable container */}
+         <div className="sticky top-0 z-40 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-sm py-3 px-4 md:px-6 border-b border-gray-100 dark:border-gray-800">
             <div className="max-w-[1000px] mx-auto flex items-center justify-between gap-4">
                <div className="flex items-center gap-4 flex-1 min-w-0">
                   <button
@@ -162,14 +162,12 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
             </div>
          </div>
 
-         {/* Spacer for fixed header */}
-         <div className="h-16 md:h-20"></div>
-
+         {/* Content area */}
          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="w-full max-w-[1000px] mx-auto px-4 md:px-6 pb-20 overflow-hidden"
+            className="w-full max-w-[1000px] mx-auto px-4 md:px-6 pb-20 overflow-hidden py-6"
          >
 
             {/* Main Content */}
@@ -322,7 +320,7 @@ const ClipDetail = ({ clip, onBack, language = 'KR' }: ClipDetailProps) => {
                onCategoryChange={handleCategoryChange}
             />
          </motion.div>
-      </>
+      </div>
    );
 };
 
