@@ -1,5 +1,25 @@
 # Linkbrain v-2 개발 로그
 
+## 2025-12-08 스토리북 도입 및 레이아웃 중복 제거
+
+### 목표
+1. 기존 UI를 스토리북으로 고정해 리팩터 후 시각 회귀 확인
+2. 모바일/데스크톱 카드 렌더링 중복 제거로 브레이크포인트 수정 시 꼬임 완화
+
+### 주요 변경 사항
+- **스토리북 추가**: Vite 기반 Storybook 설정, 라이트/다크 토글 decorator, Tailwind 전역 스타일 적용.
+- **대표 스토리 작성**:
+  - `ClipCard` (그리드/리스트/썸네일 없음 변형)
+  - `ClipShowcase` (그리드/리스트 레이아웃 스냅샷)
+  - `CreateCollectionDialog`, `DeleteConfirmationDialog`
+- **ClipGrid 중복 제거**: 모바일/데스크톱, 리스트/그리드 렌더링을 `renderClipItem` 단일 경로로 통합해 체크박스/액션/컬렉션 이동 동작을 한 번에 유지.
+
+### 파일 변경 목록
+- `.storybook/preview.js` - Tailwind + 라이트/다크 decorator 설정
+- `src/stories/*.stories.tsx` - 대표 UI 스토리 (모두 mock 데이터)
+- `src/components/ClipGrid.tsx` - 카드 렌더링 경로 단일화(레이아웃/기능 동일)
+- `package.json`, `package-lock.json`, `vite.config.ts` - Storybook/Vitest 설정 및 의존성 추가
+
 ## 2025-12-06 세션 3: 5대 기능 구현
 
 ### 목표

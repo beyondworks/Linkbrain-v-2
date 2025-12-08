@@ -5,7 +5,6 @@ import { db, auth } from '../lib/firebase';
 import { doc, updateDoc, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'sonner';
-import { parseThreadContent } from '../../api/lib/content-processor';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import { InstagramLayout } from './ClipDetail_Instagram';
 import { ThreadsLayout } from './ClipDetail_Threads';

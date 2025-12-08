@@ -1,10 +1,16 @@
-
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import fs from 'fs';
 
 // Load .env file manually
+import { fileURLToPath } from 'node:url';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
+const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 const loadEnv = () => {
   const envPath = path.resolve(__dirname, '.env');
   if (fs.existsSync(envPath)) {
@@ -19,40 +25,40 @@ const loadEnv = () => {
     });
   }
 };
-
 loadEnv();
-
 const localApiPlugin = () => ({
   name: 'local-api-analyze',
   configureServer(server: any) {
     server.middlewares.use(async (req: any, res: any, next: any) => {
       if (!req.url?.startsWith('/api/analyze')) return next();
-
       let body = '';
-      req.on('data', (chunk: any) => { body += chunk; });
+      req.on('data', (chunk: any) => {
+        body += chunk;
+      });
       req.on('end', async () => {
         try {
           // Simple dynamic import - Vite HMR will handle updates
           const analyzeModule = await import('./api/analyze');
           const analyzeHandler = analyzeModule.default;
-
           const parsedBody = body ? JSON.parse(body) : {};
           const vercelReq: any = {
             method: req.method || 'GET',
             body: parsedBody,
             query: {},
-            headers: req.headers,
+            headers: req.headers
           };
           const vercelRes: any = {
             setHeader: res.setHeader.bind(res),
-            status: (code: number) => { res.statusCode = code; return vercelRes; },
+            status: (code: number) => {
+              res.statusCode = code;
+              return vercelRes;
+            },
             json: (data: any) => {
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify(data));
             },
-            end: () => res.end(),
+            end: () => res.end()
           };
-
           await analyzeHandler(vercelReq, vercelRes);
         } catch (err: any) {
           console.error('❌ Local API error:', err);
@@ -66,9 +72,8 @@ const localApiPlugin = () => ({
         }
       });
     });
-  },
+  }
 });
-
 export default defineConfig({
   plugins: [react(), localApiPlugin()],
   resolve: {
@@ -112,15 +117,38 @@ export default defineConfig({
       '@radix-ui/react-aspect-ratio@1.1.2': '@radix-ui/react-aspect-ratio',
       '@radix-ui/react-alert-dialog@1.1.6': '@radix-ui/react-alert-dialog',
       '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
-      '@': path.resolve(__dirname, './src'),
-    },
+      '@': path.resolve(__dirname, './src')
+    }
   },
   build: {
     target: 'esnext',
-    outDir: 'build',
+    outDir: 'build'
   },
   server: {
     port: 3000,
-    open: true,
+    open: true
   },
+  test: {
+    projects: [{
+      extends: true,
+      plugins: [
+      // The plugin will run tests for the stories defined in your Storybook config
+      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+      storybookTest({
+        configDir: path.join(dirname, '.storybook')
+      })],
+      test: {
+        name: 'storybook',
+        browser: {
+          enabled: true,
+          headless: true,
+          provider: playwright({}),
+          instances: [{
+            browser: 'chromium'
+          }]
+        },
+        setupFiles: ['.storybook/vitest.setup.js']
+      }
+    }]
+  }
 });

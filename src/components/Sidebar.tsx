@@ -60,9 +60,6 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
       return;
     }
 
-    console.log('[Sidebar] Current user.uid:', user.uid);
-    console.log('[Sidebar] Current user email:', user.email);
-
     // Fetch Collections
     const qCollections = query(
       collection(db, 'collections'),
@@ -74,7 +71,6 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
         id: doc.id,
         ...doc.data()
       }));
-      console.log('[Sidebar] Collections fetched:', fetched.length);
       setCollections(fetched);
     });
 
@@ -89,13 +85,6 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
         id: doc.id,
         ...doc.data()
       }));
-      console.log('[Sidebar] Clips query result:', clips.length);
-      console.log('[Sidebar] Sample clip userId:', clips[0]?.userId);
-      console.log('[Sidebar] First 3 clips:', clips.slice(0, 3).map(c => ({
-        id: c.id,
-        userId: c.userId,
-        title: c.title
-      })));
 
       // Extract unique categories
       const uniqueCategories = Array.from(new Set(clips.map((clip: any) => clip.category))).filter(Boolean);
@@ -522,4 +511,3 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
 };
 
 export default Sidebar;
-

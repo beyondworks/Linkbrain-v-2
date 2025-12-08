@@ -149,6 +149,29 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
   // const finalSortedClips = sortOrder === 'newest' ? sortedClips : [...sortedClips].reverse();
   const visibleClips = sortedClips.slice(0, visibleCount);
 
+  const renderClipItem = (clip: any, variant: 'grid' | 'list') => (
+    <div key={clip.id} className="relative">
+      {isSelectMode && (
+        <input
+          type="checkbox"
+          checked={selectedClips.has(clip.id)}
+          onChange={() => toggleClipSelection(clip.id)}
+          className="absolute top-4 right-4 w-5 h-5 z-10 cursor-pointer"
+        />
+      )}
+      <ClipCard
+        {...clip}
+        variant={variant}
+        language={language}
+        collections={collections}
+        onSelectCollection={(name) => handleSelectCollection(clip.id, name)}
+        onCreateCollection={handleCreateCollection}
+        onClick={!isSelectMode ? () => onClipClick && onClipClick(clip) : undefined}
+        showThumbnail={showThumbnails}
+      />
+    </div>
+  );
+
   if (loading) {
     return <div className="w-full text-center py-20">Loading clips...</div>;
   }
@@ -545,54 +568,12 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
       {/* Mobile List View (Always List) */}
       <div className="grid gap-4 grid-cols-1 md:hidden">
-        {visibleClips.map(clip => (
-          <div key={clip.id} className="relative">
-            {isSelectMode && (
-              <input
-                type="checkbox"
-                checked={selectedClips.has(clip.id)}
-                onChange={() => toggleClipSelection(clip.id)}
-                className="absolute top-4 right-4 w-5 h-5 z-10 cursor-pointer"
-              />
-            )}
-            <ClipCard
-              {...clip}
-              variant="list"
-              language={language}
-              collections={collections}
-              onSelectCollection={(name) => handleSelectCollection(clip.id, name)}
-              onCreateCollection={handleCreateCollection}
-              onClick={!isSelectMode ? () => onClipClick && onClipClick(clip) : undefined}
-              showThumbnail={showThumbnails}
-            />
-          </div>
-        ))}
+        {visibleClips.map((clip) => renderClipItem(clip, 'list'))}
       </div>
 
       {/* Desktop View (Grid/List Toggleable) */}
       <div className={`hidden md:grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-        {visibleClips.map(clip => (
-          <div key={clip.id} className="relative">
-            {isSelectMode && (
-              <input
-                type="checkbox"
-                checked={selectedClips.has(clip.id)}
-                onChange={() => toggleClipSelection(clip.id)}
-                className="absolute top-4 right-4 w-5 h-5 z-10 cursor-pointer"
-              />
-            )}
-            <ClipCard
-              {...clip}
-              variant={viewMode}
-              language={language}
-              collections={collections}
-              onSelectCollection={(name) => handleSelectCollection(clip.id, name)}
-              onCreateCollection={handleCreateCollection}
-              onClick={!isSelectMode ? () => onClipClick && onClipClick(clip) : undefined}
-              showThumbnail={showThumbnails}
-            />
-          </div>
-        ))}
+        {visibleClips.map((clip) => renderClipItem(clip, viewMode))}
       </div>
 
       {/* Infinite Scroll Sentinel */}
