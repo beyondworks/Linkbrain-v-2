@@ -179,42 +179,25 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
     const sentimentPercentages = getSentimentPercentages();
 
     return (
-        <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-            {/* Header */}
-            <div className="sticky top-0 z-30 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
-                <div className="max-w-4xl mx-auto px-4 md:px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={onBack}
-                                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                            >
-                                <ArrowLeft className="w-5 h-5 text-[#3d3d3d] dark:text-white" />
-                            </button>
-                            <div>
-                                <h1 className="text-xl font-bold text-[#3d3d3d] dark:text-white flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-[#21DBA4]" />
-                                    {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
-                                </h1>
-                            </div>
-                        </div>
+        <div className="w-full px-6 md:px-10 pb-20 max-w-4xl mx-auto pt-8">
+            {/* Header with Back Button */}
+            <div className="mb-8">
+                <div className="flex items-center gap-4 mb-2">
+                    <button
+                        onClick={onBack}
+                        className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5 text-[#3d3d3d] dark:text-white" />
+                    </button>
+                    <h1 className="text-2xl font-bold text-[#3d3d3d] dark:text-white flex items-center gap-2">
+                        <Sparkles className="w-6 h-6 text-[#21DBA4]" />
+                        {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
+                    </h1>
+                </div>
 
-                        <button
-                            onClick={() => generateReport(activeTab)}
-                            disabled={generating}
-                            className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-medium hover:bg-[#1ec795] transition-colors disabled:opacity-50"
-                        >
-                            {generating ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : (
-                                <FileText className="w-4 h-4" />
-                            )}
-                            {language === 'KR' ? '리포트 생성' : 'Generate Report'}
-                        </button>
-                    </div>
-
-                    {/* Period Tabs */}
-                    <div className="flex gap-2 mt-4">
+                {/* Period Tabs & Generate Button */}
+                <div className="flex items-center justify-between mt-4">
+                    <div className="flex gap-2">
                         {(['weekly', 'monthly'] as const).map((period) => (
                             <button
                                 key={period}
@@ -231,11 +214,23 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
                             </button>
                         ))}
                     </div>
+                    <button
+                        onClick={() => generateReport(activeTab)}
+                        disabled={generating}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-medium hover:bg-[#1ec795] transition-colors disabled:opacity-50"
+                    >
+                        {generating ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <FileText className="w-4 h-4" />
+                        )}
+                        {language === 'KR' ? '리포트 생성' : 'Generate Report'}
+                    </button>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 space-y-6">
+            <div className="space-y-6">
                 {loading ? (
                     <LoadingState />
                 ) : !insight || insight.totalClips === 0 ? (

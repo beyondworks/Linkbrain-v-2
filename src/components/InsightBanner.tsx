@@ -83,7 +83,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-[800px] mx-auto mt-8 px-4"
+                className="w-full max-w-[1400px] mx-auto mb-6 px-[32px] md:px-6"
             >
                 <div className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-xl rounded-2xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
                     <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="w-full max-w-[800px] mx-auto mt-8 px-4"
+                className="w-full max-w-[1400px] mx-auto mb-6 px-[32px] md:px-6"
             >
                 <motion.div
                     whileHover={{ scale: 1.01 }}
@@ -144,7 +144,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="w-full max-w-[800px] mx-auto mt-8 px-4"
+            className="w-full max-w-[1400px] mx-auto mb-6 px-[32px] md:px-6"
         >
             <motion.div
                 whileHover={{ scale: 1.01 }}
