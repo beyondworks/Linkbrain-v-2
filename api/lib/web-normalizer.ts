@@ -103,6 +103,73 @@ function cleanMarkdownLinks(text: string): string {
 }
 
 /**
+ * Convert markdown formatting to plain text
+ * - Bold: **text** or __text__ → text
+ * - Italic: *text* or _text_ → text
+ * - Headers: # ## ### → text (without #)
+ * - Blockquotes: > text → text
+ * - Lists: - item, * item, 1. item → item
+ * - Inline code: `code` → code
+ * - Code blocks: ```code``` → code
+ * - Strikethrough: ~~text~~ → text
+ * - Horizontal rules: --- or *** → (removed)
+ */
+function cleanMarkdownFormatting(text: string): string {
+    let t = text;
+
+    // Remove code blocks (triple backticks)
+    t = t.replace(/```[\s\S]*?```/g, '');
+
+    // Remove inline code backticks
+    t = t.replace(/`([^`]+)`/g, '$1');
+
+    // Remove bold markdown: **text** or __text__
+    t = t.replace(/\*\*([^\*]+)\*\*/g, '$1');
+    t = t.replace(/__([^_]+)__/g, '$1');
+
+    // Remove italic markdown: *text* or _text_ (careful not to match list items)
+    // Only match if not at start of line (to avoid list items)
+    t = t.replace(/(?<!^)(?<!\n)\*([^\*\n]+)\*/g, '$1');
+    t = t.replace(/(?<!^)(?<!\n)_([^_\n]+)_/g, '$1');
+
+    // Remove strikethrough: ~~text~~
+    t = t.replace(/~~([^~]+)~~/g, '$1');
+
+    // Remove headers: # ## ### #### ##### ######
+    t = t.replace(/^#{1,6}\s+(.+)$/gm, '$1');
+
+    // Remove blockquotes: > text
+    t = t.replace(/^>\s*/gm, '');
+
+    // Clean list items: - item, * item (at start of line)
+    t = t.replace(/^[\*\-]\s+/gm, '');
+
+    // Clean numbered lists: 1. item, 2. item etc
+    t = t.replace(/^\d+\.\s+/gm, '');
+
+    // Remove horizontal rules
+    t = t.replace(/^[-\*_]{3,}$/gm, '');
+
+    // Remove table separators
+    t = t.replace(/^\|?[-:]+\|[-:|\s]+$/gm, '');
+
+    // Clean table pipes (basic cleanup)
+    t = t.replace(/\|/g, ' ');
+
+    // Remove HTML-like entities that might slip through
+    t = t.replace(/&nbsp;/g, ' ');
+    t = t.replace(/&amp;/g, '&');
+    t = t.replace(/&lt;/g, '<');
+    t = t.replace(/&gt;/g, '>');
+    t = t.replace(/&quot;/g, '"');
+
+    // Remove leftover markdown brackets that aren't links
+    t = t.replace(/\[([^\]]+)\]/g, '$1');
+
+    return t;
+}
+
+/**
  * Remove garbage tokens
  */
 function removeGarbageTokens(text: string): string {
@@ -258,26 +325,29 @@ export function normalizeWeb(raw: string): string {
     // Step 2: Clean markdown links
     text = cleanMarkdownLinks(text);
 
-    // Step 3: Remove garbage tokens
+    // Step 3: Clean markdown formatting (bold, italic, headers, quotes, lists)
+    text = cleanMarkdownFormatting(text);
+
+    // Step 4: Remove garbage tokens
     text = removeGarbageTokens(text);
 
-    // Step 4: Remove JSON blocks
+    // Step 5: Remove JSON blocks
     text = removeJsonBlocks(text);
 
-    // Step 5: Remove navigation sections
+    // Step 6: Remove navigation sections
     text = removeNavigationSections(text);
 
-    // Step 6: Extract main content
+    // Step 7: Extract main content
     text = extractMainContent(text);
 
-    // Step 7: Clean up whitespace and format paragraphs
+    // Step 8: Clean up whitespace and format paragraphs
     const paragraphs = text
         .replace(/\r\n/g, '\n')
         .split(/\n{2,}/)
         .map(p => p.trim())
         .filter(p => p.length > 0);
 
-    // Step 8: Filter out very short/noise paragraphs
+    // Step 9: Filter out very short/noise paragraphs
     const filtered = paragraphs.filter(p => {
         if (p.length < 10) return false;
         if (/^\d+$/.test(p)) return false;
