@@ -4386,6 +4386,11 @@ html {
 }
 
 body {
+  background-color: #f7f7f7;
+}
+
+.dark body,
+body.dark {
   background-color: #121212;
 }
 
@@ -4434,7 +4439,7 @@ body {
 
 /* Hero Catchphrase Overrides */
 .hero-catchphrase {
-  font-size: 20px !important;
+  font-size: 24px !important;
   font-weight: 700 !important;
   margin-bottom: 64px !important;
 }

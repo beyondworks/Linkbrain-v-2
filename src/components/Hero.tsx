@@ -99,10 +99,11 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        className="hero-catchphrase text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center"
+        className="text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center"
+        style={{ marginBottom: '64px' }}
       >
-        <p className="mb-1">{language === 'KR' ? "링크가 쌓일수록 - 지식이 쌓이는 곳" : "Where links become knowledge"}</p>
-        <p>
+        <p style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>{language === 'KR' ? "링크가 쌓일수록 - 지식이 쌓이는 곳" : "Where links become knowledge"}</p>
+        <p style={{ fontSize: '18px', fontWeight: 700 }}>
           {language === 'KR'
             ? <>링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요</>
             : "Just save the link, Linkbrain will handle organizing, analyzing, and summarizing."}
