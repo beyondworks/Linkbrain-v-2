@@ -14,6 +14,8 @@ import SettingsPage from './components/SettingsPage';
 import ProfilePage from './components/ProfilePage';
 import SecurityPage from './components/SecurityPage';
 import NotificationsPage from './components/NotificationsPage';
+import InsightsPage from './components/InsightsPage';
+import InsightBanner from './components/InsightBanner';
 import { Settings } from 'lucide-react';
 import { auth, db } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -23,7 +25,7 @@ import { toast, Toaster } from 'sonner';
 const App = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications'>('clips');
+  const [currentView, setCurrentView] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications' | 'insights'>('clips');
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [selectedClip, setSelectedClip] = useState<any>(null);
   const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
@@ -266,6 +268,10 @@ const App = () => {
           {currentView === 'clips' && (
             <>
               <Hero language={language} />
+              <InsightBanner
+                language={language}
+                onViewDetails={() => setCurrentView('insights')}
+              />
               <ClipGrid
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategorySelect}
@@ -340,6 +346,14 @@ const App = () => {
           {currentView === 'settings-notifications' && (
             <NotificationsPage
               onBack={() => setCurrentView('settings')}
+              language={language}
+              user={user}
+            />
+          )}
+
+          {currentView === 'insights' && (
+            <InsightsPage
+              onBack={() => handleNavigate('clips')}
               language={language}
               user={user}
             />
