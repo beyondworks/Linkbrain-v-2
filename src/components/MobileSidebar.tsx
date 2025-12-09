@@ -326,29 +326,51 @@ const MobileSidebar = ({
                                                 return a.name.localeCompare(b.name);
                                             });
 
-                                            return sortedTags.map(tag => (
-                                                <div key={tag.name} className="group/tag relative self-start flex items-center">
-                                                    <button
-                                                        onClick={() => handleLinkClick(() => handleCategorySelect(tag.name))}
-                                                        className={`${tag.color.bg} h-[28px] px-3 rounded-[8px] flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left`}
-                                                    >
-                                                        {favoriteCategories.includes(tag.name) && (
-                                                            <Star className="w-2.5 h-2.5 mr-1 fill-current" />
-                                                        )}
-                                                        <span className={`${tag.color.text} text-[14px] font-medium`}>{tag.name}</span>
-                                                    </button>
-                                                    {/* Favorite Toggle */}
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            toggleFavorite(tag.name);
-                                                        }}
-                                                        className="absolute -right-5 opacity-0 group-hover/tag:opacity-100 transition-opacity p-0.5"
-                                                    >
-                                                        <Star className={`w-3 h-3 ${favoriteCategories.includes(tag.name) ? 'fill-yellow-400 text-yellow-400' : 'text-[#959595]'}`} />
-                                                    </button>
-                                                </div>
-                                            ));
+                                            return sortedTags.map(tag => {
+                                                // Long press state for mobile
+                                                let longPressTimer: NodeJS.Timeout | null = null;
+
+                                                const handleTouchStart = () => {
+                                                    longPressTimer = setTimeout(() => {
+                                                        toggleFavorite(tag.name);
+                                                        if (navigator.vibrate) navigator.vibrate(50);
+                                                    }, 500);
+                                                };
+
+                                                const handleTouchEnd = () => {
+                                                    if (longPressTimer) {
+                                                        clearTimeout(longPressTimer);
+                                                        longPressTimer = null;
+                                                    }
+                                                };
+
+                                                return (
+                                                    <div key={tag.name} className="group/tag relative self-start flex items-center">
+                                                        <button
+                                                            onClick={() => handleLinkClick(() => handleCategorySelect(tag.name))}
+                                                            onTouchStart={handleTouchStart}
+                                                            onTouchEnd={handleTouchEnd}
+                                                            onTouchCancel={handleTouchEnd}
+                                                            className={`${tag.color.bg} h-[28px] px-3 rounded-[8px] flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left select-none`}
+                                                        >
+                                                            {favoriteCategories.includes(tag.name) && (
+                                                                <Star className="w-2.5 h-2.5 mr-1 fill-current" />
+                                                            )}
+                                                            <span className={`${tag.color.text} text-[14px] font-medium`}>{tag.name}</span>
+                                                        </button>
+                                                        {/* Favorite Toggle */}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                toggleFavorite(tag.name);
+                                                            }}
+                                                            className="absolute -right-5 opacity-0 group-hover/tag:opacity-100 transition-opacity p-0.5"
+                                                        >
+                                                            <Star className={`w-3 h-3 ${favoriteCategories.includes(tag.name) ? 'fill-yellow-400 text-yellow-400' : 'text-[#959595]'}`} />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            });
                                         })()}
                                     </div>
                                 </div>

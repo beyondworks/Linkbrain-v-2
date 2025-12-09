@@ -335,30 +335,58 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                             return a.name.localeCompare(b.name);
                           });
 
-                          return sortedTags.map(tag => (
-                            <div key={tag.name} className="group/tag relative self-start flex items-center">
-                              <button
-                                onClick={() => handleCategorySelect(tag.name)}
-                                className={`${tag.color.bg} h-[30px] px-4 rounded-[10px] flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left`}
-                              >
-                                {favoriteCategories.includes(tag.name) && (
-                                  <Star className="w-3 h-3 mr-1.5 fill-current" />
-                                )}
-                                <span className={`${tag.color.text} text-[16px] font-medium whitespace-nowrap`}>{tag.name}</span>
-                              </button>
-                              {/* Favorite Toggle (on hover) */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleFavorite(tag.name);
-                                }}
-                                className="absolute -right-6 opacity-0 group-hover/tag:opacity-100 transition-opacity p-1"
-                                title={favoriteCategories.includes(tag.name) ? '즐겨찾기 해제' : '즐겨찾기 추가'}
-                              >
-                                <Star className={`w-3.5 h-3.5 ${favoriteCategories.includes(tag.name) ? 'fill-yellow-400 text-yellow-400' : 'text-[#959595] hover:text-yellow-400'}`} />
-                              </button>
-                            </div>
-                          ));
+                          return sortedTags.map(tag => {
+                            // Long press state for mobile
+                            let longPressTimer: NodeJS.Timeout | null = null;
+
+                            const handleTouchStart = () => {
+                              longPressTimer = setTimeout(() => {
+                                toggleFavorite(tag.name);
+                                if (navigator.vibrate) navigator.vibrate(50);
+                              }, 500);
+                            };
+
+                            const handleTouchEnd = () => {
+                              if (longPressTimer) {
+                                clearTimeout(longPressTimer);
+                                longPressTimer = null;
+                              }
+                            };
+
+                            return (
+                              <div key={tag.name} className="group/tag relative self-start flex items-center">
+                                <button
+                                  onClick={() => handleCategorySelect(tag.name)}
+                                  onDoubleClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    toggleFavorite(tag.name);
+                                  }}
+                                  onTouchStart={handleTouchStart}
+                                  onTouchEnd={handleTouchEnd}
+                                  onTouchCancel={handleTouchEnd}
+                                  className={`${tag.color.bg} h-[30px] px-4 rounded-[10px] flex items-center hover:opacity-80 transition-opacity cursor-pointer text-left select-none`}
+                                  title={language === 'KR' ? '더블클릭으로 즐겨찾기 토글' : 'Double-click to toggle favorite'}
+                                >
+                                  {favoriteCategories.includes(tag.name) && (
+                                    <Star className="w-3 h-3 mr-1.5 fill-current" />
+                                  )}
+                                  <span className={`${tag.color.text} text-[16px] font-medium whitespace-nowrap`}>{tag.name}</span>
+                                </button>
+                                {/* Favorite Toggle (on hover) */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleFavorite(tag.name);
+                                  }}
+                                  className="absolute -right-6 opacity-0 group-hover/tag:opacity-100 transition-opacity p-1"
+                                  title={favoriteCategories.includes(tag.name) ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+                                >
+                                  <Star className={`w-3.5 h-3.5 ${favoriteCategories.includes(tag.name) ? 'fill-yellow-400 text-yellow-400' : 'text-[#959595] hover:text-yellow-400'}`} />
+                                </button>
+                              </div>
+                            );
+                          });
                         })()}
                       </div>
                     </div>
