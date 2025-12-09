@@ -5,8 +5,14 @@ import { db, auth } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'sonner';
+import InsightBanner from './InsightBanner';
 
-const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
+interface HeroProps {
+  language: 'KR' | 'EN';
+  onViewInsight?: () => void;
+}
+
+const Hero = ({ language, onViewInsight }: HeroProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -126,7 +132,7 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
             ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
             : { duration: 0.5, delay: 0.4, ease: "easeOut" }
         }
-        className="w-full max-w-[800px] relative rounded-full"
+        className="w-full max-w-[800px] relative rounded-full z-10"
       >
         <div className="relative w-full h-[60px] md:h-[76px] bg-white dark:bg-[#1e1e1e] rounded-full flex items-center px-4 md:px-8 overflow-visible shadow-sm border border-gray-100 dark:border-gray-800">
           <input
@@ -176,6 +182,11 @@ const Hero = ({ language }: { language: 'KR' | 'EN' }) => {
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Insight Banner positioned directly below input */}
+      <div className="w-full max-w-[800px] mt-4 relative z-0">
+        <InsightBanner language={language} onViewDetails={onViewInsight} />
+      </div>
     </div>
   );
 };

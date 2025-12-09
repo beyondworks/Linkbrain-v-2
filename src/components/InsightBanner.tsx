@@ -104,7 +104,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="w-full max-w-[1400px] mx-auto mb-6 px-[32px] md:px-6"
+                className="w-full px-0"
             >
                 <motion.div
                     whileHover={{ scale: 1.01 }}
@@ -118,7 +118,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-left">
                         {/* Highlight Message */}
                         <p className="text-[15px] text-[#3d3d3d] dark:text-white font-medium truncate mb-1.5">
                             {language === 'KR'
@@ -145,7 +145,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="w-full max-w-[1400px] mx-auto mb-6 px-[32px] md:px-6"
+            className="w-full px-0"
         >
             <motion.div
                 whileHover={{ scale: 1.01 }}
@@ -159,7 +159,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 text-left">
                     {/* Highlight Message */}
                     <p className="text-[15px] text-[#3d3d3d] dark:text-white font-medium truncate mb-1">
                         {insight.highlight}

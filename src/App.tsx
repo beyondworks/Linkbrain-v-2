@@ -15,7 +15,7 @@ import ProfilePage from './components/ProfilePage';
 import SecurityPage from './components/SecurityPage';
 import NotificationsPage from './components/NotificationsPage';
 import InsightsPage from './components/InsightsPage';
-import InsightBanner from './components/InsightBanner';
+
 import { Settings } from 'lucide-react';
 import { auth, db } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -267,11 +267,7 @@ const App = () => {
 
           {currentView === 'clips' && (
             <>
-              <Hero language={language} />
-              <InsightBanner
-                language={language}
-                onViewDetails={() => setCurrentView('insights')}
-              />
+              <Hero language={language} onViewInsight={() => setCurrentView('insights')} />
               <ClipGrid
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategorySelect}

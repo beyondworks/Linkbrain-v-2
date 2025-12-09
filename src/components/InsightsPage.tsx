@@ -179,238 +179,255 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
     const sentimentPercentages = getSentimentPercentages();
 
     return (
-        <div className="w-full px-6 md:px-10 pb-20 max-w-4xl mx-auto pt-8">
-            {/* Header with Back Button */}
-            <div className="mb-8">
-                <div className="flex items-center gap-4 mb-2">
-                    <button
-                        onClick={onBack}
-                        className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5 text-[#3d3d3d] dark:text-white" />
-                    </button>
-                    <h1 className="text-2xl font-bold text-[#3d3d3d] dark:text-white flex items-center gap-2">
-                        <Sparkles className="w-6 h-6 text-[#21DBA4]" />
-                        {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
-                    </h1>
-                </div>
-
-                {/* Period Tabs & Generate Button */}
-                <div className="flex items-center justify-between mt-4">
-                    <div className="flex gap-2">
-                        {(['weekly', 'monthly'] as const).map((period) => (
-                            <button
-                                key={period}
-                                onClick={() => setActiveTab(period)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === period
-                                    ? 'bg-[#21DBA4] text-white'
-                                    : 'bg-gray-100 dark:bg-gray-800 text-[#3d3d3d] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                                    }`}
-                            >
-                                {period === 'weekly'
-                                    ? (language === 'KR' ? '주간' : 'Weekly')
-                                    : (language === 'KR' ? '월간' : 'Monthly')
-                                }
-                            </button>
-                        ))}
+        <div className="w-full h-full bg-[#f8f8f8] dark:bg-[#121212] overflow-y-auto">
+            {/* Header Area */}
+            <div className="sticky top-0 z-10 bg-[#f8f8f8]/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-6 md:px-8 py-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-[1600px] mx-auto w-full">
+                    {/* Left: Title & Back */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={onBack}
+                            className="p-2 -ml-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-[#3d3d3d] dark:text-white" />
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-[#21DBA4]/10 flex items-center justify-center">
+                                <Sparkles className="w-4 h-4 text-[#21DBA4]" />
+                            </div>
+                            <h1 className="text-xl md:text-2xl font-bold text-[#3d3d3d] dark:text-white">
+                                {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
+                            </h1>
+                        </div>
                     </div>
-                    <button
-                        onClick={() => generateReport(activeTab)}
-                        disabled={generating}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-medium hover:bg-[#1ec795] transition-colors disabled:opacity-50"
-                    >
-                        {generating ? (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <FileText className="w-4 h-4" />
-                        )}
-                        {language === 'KR' ? '리포트 생성' : 'Generate Report'}
-                    </button>
+
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-3">
+                        {/* Period Toggle */}
+                        <div className="bg-white dark:bg-[#1e1e1e] p-1 rounded-full border border-gray-200 dark:border-gray-800 flex items-center">
+                            {(['weekly', 'monthly'] as const).map((period) => (
+                                <button
+                                    key={period}
+                                    onClick={() => setActiveTab(period)}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${activeTab === period
+                                        ? 'bg-[#3d3d3d] text-white dark:bg-white dark:text-black shadow-sm'
+                                        : 'text-[#959595] hover:text-[#3d3d3d] dark:hover:text-gray-300'
+                                        }`}
+                                >
+                                    {period === 'weekly'
+                                        ? (language === 'KR' ? '주간' : 'Weekly')
+                                        : (language === 'KR' ? '월간' : 'Monthly')
+                                    }
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Generate Button */}
+                        <button
+                            onClick={() => generateReport(activeTab)}
+                            disabled={generating}
+                            className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-bold hover:bg-[#1ec795] transition-colors disabled:opacity-50 shadow-sm hover:shadow-md"
+                        >
+                            {generating ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <FileText className="w-4 h-4" />
+                            )}
+                            {language === 'KR' ? '리포트 생성' : 'Generate Report'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="space-y-6">
-                {loading ? (
-                    <LoadingState />
-                ) : !insight || insight.totalClips === 0 ? (
-                    <EmptyState language={language} />
-                ) : (
-                    <>
-                        {/* Highlight Card */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-gradient-to-br from-[#21DBA4] to-[#1ec795] rounded-2xl p-6 text-white shadow-lg"
-                        >
-                            <div className="flex items-center gap-2 mb-3">
-                                <Sparkles className="w-5 h-5" />
-                                <span className="text-sm font-medium opacity-90">
-                                    {activeTab === 'weekly'
-                                        ? (language === 'KR' ? '이번 주 하이라이트' : 'This Week\'s Highlight')
-                                        : (language === 'KR' ? '이번 달 하이라이트' : 'This Month\'s Highlight')
-                                    }
-                                </span>
-                            </div>
-                            <p className="text-xl md:text-2xl font-bold leading-snug">
-                                {insight.highlight}
-                            </p>
-                            <div className="flex items-center gap-2 mt-4 text-sm opacity-80">
-                                <TrendingUp className="w-4 h-4" />
-                                <span>
-                                    {language === 'KR'
-                                        ? `총 ${insight.totalClips}개의 클립 분석`
-                                        : `${insight.totalClips} clips analyzed`
-                                    }
-                                </span>
-                            </div>
-                        </motion.div>
-
-                        {/* Stats Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Top Keywords */}
-                            <StatsCard
-                                title={language === 'KR' ? '인기 키워드' : 'Top Keywords'}
-                                icon={<BarChart3 className="w-5 h-5" />}
-                            >
-                                <div className="flex flex-wrap gap-2">
-                                    {insight.topKeywords.slice(0, 8).map((kw, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="px-3 py-1.5 rounded-full text-sm font-medium"
-                                            style={{
-                                                backgroundColor: `rgba(33, 219, 164, ${0.1 + (0.15 * (1 - idx / 8))})`,
-                                                color: '#21DBA4'
-                                            }}
-                                        >
-                                            {kw.keyword}
-                                            <span className="ml-1 opacity-60">({kw.count})</span>
-                                        </span>
-                                    ))}
-                                </div>
-                            </StatsCard>
-
-                            {/* Top Sources */}
-                            <StatsCard
-                                title={language === 'KR' ? '주요 출처' : 'Top Sources'}
-                                icon={<PieChart className="w-5 h-5" />}
-                            >
-                                <div className="space-y-3">
-                                    {insight.topSources.slice(0, 5).map((source, idx) => (
-                                        <div key={idx} className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                {source.favicon && (
-                                                    <img src={source.favicon} alt="" className="w-4 h-4 rounded" />
-                                                )}
-                                                <span className="text-sm text-[#3d3d3d] dark:text-white">
-                                                    {source.source}
-                                                </span>
-                                            </div>
-                                            <span className="text-sm text-[#959595]">{source.count}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </StatsCard>
-
-                            {/* Sentiment Analysis */}
-                            <StatsCard
-                                title={language === 'KR' ? '감정 분석' : 'Sentiment Analysis'}
-                                icon={<Star className="w-5 h-5" />}
-                            >
-                                <div className="space-y-3">
-                                    <SentimentBar
-                                        label={language === 'KR' ? '긍정' : 'Positive'}
-                                        percentage={sentimentPercentages.positive}
-                                        color="#21DBA4"
-                                    />
-                                    <SentimentBar
-                                        label={language === 'KR' ? '중립' : 'Neutral'}
-                                        percentage={sentimentPercentages.neutral}
-                                        color="#959595"
-                                    />
-                                    <SentimentBar
-                                        label={language === 'KR' ? '부정' : 'Negative'}
-                                        percentage={sentimentPercentages.negative}
-                                        color="#EF4444"
-                                    />
-                                </div>
-                            </StatsCard>
-
-                            {/* New Interests */}
-                            <StatsCard
-                                title={language === 'KR' ? '새로운 관심사' : 'New Interests'}
-                                icon={<TrendingUp className="w-5 h-5" />}
-                            >
-                                {insight.newInterests && insight.newInterests.length > 0 ? (
-                                    <div className="space-y-2">
-                                        {insight.newInterests.map((interest, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="flex items-center gap-2 p-2 rounded-lg bg-[#21DBA4]/5"
-                                            >
-                                                <Star className="w-4 h-4 text-[#21DBA4]" />
-                                                <span className="text-sm text-[#3d3d3d] dark:text-white">
-                                                    {interest}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-sm text-[#959595]">
-                                        {language === 'KR' ? '새로운 관심사가 발견되지 않았습니다' : 'No new interests detected'}
-                                    </p>
-                                )}
-
-                                {insight.interestPrediction && (
-                                    <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-                                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
-                                            {language === 'KR' ? '예측' : 'Prediction'}
-                                        </p>
-                                        <p className="text-sm text-blue-800 dark:text-blue-300">
-                                            {insight.interestPrediction}
-                                        </p>
-                                    </div>
-                                )}
-                            </StatsCard>
-                        </div>
-
-                        {/* Past Reports */}
-                        {reports.length > 0 && (
+            {/* Content Area */}
+            <div className="px-6 md:px-8 pb-20 max-w-[1600px] mx-auto w-full">
+                {/* Content */}
+                <div className="space-y-6">
+                    {loading ? (
+                        <LoadingState />
+                    ) : !insight || insight.totalClips === 0 ? (
+                        <EmptyState language={language} />
+                    ) : (
+                        <>
+                            {/* Highlight Card */}
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
+                                className="bg-gradient-to-br from-[#21DBA4] to-[#1ec795] rounded-[24px] p-8 text-white shadow-lg"
                             >
-                                <h2 className="text-lg font-bold text-[#3d3d3d] dark:text-white mb-4 flex items-center gap-2">
-                                    <Clock className="w-5 h-5 text-[#21DBA4]" />
-                                    {language === 'KR' ? '지난 리포트' : 'Past Reports'}
-                                </h2>
-                                <div className="space-y-3">
-                                    {reports.map((report) => (
-                                        <ReportCard key={report.id} report={report} language={language} />
-                                    ))}
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Sparkles className="w-5 h-5" />
+                                    <span className="text-sm font-medium opacity-90">
+                                        {activeTab === 'weekly'
+                                            ? (language === 'KR' ? '이번 주 하이라이트' : 'This Week\'s Highlight')
+                                            : (language === 'KR' ? '이번 달 하이라이트' : 'This Month\'s Highlight')
+                                        }
+                                    </span>
+                                </div>
+                                <p className="text-xl md:text-3xl font-bold leading-snug">
+                                    {insight.highlight}
+                                </p>
+                                <div className="flex items-center gap-2 mt-4 text-sm opacity-80">
+                                    <TrendingUp className="w-4 h-4" />
+                                    <span>
+                                        {language === 'KR'
+                                            ? `총 ${insight.totalClips}개의 클립 분석`
+                                            : `${insight.totalClips} clips analyzed`
+                                        }
+                                    </span>
                                 </div>
                             </motion.div>
-                        )}
-                    </>
-                )}
+
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Top Keywords */}
+                                <StatsCard
+                                    title={language === 'KR' ? '인기 키워드' : 'Top Keywords'}
+                                    icon={<BarChart3 className="w-5 h-5" />}
+                                >
+                                    <div className="flex flex-wrap gap-2">
+                                        {insight.topKeywords.slice(0, 8).map((kw, idx) => (
+                                            <span
+                                                key={idx}
+                                                className="px-3 py-1.5 rounded-full text-sm font-medium"
+                                                style={{
+                                                    backgroundColor: `rgba(33, 219, 164, ${0.1 + (0.15 * (1 - idx / 8))})`,
+                                                    color: '#21DBA4'
+                                                }}
+                                            >
+                                                {kw.keyword}
+                                                <span className="ml-1 opacity-60">({kw.count})</span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </StatsCard>
+
+                                {/* Top Sources */}
+                                <StatsCard
+                                    title={language === 'KR' ? '주요 출처' : 'Top Sources'}
+                                    icon={<PieChart className="w-5 h-5" />}
+                                >
+                                    <div className="space-y-3">
+                                        {insight.topSources.slice(0, 5).map((source, idx) => (
+                                            <div key={idx} className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    {source.favicon && (
+                                                        <img src={source.favicon} alt="" className="w-4 h-4 rounded" />
+                                                    )}
+                                                    <span className="text-sm text-[#3d3d3d] dark:text-white">
+                                                        {source.source}
+                                                    </span>
+                                                </div>
+                                                <span className="text-sm text-[#959595]">{source.count}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </StatsCard>
+
+                                {/* Sentiment Analysis */}
+                                <StatsCard
+                                    title={language === 'KR' ? '감정 분석' : 'Sentiment Analysis'}
+                                    icon={<Star className="w-5 h-5" />}
+                                >
+                                    <div className="space-y-3">
+                                        <SentimentBar
+                                            label={language === 'KR' ? '긍정' : 'Positive'}
+                                            percentage={sentimentPercentages.positive}
+                                            color="#21DBA4"
+                                        />
+                                        <SentimentBar
+                                            label={language === 'KR' ? '중립' : 'Neutral'}
+                                            percentage={sentimentPercentages.neutral}
+                                            color="#959595"
+                                        />
+                                        <SentimentBar
+                                            label={language === 'KR' ? '부정' : 'Negative'}
+                                            percentage={sentimentPercentages.negative}
+                                            color="#EF4444"
+                                        />
+                                    </div>
+                                </StatsCard>
+
+                                {/* New Interests */}
+                                <StatsCard
+                                    title={language === 'KR' ? '새로운 관심사' : 'New Interests'}
+                                    icon={<TrendingUp className="w-5 h-5" />}
+                                >
+                                    {insight.newInterests && insight.newInterests.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {insight.newInterests.map((interest, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="flex items-center gap-2 p-2 rounded-lg bg-[#21DBA4]/5"
+                                                >
+                                                    <Star className="w-4 h-4 text-[#21DBA4]" />
+                                                    <span className="text-sm text-[#3d3d3d] dark:text-white">
+                                                        {interest}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-[#959595]">
+                                            {language === 'KR' ? '새로운 관심사가 발견되지 않았습니다' : 'No new interests detected'}
+                                        </p>
+                                    )}
+
+                                    {insight.interestPrediction && (
+                                        <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
+                                                {language === 'KR' ? '예측' : 'Prediction'}
+                                            </p>
+                                            <p className="text-sm text-blue-800 dark:text-blue-300">
+                                                {insight.interestPrediction}
+                                            </p>
+                                        </div>
+                                    )}
+                                </StatsCard>
+                            </div>
+
+                            {/* Past Reports */}
+                            {reports.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="pt-6"
+                                >
+                                    <h2 className="text-lg font-bold text-[#3d3d3d] dark:text-white mb-4 flex items-center gap-2">
+                                        <Clock className="w-5 h-5 text-[#21DBA4]" />
+                                        {language === 'KR' ? '지난 리포트' : 'Past Reports'}
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {reports.map((report) => (
+                                            <ReportCard key={report.id} report={report} language={language} />
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
 // Sub-components
+
 const StatsCard: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, icon, children }) => (
     <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
+        className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col"
     >
         <div className="flex items-center gap-2.5 mb-5 text-[#21DBA4]">
             {icon}
             <h3 className="font-semibold text-[#3d3d3d] dark:text-white text-[15px]">{title}</h3>
         </div>
-        {children}
+        <div className="flex-1">
+            {children}
+        </div>
     </motion.div>
 );
 
