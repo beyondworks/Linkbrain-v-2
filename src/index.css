@@ -4388,6 +4388,7 @@ html {
 body {
   background-color: #121212;
 }
+
 .text-\[52px\] {
   font-size: 52px !important;
 }
@@ -4429,4 +4430,11 @@ body {
   .md\:inline {
     display: inline !important;
   }
+}
+
+/* Hero Catchphrase Overrides */
+.hero-catchphrase {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  margin-bottom: 64px !important;
 }

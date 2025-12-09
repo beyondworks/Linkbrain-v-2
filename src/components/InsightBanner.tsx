@@ -104,38 +104,28 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="w-full px-0"
+                className="w-full px-0 flex flex-col items-center gap-4 py-2"
             >
-                <motion.div
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
+                {/* Highlight Message - Centered */}
+                <p className="text-[13px] text-[#7d7d7d] dark:text-gray-400 font-medium text-center">
+                    {language === 'KR'
+                        ? '클립을 저장하면 AI가 자동으로 관심사를 분석해드려요'
+                        : 'Save clips and AI will analyze your interests'
+                    }
+                </p>
+
+                {/* Pill Button */}
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={onViewDetails}
-                    className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] p-5 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm cursor-pointer group transition-all hover:shadow-md flex items-center gap-4"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-[#1e1e1e] rounded-full border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all group"
                 >
-                    {/* Icon - Simplified to match app aesthetic */}
-                    <div className="flex-shrink-0 w-12 h-12 rounded-[18px] bg-[#f0f0f0] dark:bg-[#2a2a2a] flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-[#21DBA4]" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 text-left">
-                        {/* Highlight Message */}
-                        <p className="text-[15px] text-[#3d3d3d] dark:text-white font-medium truncate mb-1.5">
-                            {language === 'KR'
-                                ? '클립을 저장하면 AI가 관심사를 분석해드려요'
-                                : 'Save clips and AI will analyze your interests'
-                            }
-                        </p>
-
-                        {/* Action Text */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-[12px] text-[#959595] dark:text-gray-400 group-hover:text-[#21DBA4] transition-colors flex items-center gap-1">
-                                {language === 'KR' ? '인사이트 페이지 보기' : 'View insights page'}
-                                <ChevronRight className="w-3 h-3" />
-                            </span>
-                        </div>
-                    </div>
-                </motion.div>
+                    <Sparkles className="w-4 h-4 text-[#21DBA4]" />
+                    <span className="text-[14px] text-[#3d3d3d] dark:text-gray-200 font-medium group-hover:text-[#21DBA4] transition-colors">
+                        {language === 'KR' ? '인사이트 페이지 보기' : 'View insights page'}
+                    </span>
+                </motion.button>
             </motion.div>
         );
     }

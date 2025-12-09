@@ -84,31 +84,29 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
   return (
     <div className="w-full flex flex-col items-center justify-center pt-24 md:pt-32 pb-20 px-4 text-center relative overflow-hidden">
 
-      {/* Main Headings */}
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="text-[48px] md:text-[64px] font-extrabold italic text-[#21DBA4] mb-6 leading-[1.1] tracking-tight"
+        className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center"
+        style={{ fontSize: 'clamp(48px, 8vw, 72px)' }}
       >
-        {/* Mobile: separate lines */}
-        <span className="md:hidden flex flex-col items-center">
-          <span>COLLECT</span>
-          <span>CONNECT</span>
-          <span>CREATE</span>
-        </span>
-        {/* Desktop: single line */}
-        <span className="hidden md:inline">Collect. Connect. Create.</span>
+        <span className="block">Collect links</span>
+        <span className="block">Create a second brain</span>
       </motion.h1>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        className="text-base md:text-[24px] text-[#3d3d3d] dark:text-gray-300 max-w-2xl leading-snug mb-16"
+        className="hero-catchphrase text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center"
       >
-        <p>{language === 'KR' ? "스크랩을 더 쉽게 - 정리는 더 똑똑하게" : "Your internet brain, reimaged."}</p>
-        <p>{language === 'KR' ? "링크 하나면 충분해요 나머진 우리가 할게요" : "Save links with full context and let AI do the heavy lifting."}</p>
+        <p className="mb-1">{language === 'KR' ? "링크가 쌓일수록 - 지식이 쌓이는 곳" : "Where links become knowledge"}</p>
+        <p>
+          {language === 'KR'
+            ? <>링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요</>
+            : "Just save the link, Linkbrain will handle organizing, analyzing, and summarizing."}
+        </p>
       </motion.div>
 
       {/* Input Area */}
@@ -184,7 +182,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
       </motion.div>
 
       {/* Insight Banner positioned directly below input */}
-      <div className="w-full max-w-[800px] mt-4 relative z-0">
+      <div className="w-full max-w-[800px] mt-12 relative z-0">
         <InsightBanner language={language} onViewDetails={onViewInsight} />
       </div>
     </div>
