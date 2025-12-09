@@ -110,28 +110,29 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={onViewDetails}
-                    className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-xl rounded-2xl p-4 md:p-5 border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer group transition-all hover:shadow-md hover:border-[#21DBA4]/30"
+                    className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] p-5 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm cursor-pointer group transition-all hover:shadow-md flex items-center gap-4"
                 >
-                    <div className="flex items-center gap-3 md:gap-4">
-                        <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#21DBA4]/50 to-[#1ec795]/50 flex items-center justify-center shadow-sm">
-                            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[14px] md:text-[16px] text-[#3d3d3d] dark:text-white font-medium">
-                                {language === 'KR'
-                                    ? '클립을 저장하면 AI가 관심사를 분석해드려요'
-                                    : 'Save clips and AI will analyze your interests'
-                                }
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                                <TrendingUp className="w-3 h-3 text-[#21DBA4]" />
-                                <span className="text-[12px] text-[#959595] dark:text-gray-400">
-                                    {language === 'KR' ? '인사이트 페이지 보기' : 'View insights page'}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="flex-shrink-0">
-                            <ChevronRight className="w-5 h-5 text-[#959595] group-hover:text-[#21DBA4] group-hover:translate-x-1 transition-all" />
+                    {/* Icon - Simplified to match app aesthetic */}
+                    <div className="flex-shrink-0 w-12 h-12 rounded-[18px] bg-[#f0f0f0] dark:bg-[#2a2a2a] flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-[#21DBA4]" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                        {/* Highlight Message */}
+                        <p className="text-[15px] text-[#3d3d3d] dark:text-white font-medium truncate mb-1.5">
+                            {language === 'KR'
+                                ? '클립을 저장하면 AI가 관심사를 분석해드려요'
+                                : 'Save clips and AI will analyze your interests'
+                            }
+                        </p>
+
+                        {/* Action Text */}
+                        <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#959595] dark:text-gray-400 group-hover:text-[#21DBA4] transition-colors flex items-center gap-1">
+                                {language === 'KR' ? '인사이트 페이지 보기' : 'View insights page'}
+                                <ChevronRight className="w-3 h-3" />
+                            </span>
                         </div>
                     </div>
                 </motion.div>
@@ -150,24 +151,24 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={onViewDetails}
-                className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-xl rounded-2xl p-4 md:p-5 border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer group transition-all hover:shadow-md hover:border-[#21DBA4]/30"
+                className="w-full bg-white dark:bg-[#1e1e1e] rounded-[24px] p-5 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm cursor-pointer group transition-all hover:shadow-md flex items-center gap-4"
             >
-                <div className="flex items-center gap-3 md:gap-4">
-                    {/* Icon */}
-                    <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#21DBA4] to-[#1ec795] flex items-center justify-center shadow-sm">
-                        <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                    </div>
+                {/* Icon */}
+                <div className="flex-shrink-0 w-12 h-12 rounded-[18px] bg-[#21DBA4]/10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-[#21DBA4]" />
+                </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                        {/* Highlight Message */}
-                        <p className="text-[14px] md:text-[16px] text-[#3d3d3d] dark:text-white font-medium truncate">
-                            {insight.highlight}
-                        </p>
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                    {/* Highlight Message */}
+                    <p className="text-[15px] text-[#3d3d3d] dark:text-white font-medium truncate mb-1">
+                        {insight.highlight}
+                    </p>
 
-                        {/* Stats */}
-                        <div className="flex items-center gap-2 mt-1">
-                            <TrendingUp className="w-3 h-3 text-[#21DBA4]" />
+                    {/* Stats */}
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5">
+                            <TrendingUp className="w-3.5 h-3.5 text-[#959595]" />
                             <span className="text-[12px] text-[#959595] dark:text-gray-400">
                                 {language === 'KR'
                                     ? `${insight.totalClips}개의 클립 분석`
@@ -175,32 +176,24 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                                 }
                             </span>
                         </div>
-                    </div>
 
-                    {/* Arrow */}
-                    <div className="flex-shrink-0">
-                        <ChevronRight className="w-5 h-5 text-[#959595] group-hover:text-[#21DBA4] group-hover:translate-x-1 transition-all" />
+                        {/* Keywords (Mini) */}
+                        {insight.topKeywords && insight.topKeywords.length > 0 && (
+                            <div className="hidden md:flex items-center gap-1.5 border-l border-gray-200 dark:border-gray-700 pl-3">
+                                {insight.topKeywords.slice(0, 3).map((kw, idx) => (
+                                    <span key={idx} className="text-[11px] text-[#959595]">#{kw.keyword}</span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Top Keywords (optional, shown on larger screens) */}
-                {insight.topKeywords && insight.topKeywords.length > 0 && (
-                    <div className="hidden md:flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-                        <span className="text-[11px] text-[#959595] dark:text-gray-500">
-                            {language === 'KR' ? '인기 키워드:' : 'Top keywords:'}
-                        </span>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                            {insight.topKeywords.slice(0, 4).map((kw, idx) => (
-                                <span
-                                    key={idx}
-                                    className="text-[11px] px-2 py-0.5 rounded-full bg-[#21DBA4]/10 text-[#21DBA4] font-medium"
-                                >
-                                    #{kw.keyword}
-                                </span>
-                            ))}
-                        </div>
+                {/* Arrow */}
+                <div className="flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-transparent group-hover:bg-[#f0f0f0] dark:group-hover:bg-[#2a2a2a] flex items-center justify-center transition-colors">
+                        <ChevronRight className="w-4 h-4 text-[#959595] group-hover:text-[#3d3d3d] dark:group-hover:text-white transition-colors" />
                     </div>
-                )}
+                </div>
             </motion.div>
         </motion.div>
     );

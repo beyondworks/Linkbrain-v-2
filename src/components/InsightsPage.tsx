@@ -404,66 +404,66 @@ const StatsCard: React.FC<{ title: string; icon: React.ReactNode; children: Reac
     <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-[#1e1e1e] rounded-2xl p-5 border border-gray-100 dark:border-gray-800"
+        className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
     >
-        <div className="flex items-center gap-2 mb-4 text-[#21DBA4]">
+        <div className="flex items-center gap-2.5 mb-5 text-[#21DBA4]">
             {icon}
-            <h3 className="font-semibold text-[#3d3d3d] dark:text-white">{title}</h3>
+            <h3 className="font-semibold text-[#3d3d3d] dark:text-white text-[15px]">{title}</h3>
         </div>
         {children}
     </motion.div>
 );
 
 const SentimentBar: React.FC<{ label: string; percentage: number; color: string }> = ({ label, percentage, color }) => (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
         <div className="flex items-center justify-between text-sm">
-            <span className="text-[#3d3d3d] dark:text-white">{label}</span>
-            <span className="text-[#959595]">{percentage}%</span>
+            <span className="text-[#3d3d3d] dark:text-white text-[13px]">{label}</span>
+            <span className="text-[#959595] text-[12px]">{percentage}%</span>
         </div>
-        <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${percentage}%` }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="h-full rounded-full"
-                style={{ backgroundColor: color }}
+        <div className="h-2 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-full overflow-hidden">
+            <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${percentage}%`, backgroundColor: color }}
             />
         </div>
     </div>
 );
 
 const ReportCard: React.FC<{ report: Report; language: 'KR' | 'EN' }> = ({ report, language }) => (
-    <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-4 border border-gray-100 dark:border-gray-800 flex items-center justify-between hover:border-[#21DBA4]/30 transition-colors cursor-pointer">
-        <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${report.type === 'weekly' ? 'bg-[#21DBA4]/10' : 'bg-blue-500/10'
-                }`}>
-                <Calendar className={`w-5 h-5 ${report.type === 'weekly' ? 'text-[#21DBA4]' : 'text-blue-500'
-                    }`} />
+    <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-5 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-all cursor-pointer group flex items-center justify-between">
+        <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-[18px] bg-[#21DBA4]/10 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-[#21DBA4]" />
             </div>
             <div>
-                <p className="font-medium text-[#3d3d3d] dark:text-white">
-                    {report.period.label}
-                </p>
-                <p className="text-xs text-[#959595]">
-                    {report.totalClips} {language === 'KR' ? '클립' : 'clips'}
-                    {!report.isRead && (
-                        <span className="ml-2 px-1.5 py-0.5 bg-[#21DBA4] text-white text-[10px] rounded-full">
-                            NEW
-                        </span>
-                    )}
+                <h4 className="font-semibold text-[#3d3d3d] dark:text-white text-[15px] mb-0.5">
+                    {language === 'KR'
+                        ? `${report.type === 'weekly' ? '주간' : '월간'} 리포트`
+                        : `${report.type === 'weekly' ? 'Weekly' : 'Monthly'} Report`
+                    }
+                </h4>
+                <p className="text-[12px] text-[#959595]">
+                    {new Date(report.createdAt).toLocaleDateString()}
                 </p>
             </div>
         </div>
-        <ChevronRight className="w-5 h-5 text-[#959595]" />
+        <ChevronRight className="w-5 h-5 text-[#959595] group-hover:text-[#21DBA4] transition-colors" />
     </div>
 );
 
 const LoadingState = () => (
-    <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white dark:bg-[#1e1e1e] rounded-2xl p-6 animate-pulse">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4" />
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 border border-[#b5b5b5]/30 dark:border-gray-800 h-[200px] animate-pulse">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#2a2a2a]" />
+                    <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded w-1/3" />
+                </div>
+                <div className="space-y-3">
+                    <div className="h-3 bg-gray-100 dark:bg-[#2a2a2a] rounded w-full" />
+                    <div className="h-3 bg-gray-100 dark:bg-[#2a2a2a] rounded w-3/4" />
+                    <div className="h-3 bg-gray-100 dark:bg-[#2a2a2a] rounded w-1/2" />
+                </div>
             </div>
         ))}
     </div>
@@ -471,19 +471,20 @@ const LoadingState = () => (
 
 const EmptyState: React.FC<{ language: 'KR' | 'EN' }> = ({ language }) => (
     <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center py-20"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center py-20 bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#b5b5b5]/30 dark:border-gray-800 border-dashed"
     >
-        <Sparkles className="w-16 h-16 text-[#21DBA4]/30 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-[#3d3d3d] dark:text-white mb-2">
+        <div className="w-16 h-16 bg-gray-50 dark:bg-[#2a2a2a] rounded-full flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-6 h-6 text-[#959595]" />
+        </div>
+        <h2 className="text-lg font-bold text-[#3d3d3d] dark:text-white mb-2">
             {language === 'KR' ? '아직 분석할 데이터가 없어요' : 'No data to analyze yet'}
         </h2>
-        <p className="text-[#959595] max-w-sm mx-auto">
+        <p className="text-sm text-[#959595] dark:text-gray-400">
             {language === 'KR'
                 ? '클립을 저장하면 AI가 자동으로 관심사를 분석해드려요'
-                : 'Save some clips and AI will analyze your interests automatically'
-            }
+                : 'Save clips and AI will analyze your interests automatically'}
         </p>
     </motion.div>
 );
