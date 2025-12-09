@@ -1,0 +1,195 @@
+/**
+ * MUSE Project Mock Data
+ *
+ * 시나리오 기반의 더미 데이터
+ */
+
+// 1. Metric Data for Dashboard (Team Pulse)
+export const museMetrics = [
+  {
+    id: 'deadline-today',
+    label: 'Deadline Today',
+    value: '12',
+    trend: 'High Urgency',
+    trendColor: 'error',
+    icon: 'timer',
+  },
+  {
+    id: 'pending-approval',
+    label: 'Pending Approval',
+    value: '8',
+    trend: '+2 from yesterday',
+    trendColor: 'warning',
+    icon: 'pending',
+  },
+  {
+    id: 'active-projects',
+    label: 'Active Projects',
+    value: '24',
+    trend: 'On Track',
+    trendColor: 'success',
+    icon: 'folder',
+  },
+  {
+    id: 'team-velocity',
+    label: 'Team Velocity',
+    value: '94%',
+    trend: '+5% increase',
+    trendColor: 'info',
+    icon: 'trending_up',
+  },
+];
+
+// 2. Asset Data for Library (Asset Vault)
+export const museAssets = [
+  {
+    id: 'asset-001',
+    title: 'Neon City Night Loop 4K',
+    type: 'video',
+    format: 'MP4',
+    resolution: '4K',
+    duration: '00:15',
+    size: '450 MB',
+    thumbnail: 'https://images.pexels.com/photos/3131971/pexels-photo-3131971.jpeg?auto=compress&cs=tinysrgb&w=600',
+    tags: ['Neon', 'City', 'Night', 'Cyberpunk'],
+    license: 'Commercial',
+    status: 'approved',
+  },
+  {
+    id: 'asset-002',
+    title: 'Abstract Fluid Motion',
+    type: 'video',
+    format: 'MOV',
+    resolution: '1080p',
+    duration: '00:10',
+    size: '120 MB',
+    thumbnail: 'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=600',
+    tags: ['Abstract', 'Fluid', 'Background'],
+    license: 'Commercial',
+    status: 'approved',
+  },
+  {
+    id: 'asset-003',
+    title: 'Product Mockup - Midnight Black',
+    type: 'image',
+    format: 'PNG',
+    resolution: '4000x3000',
+    size: '15 MB',
+    thumbnail: 'https://images.pexels.com/photos/3945659/pexels-photo-3945659.jpeg?auto=compress&cs=tinysrgb&w=600',
+    tags: ['Product', 'Mockup', 'Smartphone'],
+    license: 'Internal Only',
+    status: 'pending',
+  },
+  {
+    id: 'asset-004',
+    title: 'Tech Interface HUD Elements',
+    type: 'video',
+    format: 'MP4',
+    resolution: '4K',
+    duration: '00:20',
+    size: '320 MB',
+    thumbnail: 'https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg?auto=compress&cs=tinysrgb&w=600',
+    tags: ['HUD', 'UI', 'Tech', 'Overlay'],
+    license: 'Commercial',
+    status: 'approved',
+  },
+  {
+    id: 'asset-005',
+    title: 'Corporate Interview B-Roll',
+    type: 'video',
+    format: 'MP4',
+    resolution: '4K',
+    duration: '01:30',
+    size: '850 MB',
+    thumbnail: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600',
+    tags: ['Business', 'Office', 'Meeting'],
+    license: 'Commercial',
+    status: 'approved',
+  },
+   {
+    id: 'asset-006',
+    title: 'Glitch Text Effect Pack',
+    type: 'image',
+    format: 'PSD',
+    resolution: 'N/A',
+    size: '500 MB',
+    thumbnail: 'https://images.pexels.com/photos/2228553/pexels-photo-2228553.jpeg?auto=compress&cs=tinysrgb&w=600',
+    tags: ['Glitch', 'Text', 'Effect'],
+    license: 'Commercial',
+    status: 'approved',
+  },
+];
+
+// 3. Project Data for Manager (Campaign Ops)
+export const museProjects = [
+  {
+    id: 'proj-001',
+    title: 'Zenith X5 Launch Teaser',
+    client: 'Neon Spikes',
+    deadline: '2024-10-25',
+    status: 'In Progress',
+    progress: 65,
+    priority: 'High',
+    assignee: 'Mike',
+    assigneeAvatar: 'https://i.pravatar.cc/150?u=mike',
+  },
+  {
+    id: 'proj-002',
+    title: 'Summer Vibe Instagram Reels',
+    client: 'Fashion Brand A',
+    deadline: '2024-11-01',
+    status: 'Client Review',
+    progress: 90,
+    priority: 'Medium',
+    assignee: 'Sarah',
+    assigneeAvatar: 'https://i.pravatar.cc/150?u=sarah',
+  },
+  {
+    id: 'proj-003',
+    title: 'Corporate Identity Renewal',
+    client: 'Tech Corp B',
+    deadline: '2024-12-15',
+    status: 'Planning',
+    progress: 10,
+    priority: 'Low',
+    assignee: 'Jin',
+    assigneeAvatar: 'https://i.pravatar.cc/150?u=jin',
+  },
+  {
+    id: 'proj-004',
+    title: 'Holiday Promo Campaign',
+    client: 'Retail Giant C',
+    deadline: '2024-10-20',
+    status: 'Pending Approval',
+    progress: 95,
+    priority: 'Critical',
+    assignee: 'Mike',
+    assigneeAvatar: 'https://i.pravatar.cc/150?u=mike',
+  },
+  {
+    id: 'proj-005',
+    title: 'Internal Training Video Series',
+    client: 'Neon Spikes',
+    deadline: '2025-01-10',
+    status: 'On Hold',
+    progress: 30,
+    priority: 'Low',
+    assignee: 'Sarah',
+    assigneeAvatar: 'https://i.pravatar.cc/150?u=sarah',
+  },
+];
+
+// 4. User Profile Data
+export const museUser = {
+  name: 'Sarah Kim',
+  role: 'Head of Content',
+  email: 'sarah.kim@muse.design',
+  avatar: 'https://i.pravatar.cc/150?u=sarah',
+  notifications: {
+    email: true,
+    slack: true,
+    push: false,
+  },
+  theme: 'dark',
+};
+

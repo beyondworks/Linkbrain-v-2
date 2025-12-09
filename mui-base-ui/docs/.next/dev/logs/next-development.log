@@ -1,0 +1,12 @@
+[01:44:33.169] Server  ERROR   Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.176] Server  ERROR    ⨯ "unhandledRejection:" Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.178] Server  ERROR    ⨯ "unhandledRejection: " Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.182] Server  ERROR   Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.183] Server  ERROR    ⨯ "unhandledRejection:" Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.184] Server  ERROR    ⨯ "unhandledRejection: " Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.187] Server  ERROR   Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.188] Server  ERROR    ⨯ "unhandledRejection:" Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.190] Server  ERROR    ⨯ "unhandledRejection: " Error: ENOENT: no such file or directory, scandir '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs/src/app'
+[01:44:33.251] Server  ERROR    ⨯ Module not found: Error: Can't resolve 'next-flight-client-entry-loader' in '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs'
+[01:44:47.811] Server  ERROR    ⨯ Module not found: SyntaxError: /Users/yoogeon/Desktop/App build/Linkbrain v-2/package.json (directory description file): SyntaxError: /Users/yoogeon/Desktop/App build/Linkbrain v-2/package.json (directory description file): SyntaxError: /Users/yoogeon/Desktop/App build/Linkbrain v-2/package.json (directory description file): SyntaxError: Expected double-quoted property name in JSON at position 2836 (line 88 column 3)
+[01:45:10.181] Server  ERROR    ⨯ Module not found: Error: Can't resolve 'next-flight-client-entry-loader' in '/Users/yoogeon/Desktop/App build/Linkbrain v-2/mui-base-ui/docs'
