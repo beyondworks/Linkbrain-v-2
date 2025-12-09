@@ -97,9 +97,46 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
         );
     }
 
-    // Error or no data state
+    // Error or no data state - show placeholder banner
     if (error || !insight || insight.totalClips === 0) {
-        return null; // Don't show banner if no insights available
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="w-full max-w-[800px] mx-auto mt-8 px-4"
+            >
+                <motion.div
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={onViewDetails}
+                    className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-xl rounded-2xl p-4 md:p-5 border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer group transition-all hover:shadow-md hover:border-[#21DBA4]/30"
+                >
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#21DBA4]/50 to-[#1ec795]/50 flex items-center justify-center shadow-sm">
+                            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[14px] md:text-[16px] text-[#3d3d3d] dark:text-white font-medium">
+                                {language === 'KR'
+                                    ? '클립을 저장하면 AI가 관심사를 분석해드려요'
+                                    : 'Save clips and AI will analyze your interests'
+                                }
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                                <TrendingUp className="w-3 h-3 text-[#21DBA4]" />
+                                <span className="text-[12px] text-[#959595] dark:text-gray-400">
+                                    {language === 'KR' ? '인사이트 페이지 보기' : 'View insights page'}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex-shrink-0">
+                            <ChevronRight className="w-5 h-5 text-[#959595] group-hover:text-[#21DBA4] group-hover:translate-x-1 transition-all" />
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
+        );
     }
 
     return (

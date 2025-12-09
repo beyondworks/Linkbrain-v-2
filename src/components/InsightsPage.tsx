@@ -369,7 +369,7 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
                                 {insight.interestPrediction && (
                                     <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
                                         <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
-                                            {language === 'KR' ? '🔮 예측' : '🔮 Prediction'}
+                                            {language === 'KR' ? '예측' : 'Prediction'}
                                         </p>
                                         <p className="text-sm text-blue-800 dark:text-blue-300">
                                             {insight.interestPrediction}

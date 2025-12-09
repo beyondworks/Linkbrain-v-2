@@ -400,7 +400,7 @@ function generateFallbackHighlight(topKeywords: KeywordStat[], period: 'weekly' 
     }
 
     const topKeyword = topKeywords[0].keyword;
-    return `🎯 ${periodKo}에 많이 저장한 주제는 '${topKeyword}' 입니다`;
+    return `${periodKo}에 많이 저장한 주제는 '${topKeyword}' 입니다`;
 }
 
 /**
@@ -455,7 +455,7 @@ function createEmptyInsight(period: 'weekly' | 'monthly' | 'custom', start: Date
         topSources: [],
         sentimentBreakdown: { positive: 0, neutral: 0, negative: 0 },
         overallSentiment: 'neutral',
-        highlight: `${periodKo}에 저장한 클립이 없습니다. 관심 있는 콘텐츠를 저장해보세요! 📚`,
+        highlight: `${periodKo}에 저장한 클립이 없습니다. 관심 있는 콘텐츠를 저장해보세요.`,
         newInterests: [],
         interestPrediction: '',
         recommendations: [],
