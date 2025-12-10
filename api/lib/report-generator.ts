@@ -13,6 +13,7 @@
  * NOTE: Independent module - does NOT affect existing functionality.
  */
 
+import { getFirestore, Firestore, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { analyzeUserClips, InsightResult, KeywordStat, CategoryStat, SourceStat, Recommendation } from './insights-analyzer';
 
 // ============================================================================
@@ -65,8 +66,8 @@ export interface Report {
     topSources: SourceStat[];
 
     // Content analysis
-    longestClip?: ClipStat;
-    shortestClip?: ClipStat;
+    longestClip?: ClipStat | null;
+    shortestClip?: ClipStat | null;
     averageWordCount: number;
 
     // Sentiment analysis
@@ -147,7 +148,7 @@ function generateSentimentInsight(
  * Generate a comprehensive report
  */
 export async function generateReport(
-    db: FirebaseFirestore.Firestore,
+    db: Firestore,
     userId: string,
     type: 'weekly' | 'monthly'
 ): Promise<Report> {
@@ -200,13 +201,13 @@ export async function generateReport(
             title: insight.longestClip.title,
             url: insight.longestClip.url,
             wordCount: insight.longestClip.wordCount || 0
-        } : undefined,
+        } : null,
         shortestClip: insight.shortestClip ? {
             id: insight.shortestClip.id,
             title: insight.shortestClip.title,
             url: insight.shortestClip.url,
             wordCount: insight.shortestClip.wordCount || 0
-        } : undefined,
+        } : null,
         averageWordCount,
         sentimentAnalysis: {
             overall: insight.overallSentiment,

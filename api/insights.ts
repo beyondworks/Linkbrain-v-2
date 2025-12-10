@@ -67,7 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         // Get userId from Authorization header or query
         const authToken = req.headers.authorization?.split('Bearer ')[1];
-        const userId = req.query.userId || authToken || req.body?.userId;
+        const userId = req.query.userId || req.body?.userId || authToken;
 
         if (!userId) {
             return res.status(401).json({ error: 'User ID is required' });

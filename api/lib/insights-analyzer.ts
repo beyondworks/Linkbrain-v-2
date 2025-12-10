@@ -11,7 +11,7 @@
  * NOTE: This is an independent module - does NOT affect existing extraction logic.
  */
 
-import { getFirestore, collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
+import { getFirestore, Firestore, collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // ============================================================================
@@ -158,8 +158,10 @@ function countWords(text: string): number {
 /**
  * Analyze user's clips and generate insights
  */
+
+
 export async function analyzeUserClips(
-    db: FirebaseFirestore.Firestore,
+    db: Firestore,
     userId: string,
     period: 'weekly' | 'monthly' | 'custom' = 'weekly',
     customDays?: number
@@ -173,8 +175,8 @@ export async function analyzeUserClips(
     const q = query(
         clipsRef,
         where('userId', '==', userId),
-        where('createdAt', '>=', start.toISOString()),
-        where('createdAt', '<=', end.toISOString()),
+        // where('createdAt', '>=', start.toISOString()),
+        // where('createdAt', '<=', end.toISOString()),
         orderBy('createdAt', 'desc')
     );
 

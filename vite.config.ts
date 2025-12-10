@@ -25,24 +25,34 @@ const loadEnv = () => {
 };
 loadEnv();
 const localApiPlugin = () => ({
-  name: 'local-api-analyze',
+  name: 'local-api',
   configureServer(server: any) {
-    server.middlewares.use(async (req: any, res: any, next: any) => {
-      if (!req.url?.startsWith('/api/analyze')) return next();
+    // Generic API handler for multiple endpoints
+    const handleApiRequest = async (req: any, res: any, modulePath: string) => {
       let body = '';
       req.on('data', (chunk: any) => {
         body += chunk;
       });
       req.on('end', async () => {
         try {
-          // Simple dynamic import - Vite HMR will handle updates
-          const analyzeModule = await import('./api/analyze');
-          const analyzeHandler = analyzeModule.default;
+          // Use Vite's ssrLoadModule to properly transpile TypeScript
+          const apiModule = await server.ssrLoadModule(modulePath);
+          const handler = apiModule.default;
+
+          // Parse query string
+          const urlParts = req.url.split('?');
+          const queryString = urlParts[1] || '';
+          const query: Record<string, string> = {};
+          queryString.split('&').forEach((param: string) => {
+            const [key, value] = param.split('=');
+            if (key) query[key] = decodeURIComponent(value || '');
+          });
+
           const parsedBody = body ? JSON.parse(body) : {};
           const vercelReq: any = {
             method: req.method || 'GET',
             body: parsedBody,
-            query: {},
+            query,
             headers: req.headers
           };
           const vercelRes: any = {
@@ -57,7 +67,7 @@ const localApiPlugin = () => ({
             },
             end: () => res.end()
           };
-          await analyzeHandler(vercelReq, vercelRes);
+          await handler(vercelReq, vercelRes);
         } catch (err: any) {
           console.error('❌ Local API error:', err);
           res.statusCode = 500;
@@ -69,6 +79,26 @@ const localApiPlugin = () => ({
           }));
         }
       });
+    };
+
+    server.middlewares.use(async (req: any, res: any, next: any) => {
+      // Route to appropriate handler
+      if (req.url?.startsWith('/api/analyze')) {
+        return handleApiRequest(req, res, './api/analyze.ts');
+      }
+      if (req.url?.startsWith('/api/insights')) {
+        return handleApiRequest(req, res, './api/insights.ts');
+      }
+      if (req.url?.startsWith('/api/reports')) {
+        return handleApiRequest(req, res, './api/reports.ts');
+      }
+      if (req.url?.startsWith('/api/clips')) {
+        return handleApiRequest(req, res, './api/clips.ts');
+      }
+      if (req.url?.startsWith('/api/collections')) {
+        return handleApiRequest(req, res, './api/collections.ts');
+      }
+      return next();
     });
   }
 });
