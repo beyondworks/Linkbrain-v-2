@@ -10,7 +10,7 @@
 
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, query, where, orderBy, limit } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
-import { generateReport, Report } from '../lib-server/report-generator';
+import { generateReport, Report } from './lib/report-generator';
 
 // Define simple interfaces for Vercel Request/Response
 interface VercelRequest {
