@@ -15,6 +15,7 @@ import ProfilePage from './components/ProfilePage';
 import SecurityPage from './components/SecurityPage';
 import NotificationsPage from './components/NotificationsPage';
 import InsightsPage from './components/InsightsPage';
+import BrowserZoomGuide from './components/BrowserZoomGuide';
 
 import { Settings } from 'lucide-react';
 import { auth, db } from './lib/firebase';
@@ -253,14 +254,20 @@ const App = () => {
           user={user}
         />
 
-        {/* Top Right Settings Button (Only visible on clips view, Desktop only) */}
+        {/* Top Right Controls (Only visible on clips view, Desktop only) */}
         {currentView === 'clips' && (
-          <button
-            onClick={() => setCurrentView('settings')}
-            className="absolute top-8 right-8 z-20 w-12 h-12 bg-white dark:bg-[#1e1e1e] rounded-full shadow-md hidden md:flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:shadow-lg transition-all duration-300"
-          >
-            <Settings className="w-6 h-6" />
-          </button>
+          <div className="absolute top-8 right-8 z-20 hidden md:flex items-center gap-3">
+            {/* Browser Zoom Guide */}
+            <BrowserZoomGuide language={language} />
+
+            {/* Settings Button */}
+            <button
+              onClick={() => setCurrentView('settings')}
+              className="w-12 h-12 bg-white dark:bg-[#1e1e1e] rounded-full shadow-md flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:shadow-lg transition-all duration-300"
+            >
+              <Settings className="w-6 h-6" />
+            </button>
+          </div>
         )}
 
         <FloatingSearchButton currentView={currentView} language={language} />
