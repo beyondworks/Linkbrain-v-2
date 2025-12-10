@@ -1,5 +1,7 @@
-import { getFirestore, collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc, query, where, orderBy, Query, DocumentSnapshot } from 'firebase/firestore';
-import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { verifyAuth } from './lib/auth';
+import { setCorsHeaders, handlePreflight } from './lib/cors';
 
 // Define simple interfaces for Vercel Request/Response
 interface VercelRequest {
@@ -16,30 +18,18 @@ interface VercelResponse {
     end: () => void;
 }
 
-// Initialize Firebase (if not already initialized)
-const firebaseConfig = {
-    apiKey: process.env.VITE_FIREBASE_API_KEY,
-    authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.VITE_FIREBASE_APP_ID,
-    measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+// Initialize Firebase Admin (if not already initialized)
+if (getApps().length === 0) {
+    initializeApp({
+        credential: cert({
+            projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+        })
+    });
+}
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
-
-// Middleware for CORS
-const setCorsHeaders = (res: VercelResponse) => {
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-    );
-};
+const db = getFirestore();
 
 // Interface for Clip document
 interface Clip {
@@ -77,19 +67,24 @@ interface Clip {
 
 // Vercel Serverless Function Handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
+    if (handlePreflight(req, res)) {
         return;
     }
 
     try {
-        // Get userId from Authorization header or query
-        const authToken = req.headers.authorization?.split('Bearer ')[1];
-        const userId = req.query.userId || req.body?.userId || authToken;
+        // Verify authentication for all operations
+        const auth = await verifyAuth(req);
 
-        if (!userId && req.method !== 'GET') {
+        // GET requests can be public for some cases, but we still prefer auth
+        if (!auth && req.method !== 'GET') {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        const userId = auth?.userId || req.query.userId;
+
+        if (!userId) {
             return res.status(401).json({ error: 'User ID is required' });
         }
 
@@ -119,16 +114,13 @@ async function handleCreateClip(req: VercelRequest, res: VercelResponse, userId:
             url, platform, template, title, summary, keywords, category, sentiment, type,
             image, author, authorProfile, mediaItems, engagement, mentions, comments,
             publishDate, htmlContent, collectionIds = [],
-            // NEW: Accept processed content fields
             rawMarkdown, contentMarkdown, contentHtml, images
         } = req.body;
 
-        // Validate required fields
         if (!url || !title) {
             return res.status(400).json({ error: 'URL and title are required' });
         }
 
-        // Create clip document
         const clipData: Clip = {
             userId,
             url,
@@ -154,22 +146,18 @@ async function handleCreateClip(req: VercelRequest, res: VercelResponse, userId:
             likeCount: 0,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            // NEW: Add processed content fields if provided
             ...(rawMarkdown && { rawMarkdown }),
             ...(contentMarkdown && { contentMarkdown }),
             ...(contentHtml && { contentHtml }),
             ...(images && { images }),
         };
 
-        // Compress HTML content if too large (Firestore 1MB limit per doc)
         if (clipData.htmlContent && clipData.htmlContent.length > 100000) {
-            console.warn(`HTML content too large (${clipData.htmlContent.length} bytes), storing truncated version`);
             clipData.htmlContent = clipData.htmlContent.substring(0, 100000);
         }
 
-        // Add to Firestore
-        const clipsCollection = collection(db, 'clips');
-        const docRef = await addDoc(clipsCollection, clipData);
+        // Firebase Admin SDK syntax
+        const docRef = await db.collection('clips').add(clipData);
 
         res.status(201).json({
             id: docRef.id,
@@ -187,52 +175,40 @@ async function handleGetClips(req: VercelRequest, res: VercelResponse, userId: s
     try {
         const { category, platform, search, collectionId, limit = 50, offset = 0 } = req.query;
 
-        let q: Query = collection(db, 'clips');
-
-        // Build query with filters
-        const whereConditions = [];
+        // Build query with Firebase Admin SDK
+        let queryRef: FirebaseFirestore.Query = db.collection('clips');
 
         if (userId) {
-            whereConditions.push(where('userId', '==', userId));
+            queryRef = queryRef.where('userId', '==', userId);
         }
-
         if (category) {
-            whereConditions.push(where('category', '==', category));
+            queryRef = queryRef.where('category', '==', category);
         }
-
         if (platform) {
-            whereConditions.push(where('platform', '==', platform));
+            queryRef = queryRef.where('platform', '==', platform);
         }
-
         if (collectionId) {
-            whereConditions.push(where('collectionIds', 'array-contains', collectionId));
+            queryRef = queryRef.where('collectionIds', 'array-contains', collectionId);
         }
 
-        // Build the query
-        if (whereConditions.length > 0) {
-            q = query(collection(db, 'clips'), ...whereConditions, orderBy('createdAt', 'desc'));
-        } else {
-            q = query(collection(db, 'clips'), orderBy('createdAt', 'desc'));
-        }
+        queryRef = queryRef.orderBy('createdAt', 'desc');
 
-        // Execute query
-        const snapshot = await getDocs(q);
-        let clips = snapshot.docs.map(doc => ({
+        const snapshot = await queryRef.get();
+        let clips = snapshot.docs.map((doc: FirebaseFirestore.DocumentSnapshot) => ({
             id: doc.id,
             ...doc.data(),
-        } as any));
+        }));
 
-        // Client-side filtering for search (simple substring match)
+        // Client-side filtering for search
         if (search) {
             const searchLower = (search as string).toLowerCase();
-            clips = clips.filter(clip =>
-                clip.title.toLowerCase().includes(searchLower) ||
-                clip.summary.toLowerCase().includes(searchLower) ||
-                clip.keywords.some((k: string) => k.toLowerCase().includes(searchLower))
+            clips = clips.filter((clip: any) =>
+                clip.title?.toLowerCase().includes(searchLower) ||
+                clip.summary?.toLowerCase().includes(searchLower) ||
+                clip.keywords?.some((k: string) => k.toLowerCase().includes(searchLower))
             );
         }
 
-        // Apply pagination
         const offsetNum = parseInt(offset as string) || 0;
         const limitNum = parseInt(limit as string) || 50;
         const paginatedClips = clips.slice(offsetNum, offsetNum + limitNum);
@@ -259,11 +235,10 @@ async function handleUpdateClip(req: VercelRequest, res: VercelResponse, userId:
             return res.status(400).json({ error: 'Clip ID is required' });
         }
 
-        // Verify ownership
-        const docRef = doc(db, 'clips', id as string);
-        const docSnap = await getDoc(docRef);
+        const docRef = db.collection('clips').doc(id as string);
+        const docSnap = await docRef.get();
 
-        if (!docSnap.exists()) {
+        if (!docSnap.exists) {
             return res.status(404).json({ error: 'Clip not found' });
         }
 
@@ -271,9 +246,8 @@ async function handleUpdateClip(req: VercelRequest, res: VercelResponse, userId:
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        // Update document
         updates.updatedAt = new Date().toISOString();
-        await updateDoc(docRef, updates);
+        await docRef.update(updates);
 
         res.status(200).json({
             id,
@@ -295,11 +269,10 @@ async function handleDeleteClip(req: VercelRequest, res: VercelResponse, userId:
             return res.status(400).json({ error: 'Clip ID is required' });
         }
 
-        // Verify ownership
-        const docRef = doc(db, 'clips', id as string);
-        const docSnap = await getDoc(docRef);
+        const docRef = db.collection('clips').doc(id as string);
+        const docSnap = await docRef.get();
 
-        if (!docSnap.exists()) {
+        if (!docSnap.exists) {
             return res.status(404).json({ error: 'Clip not found' });
         }
 
@@ -307,8 +280,7 @@ async function handleDeleteClip(req: VercelRequest, res: VercelResponse, userId:
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        // Delete document
-        await deleteDoc(docRef);
+        await docRef.delete();
 
         res.status(200).json({ success: true, deletedId: id });
     } catch (error: any) {
@@ -316,3 +288,4 @@ async function handleDeleteClip(req: VercelRequest, res: VercelResponse, userId:
         res.status(500).json({ error: 'Failed to delete clip', details: error.message });
     }
 }
+

@@ -8,9 +8,10 @@ interface ImportMetaEnv {
     readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string
     readonly VITE_FIREBASE_APP_ID: string
     readonly VITE_FIREBASE_MEASUREMENT_ID: string
-    readonly VITE_OPENAI_API_KEY: string
+    // Note: VITE_OPENAI_API_KEY removed - should never be exposed to client
 }
 
 interface ImportMeta {
     readonly env: ImportMetaEnv
 }
+

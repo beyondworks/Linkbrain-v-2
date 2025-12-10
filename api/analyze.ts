@@ -13,75 +13,18 @@
 import { createClipFromContent, detectPlatform } from './lib/clip-service';
 import { fetchUrlContent } from './lib/url-content-fetcher';
 import { extractImages } from './lib/image-extractor';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-
-// Initialize Firebase Admin (for token verification)
-if (getApps().length === 0) {
-    initializeApp({
-        credential: cert({
-            projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-        })
-    });
-}
-
-// CORS helper
-const setCorsHeaders = (res: any) => {
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-    );
-};
-
-/**
- * Extract userId from request
- * Supports both Firebase ID Token (Bearer) and direct userId in body/query
- */
-const getUserId = async (req: any): Promise<string | null> => {
-    // Try Authorization header with Firebase ID Token
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        const idToken = authHeader.split('Bearer ')[1];
-        try {
-            // Verify and decode Firebase ID Token
-            const decodedToken = await getAuth().verifyIdToken(idToken);
-            console.log('[Auth] Decoded userId from token:', decodedToken.uid);
-            return decodedToken.uid;
-        } catch (error) {
-            console.error('[Auth] Invalid Firebase token:', error);
-            // Continue to try other methods
-        }
-    }
-
-    // Try body userId (fallback for direct userId)
-    if (req.body.userId) {
-        console.log('[Auth] Using userId from body:', req.body.userId);
-        return req.body.userId;
-    }
-
-    // Try query params
-    if (req.query.userId) {
-        console.log('[Auth] Using userId from query:', req.query.userId);
-        return req.query.userId;
-    }
-
-    return null;
-};
+import { requireAuth } from './lib/auth';
+import { setCorsHeaders, handlePreflight } from './lib/cors';
+import { validateUrl } from './lib/url-validator';
 
 /**
  * Main handler
  */
 export default async function handler(req: any, res: any) {
     // CORS
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
+    if (handlePreflight(req, res)) {
         return;
     }
 
@@ -92,16 +35,17 @@ export default async function handler(req: any, res: any) {
     try {
         const { url, language } = req.body;
 
-        // Validate URL
-        if (!url) {
-            return res.status(400).json({ error: 'URL is required' });
+        // Validate URL (SSRF prevention)
+        const urlValidation = validateUrl(url);
+        if (!urlValidation.valid) {
+            return res.status(400).json({ error: urlValidation.error });
         }
 
-        // Get userId (decode Firebase token)
-        const userId = await getUserId(req);
-        if (!userId) {
-            return res.status(401).json({ error: 'Authentication required' });
-        }
+        // Require authentication (no userId fallback)
+        const auth = await requireAuth(req, res);
+        if (!auth) return; // 401 already sent
+
+        const userId = auth.userId;
 
         console.log(`[URL Import] Processing: ${url}`);
         console.log(`[URL Import] User ID: ${userId}`);

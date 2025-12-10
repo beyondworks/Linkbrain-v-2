@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer';
 import { normalizeThreads } from './threads-normalizer';
 import { normalizeWeb } from './web-normalizer';
 import { normalizeNaverBlog } from './naver-normalizer';
+import { validateUrl } from './url-validator';
 
 /**
  * URL Content Fetcher
@@ -145,6 +146,13 @@ const convertToNaverMobile = (url: string): string => {
  * 4. General web → Jina Reader
  */
 export const fetchUrlContent = async (url: string): Promise<FetchedUrlContent> => {
+    // SSRF Prevention: Validate URL before any network request
+    const urlValidation = validateUrl(url);
+    if (!urlValidation.valid) {
+        console.error(`[Content Fetcher] SSRF blocked: ${urlValidation.error}`);
+        return { rawText: '', images: [] };
+    }
+
     try {
         // Detect platform
         const urlLower = url.toLowerCase();
