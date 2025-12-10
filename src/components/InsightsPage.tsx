@@ -17,7 +17,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     Sparkles, TrendingUp, PieChart, BarChart3, Calendar,
-    ChevronRight, RefreshCw, FileText, Clock, Star,
+    ChevronRight, ChevronLeft, RefreshCw, FileText, Clock, Star,
     ArrowLeft, Download, Share2
 } from 'lucide-react';
 import { auth } from '../lib/firebase';
@@ -179,26 +179,21 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
     const sentimentPercentages = getSentimentPercentages();
 
     return (
-        <div className="w-full h-full bg-[#f8f8f8] dark:bg-[#121212] overflow-y-auto">
+        <div className="w-full h-full bg-white dark:bg-[#121212] overflow-auto pt-2" style={{ zoom: 1.15 }}>
             {/* Header Area */}
-            <div className="sticky top-0 z-10 bg-[#f8f8f8]/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-6 md:px-8 py-4 mb-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-[1600px] mx-auto w-full">
+            <div className="sticky top-0 z-10 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-6 md:px-8 py-4 mb-6">
+                <div className="flex flex-row items-center justify-between gap-4 w-full">
                     {/* Left: Title & Back */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={onBack}
-                            className="p-2 -ml-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
+                            className="w-9 h-9 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-[#3d3d3d] dark:text-white" />
+                            <ChevronLeft className="w-5 h-5" />
                         </button>
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-[#21DBA4]/10 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-[#21DBA4]" />
-                            </div>
-                            <h1 className="text-xl md:text-2xl font-bold text-[#3d3d3d] dark:text-white">
-                                {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
-                            </h1>
-                        </div>
+                        <h1 className="text-[18px] font-bold text-[#3d3d3d] dark:text-white">
+                            {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
+                        </h1>
                     </div>
 
                     {/* Right: Actions */}
@@ -240,7 +235,7 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
             </div>
 
             {/* Content Area */}
-            <div className="px-6 md:px-8 pb-20 max-w-[1600px] mx-auto w-full">
+            <div className="px-6 md:px-8 pb-20 w-full">
                 {/* Content */}
                 <div className="space-y-6">
                     {loading ? (
@@ -490,15 +485,13 @@ const EmptyState: React.FC<{ language: 'KR' | 'EN' }> = ({ language }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="text-center py-20 bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#b5b5b5]/30 dark:border-gray-800 border-dashed"
+        className="flex flex-col items-center justify-center bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#b5b5b5]/30 dark:border-gray-800"
+        style={{ minHeight: '200px' }}
     >
-        <div className="w-16 h-16 bg-gray-50 dark:bg-[#2a2a2a] rounded-full flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-6 h-6 text-[#959595]" />
-        </div>
-        <h2 className="text-lg font-bold text-[#3d3d3d] dark:text-white mb-2">
+        <h2 className="text-[15px] font-semibold text-[#3d3d3d] dark:text-white mb-2">
             {language === 'KR' ? '아직 분석할 데이터가 없어요' : 'No data to analyze yet'}
         </h2>
-        <p className="text-sm text-[#959595] dark:text-gray-400">
+        <p className="text-[13px] text-[#959595] dark:text-gray-400">
             {language === 'KR'
                 ? '클립을 저장하면 AI가 자동으로 관심사를 분석해드려요'
                 : 'Save clips and AI will analyze your interests automatically'}
