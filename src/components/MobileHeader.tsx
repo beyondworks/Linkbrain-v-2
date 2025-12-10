@@ -29,7 +29,7 @@ const MobileHeader = (props: MobileHeaderProps) => {
    const [isOpen, setIsOpen] = useState(false);
 
    return (
-      <div className="sticky top-0 z-30 w-full bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-gray-800 px-6 py-6 flex items-center justify-between md:hidden transition-colors duration-300">
+      <div className="sticky top-0 z-30 w-full bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-gray-800 px-6 min-h-[72px] flex items-center justify-between md:hidden transition-colors duration-300">
 
          <div className="flex items-center gap-3">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
