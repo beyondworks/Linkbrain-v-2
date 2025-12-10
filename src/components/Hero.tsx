@@ -88,10 +88,10 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center"
+        className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center whitespace-pre-line"
         style={{ fontSize: 'clamp(48px, 8vw, 72px)' }}
       >
-        Collect links<br />Create a second brain
+        {'Collect links\nCreate a second brain'}
       </motion.h1>
 
       <motion.div
@@ -102,16 +102,18 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         style={{ marginBottom: '64px', fontSize: '18px', fontWeight: 400 }}
       >
         {language === 'KR' ? (
-          <>
-            링크가 쌓일수록 - 지식이 쌓이는 곳<br />
-            링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요
-          </>
+          <div className="whitespace-pre-line">
+            {'링크가 쌓일수록 - 지식이 쌓이는 곳\n'}
+            {'링크 하나면 충분해요 '}
+            <span className="text-[#21DBA4]">정리·분석·요약</span>
+            {'은 '}
+            <span className="text-[#21DBA4]">링크브레인</span>
+            {'이 할게요'}
+          </div>
         ) : (
-          <>
-            Where links become knowledge<br />
-            Just save the link,<br />
-            Linkbrain will handle organizing, analyzing, and summarizing.
-          </>
+          <div className="whitespace-pre-line">
+            {'Where links become knowledge\nJust save the link,\nLinkbrain will handle organizing, analyzing, and summarizing.'}
+          </div>
         )}
       </motion.div>
 
