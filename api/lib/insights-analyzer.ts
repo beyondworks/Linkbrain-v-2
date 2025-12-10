@@ -175,8 +175,8 @@ export async function analyzeUserClips(
     const q = query(
         clipsRef,
         where('userId', '==', userId),
-        // where('createdAt', '>=', start.toISOString()),
-        // where('createdAt', '<=', end.toISOString()),
+        where('createdAt', '>=', start.toISOString()),
+        where('createdAt', '<=', end.toISOString()),
         orderBy('createdAt', 'desc')
     );
 
