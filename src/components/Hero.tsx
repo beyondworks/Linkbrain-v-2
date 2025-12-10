@@ -88,33 +88,33 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center"
+        className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center flex flex-col"
         style={{ fontSize: 'clamp(48px, 8vw, 72px)' }}
       >
-        <span className="block">Collect links</span>
-        <span className="block">Create a second brain</span>
+        <span>Collect links</span>
+        <span>Create a second brain</span>
       </motion.h1>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        className="text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center"
+        className="text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center flex flex-col"
         style={{ marginBottom: '64px' }}
       >
         {language === 'KR' ? (
           <>
-            <p style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>링크가 쌓일수록 - 지식이 쌓이는 곳</p>
-            <p style={{ fontSize: '18px', fontWeight: 400 }}>
+            <span style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>링크가 쌓일수록 - 지식이 쌓이는 곳</span>
+            <span style={{ fontSize: '18px', fontWeight: 400 }}>
               링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요
-            </p>
+            </span>
           </>
         ) : (
           <>
-            <p style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>Where links become knowledge</p>
-            <p style={{ fontSize: '18px', fontWeight: 400 }}>
+            <span style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>Where links become knowledge</span>
+            <span style={{ fontSize: '18px', fontWeight: 400 }}>
               Just save the link, Linkbrain will handle organizing, analyzing, and summarizing.
-            </p>
+            </span>
           </>
         )}
       </motion.div>
