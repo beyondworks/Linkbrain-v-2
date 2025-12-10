@@ -13,6 +13,7 @@ import { getCategoryColor } from '../lib/categoryColors';
 import svgPathsOpen from "../imports/svg-necy6hi9g3";
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { isAdmin } from '../utils/adminAuth';
 
 interface MobileSidebarProps {
     onCategorySelect?: (category: string | null) => void;
@@ -534,38 +535,43 @@ const MobileSidebar = ({
                     </AnimatePresence>
                 </div>
 
-                {/* Divider */}
-                <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-6 mx-4" />
+                {/* Admin-only sections */}
+                {isAdmin(user) && (
+                    <>
+                        {/* Divider */}
+                        <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-6 mx-4" />
 
-                {/* AI Insight */}
-                <div className="flex flex-col gap-2 mb-4">
-                    <div
-                        className="flex items-center gap-3 cursor-pointer group px-2"
-                        onClick={() => handleLinkClick(() => onNavigate && onNavigate('insights'))}
-                    >
-                        <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center transition-colors ${currentView === 'insights' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
-                            <Sparkles className="w-4 h-4" />
+                        {/* AI Insight */}
+                        <div className="flex flex-col gap-2 mb-4">
+                            <div
+                                className="flex items-center gap-3 cursor-pointer group px-2"
+                                onClick={() => handleLinkClick(() => onNavigate && onNavigate('insights'))}
+                            >
+                                <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center transition-colors ${currentView === 'insights' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                                    <Sparkles className="w-4 h-4" />
+                                </div>
+                                <span className={`text-[16px] font-medium transition-colors ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                                    AI Insight
+                                </span>
+                            </div>
                         </div>
-                        <span className={`text-[16px] font-medium transition-colors ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
-                            AI Insight
-                        </span>
-                    </div>
-                </div>
 
-                {/* Linkbrain Article */}
-                <div className="flex flex-col gap-2 mb-6">
-                    <div
-                        className="flex items-center gap-3 cursor-pointer group px-2"
-                        onClick={() => handleLinkClick(() => onNavigate && onNavigate('articles'))}
-                    >
-                        <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center transition-colors ${currentView === 'articles' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
-                            <BookOpen className="w-4 h-4" />
+                        {/* Linkbrain Article */}
+                        <div className="flex flex-col gap-2 mb-6">
+                            <div
+                                className="flex items-center gap-3 cursor-pointer group px-2"
+                                onClick={() => handleLinkClick(() => onNavigate && onNavigate('articles'))}
+                            >
+                                <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center transition-colors ${currentView === 'articles' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                                    <BookOpen className="w-4 h-4" />
+                                </div>
+                                <span className={`text-[16px] font-medium transition-colors ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                                    Linkbrain Article
+                                </span>
+                            </div>
                         </div>
-                        <span className={`text-[16px] font-medium transition-colors ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
-                            Linkbrain Article
-                        </span>
-                    </div>
-                </div>
+                    </>
+                )}
             </div>
 
             {/* Footer: User Profile */}

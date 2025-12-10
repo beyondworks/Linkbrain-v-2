@@ -15,6 +15,7 @@ import svgPathsOpen from "../imports/svg-necy6hi9g3";
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { getCategoryColor } from '../lib/categoryColors';
+import { isAdmin } from '../utils/adminAuth';
 
 interface SidebarProps {
   onCategorySelect?: (category: string | null) => void;
@@ -559,44 +560,49 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
               </AnimatePresence>
             </div>
 
-            {/* Divider */}
-            <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-2"></div>
+            {/* Admin-only sections */}
+            {isAdmin(user) && (
+              <>
+                {/* Divider */}
+                <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-2"></div>
 
-            {/* AI Insight */}
-            <div className="px-8 py-2 flex flex-col gap-2">
-              <div
-                className="flex items-center gap-[20px] cursor-pointer group"
-                onClick={() => onNavigate && onNavigate('insights')}
-              >
-                <div className={`w-[40px] h-[40px] rounded-[10px] flex items-center justify-center transition-colors ${currentView === 'insights' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
-                  <Sparkles className="w-5 h-5" />
+                {/* AI Insight */}
+                <div className="px-8 py-2 flex flex-col gap-2">
+                  <div
+                    className="flex items-center gap-[20px] cursor-pointer group"
+                    onClick={() => onNavigate && onNavigate('insights')}
+                  >
+                    <div className={`w-[40px] h-[40px] rounded-[10px] flex items-center justify-center transition-colors ${currentView === 'insights' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <span className={`text-[18px] font-medium transition-colors whitespace-nowrap ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                      AI Insight
+                    </span>
+                  </div>
                 </div>
-                <span className={`text-[18px] font-medium transition-colors whitespace-nowrap ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
-                  AI Insight
-                </span>
-              </div>
-            </div>
 
-            {/* Divider */}
-            <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-2"></div>
+                {/* Divider */}
+                <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-2"></div>
 
-            {/* Linkbrain Article */}
-            <div className="px-8 py-2 flex flex-col gap-2">
-              <div
-                className="flex items-center gap-[20px] cursor-pointer group"
-                onClick={() => onNavigate && onNavigate('articles')}
-              >
-                <div className={`w-[40px] h-[40px] rounded-[10px] flex items-center justify-center transition-colors ${currentView === 'articles' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
-                  <BookOpen className="w-5 h-5" />
+                {/* Linkbrain Article */}
+                <div className="px-8 py-2 flex flex-col gap-2">
+                  <div
+                    className="flex items-center gap-[20px] cursor-pointer group"
+                    onClick={() => onNavigate && onNavigate('articles')}
+                  >
+                    <div className={`w-[40px] h-[40px] rounded-[10px] flex items-center justify-center transition-colors ${currentView === 'articles' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                    <span className={`text-[18px] font-medium transition-colors whitespace-nowrap ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                      Linkbrain Article
+                    </span>
+                  </div>
                 </div>
-                <span className={`text-[18px] font-medium transition-colors whitespace-nowrap ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
-                  Linkbrain Article
-                </span>
-              </div>
-            </div>
 
-            {/* Divider */}
-            <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-6"></div>
+                {/* Divider */}
+                <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-6"></div>
+              </>
+            )}
 
             {/* Bottom Section */}
             <div className="px-8 pb-10 flex flex-col gap-[30px] mt-auto">

@@ -1,18 +1,15 @@
 /**
  * ArticlePage Component
- * 
- * DESIGN REFERENCE: Screenshot 2 (Strict Match)
- * - Header: "Discovery" (Bold) + "Articles" (Gray Pill). Right: Search (Pill), Bell, Avatar.
- * - Section Header: Green Sparkle + "Weekly Top Pick" (Outside Hero).
- * - Hero: Clean Image, Dark Overlay, Bottom Content. "Read Article" button (Glass/Gray).
- * - Filters: "All" (Green Circle/Squircle), others (White Pills).
- * - Grid: 3-col, Cards with Image (Tag on top-left), "Based on..." text, Title, Summary, Footer.
+ * DESIGN: Matches target screenshot exactly
+ * - Hero: Content at TOP-LEFT, compact height
+ * - 'Weekly Top Pick' header OUTSIDE hero
+ * - Filters: 'All' green circle, others simple pills
+ * - Cards: 'Read Now' buttons ON images
  */
 
 import React, { useState } from 'react';
 import {
-    Search, Bell, User, Heart, Bookmark, ChevronLeft, ChevronRight,
-    Clock, Sparkles, Share2
+    Search, Bell, User, Heart, Bookmark, ChevronLeft, ChevronRight, Clock
 } from 'lucide-react';
 
 interface ArticlePageProps {
@@ -26,7 +23,6 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
 
     const tabs = ['All', 'Design', 'Development', 'Crypto', 'Startup', 'Marketing', 'Productivity'];
 
-    // Mock Data
     const articles = [
         {
             id: 1,
@@ -100,9 +96,8 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
         <div className="w-full min-h-screen bg-white dark:bg-[#111] pb-24 font-sans text-slate-900 dark:text-slate-100">
             <div className="max-w-[1200px] mx-auto px-8 md:px-12 pt-8">
 
-                {/* --- HEADER --- */}
+                {/* HEADER */}
                 <header className="flex items-center justify-between mb-8">
-                    {/* Left: Title + Badge */}
                     <div className="flex items-center gap-3">
                         <button onClick={onBack} className="md:hidden p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full">
                             <ChevronLeft className="w-6 h-6" />
@@ -111,14 +106,13 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
                         <span className="px-2.5 py-1 bg-gray-100 dark:bg-[#222] text-slate-500 dark:text-gray-400 text-xs font-bold rounded-lg">Articles</span>
                     </div>
 
-                    {/* Right: Search + Controls */}
                     <div className="flex items-center gap-4">
                         <div className="relative hidden md:block group">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#21DBA4] transition-colors" />
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search topics..."
-                                className="pl-10 pr-4 py-2 bg-gray-100 dark:bg-[#222] rounded-full text-sm outline-none w-[280px] focus:ring-2 focus:ring-[#21DBA4]/20 transition-all font-medium text-slate-700 dark:text-gray-200 placeholder-gray-400"
+                                className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-[#222] rounded-full text-sm outline-none w-[280px] focus:ring-2 focus:ring-[#21DBA4]/20 font-medium text-slate-700 dark:text-gray-200 placeholder-gray-400 border border-gray-100 dark:border-gray-800"
                             />
                         </div>
                         <button className="p-2 text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors relative">
@@ -137,74 +131,81 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
                     </div>
                 </header>
 
-                {/* --- WEEKLY TOP PICK HEADER --- */}
+                {/* WEEKLY TOP PICK HEADER - OUTSIDE HERO */}
                 <div className="flex items-center gap-2 mb-4">
                     <FilledSparkles className="text-[#21DBA4]" size={20} />
                     <h2 className="text-xl font-bold text-slate-900 dark:text-white">Weekly Top Pick</h2>
                 </div>
 
-                {/* --- HERO CARD --- */}
-                <div className="relative w-full h-[320px] rounded-[32px] overflow-hidden mb-12 shadow-2xl group">
-                    <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-slate-900/30 transition-colors z-10" />
+                {/* HERO CARD - CONTENT AT TOP-LEFT */}
+                <div className="relative w-full h-[280px] rounded-[28px] overflow-hidden mb-12 shadow-xl group">
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70 z-10" />
                     <img
                         src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2565&auto=format&fit=crop"
                         alt="Hero"
                         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 bg-gray-200 dark:bg-gray-800"
                     />
 
-                    <div className="absolute inset-x-0 bottom-0 p-8 md:p-10 z-20 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/40 to-transparent h-full">
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="px-2.5 py-0.5 bg-[#21DBA4] text-white text-[10px] font-bold rounded-full flex items-center gap-1 uppercase tracking-wide">
-                                <FilledSparkles size={10} /> AI Trends
+                    {/* Content positioned at TOP-LEFT */}
+                    <div className="absolute top-0 left-0 p-6 md:p-8 z-20 max-w-[65%]">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="px-2.5 py-0.5 bg-[#21DBA4] text-white text-[10px] font-bold rounded-md flex items-center gap-1 uppercase tracking-wide">
+                                <FilledSparkles size={9} /> AI Trends
                             </span>
-                            <span className="text-white/80 text-[11px] font-medium flex items-center gap-1 backdrop-blur-md bg-white/10 px-2 py-0.5 rounded-full">
+                            <span className="text-white/90 text-[11px] font-medium flex items-center gap-1">
                                 <Clock size={10} /> 5 min read
                             </span>
                         </div>
 
-                        <h2 className="text-3xl md:text-4xl font-black text-white leading-tight mb-2 max-w-4xl drop-shadow-xl">
+                        <h2 className="text-2xl md:text-3xl font-black text-white leading-tight mb-2.5 drop-shadow-xl">
                             The Rise of 'Vibe Coding':<br />How AI Changes Design Systems
                         </h2>
 
-                        <p className="text-white/80 text-sm md:text-base mb-6 max-w-2xl leading-relaxed line-clamp-1 drop-shadow-md">
-                            Analyzing 24 saved clips about MCP, Gemini 2.0, and No-code tools.
+                        <p className="text-white/80 text-xs md:text-sm mb-4 leading-relaxed line-clamp-2 drop-shadow-md">
+                            Analyzing 24 saved clips about MCP, Gemini 2.0, and No-code tools. Explore how the role of designers is shifting from 'Pixel Perfect' to 'Logic Architect'.
                         </p>
+                    </div>
 
-                        <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center gap-3">
-                                <div className="flex -space-x-3">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white/20 bg-gray-300 overflow-hidden">
-                                            <img src={`https://i.pravatar.cc/100?img=${10 + i}`} alt="Curator" className="w-full h-full object-cover" />
-                                        </div>
-                                    ))}
-                                </div>
-                                <span className="text-white/90 text-xs font-bold drop-shadow-md">Curated by LinkBrain + 12 others</span>
+                    {/* Bottom content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex -space-x-2.5">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="w-7 h-7 rounded-full border-2 border-white/30 bg-gray-300 overflow-hidden">
+                                        <img src={`https://i.pravatar.cc/100?img=${10 + i}`} alt="Curator" className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
                             </div>
-
-                            {/* Glass Button from Reference */}
-                            <button className="px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition-all flex items-center gap-2 rounded-full backdrop-blur-md border border-white/20 shadow-lg group/btn">
-                                Read Article
-                                <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                            </button>
+                            <span className="text-white text-xs font-bold drop-shadow-md">Curated by LinkBrain + 12 others</span>
                         </div>
+
+                        <button className="px-5 py-2 bg-white/90 hover:bg-white text-slate-900 font-bold text-xs transition-all flex items-center gap-1.5 rounded-full shadow-lg">
+                            Read Article
+                            <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
                     </div>
                 </div>
 
-                {/* --- FILTER TABS --- */}
+                {/* FILTER TABS - All is green circle, others are simple */}
                 <div className="flex items-center gap-3 mb-10 overflow-x-auto scrollbar-hide py-1">
-                    {tabs.map(tab => (
+                    <button
+                        onClick={() => setActiveTab('All')}
+                        className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all
+                            ${activeTab === 'All'
+                                ? 'bg-[#21DBA4] text-white shadow-md'
+                                : 'bg-gray-100 dark:bg-[#222] text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2a]'}
+                        `}
+                    >
+                        All
+                    </button>
+                    {tabs.slice(1).map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`
-                                rounded-full text-sm font-bold transition-all border shrink-0
-                                ${tab === 'All'
-                                    ? `px-3 h-10 w-10 flex items-center justify-center ${activeTab === 'All' ? 'bg-[#21DBA4] text-white border-[#21DBA4] shadow-md' : 'bg-gray-100 text-gray-500'}`
-                                    : `px-6 py-2.5 ${activeTab === tab
-                                        ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-black'
-                                        : 'bg-white dark:bg-[#1e1e1e] text-slate-600 dark:text-gray-400 border-gray-100 dark:border-white/10 hover:border-gray-300'}`
-                                }
+                            className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all
+                                ${activeTab === tab
+                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                                    : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'}
                             `}
                         >
                             {tab}
@@ -212,34 +213,41 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
                     ))}
                 </div>
 
-                {/* --- ARTICLE GRID --- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 pb-20">
+                {/* ARTICLE GRID - with Read Now buttons ON images */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
                     {articles.map(article => (
                         <div key={article.id} className="group flex flex-col gap-4 cursor-pointer">
-                            {/* Card Image */}
-                            <div className="relative w-full aspect-[16/10] rounded-[20px] overflow-hidden shadow-sm border border-gray-100 dark:border-white/5 bg-gray-100 dark:bg-[#222]">
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors z-10" />
+                            {/* Card Image with overlay button */}
+                            <div className="relative w-full aspect-[16/11] rounded-[20px] overflow-hidden shadow-sm border border-gray-100 dark:border-white/5 bg-gray-100 dark:bg-[#222]">
                                 <img
                                     src={article.image}
                                     alt={article.title}
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                                 />
-                                <div className="absolute top-4 left-4 z-20">
-                                    <span className="px-3 py-1 bg-white/95 backdrop-blur-md rounded-lg text-[11px] font-bold text-slate-900 shadow-sm uppercase tracking-wide leading-none">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                {/* Category badge */}
+                                <div className="absolute top-3 left-3 z-10">
+                                    <span className="px-3 py-1 bg-white/95 backdrop-blur-sm rounded-lg text-[10px] font-bold text-slate-900 shadow-sm uppercase tracking-wide">
                                         {article.category}
                                     </span>
                                 </div>
+
+                                {/* Read Now button - appears on hover */}
+                                <button className="absolute bottom-3 right-3 z-10 px-4 py-2 bg-white hover:bg-gray-50 text-slate-900 font-bold text-xs rounded-full shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all flex items-center gap-1">
+                                    Read Now
+                                    <ChevronRight className="w-3 h-3" />
+                                </button>
                             </div>
 
                             {/* Card Content */}
                             <div className="flex flex-col">
-                                {/* Based on Clips Line */}
                                 <div className="flex items-center gap-1.5 text-[#21DBA4] mb-2">
                                     <FilledSparkles size={11} />
                                     <span className="text-[11px] font-bold uppercase tracking-wide">Based on {article.savedClips} saved clips</span>
                                 </div>
 
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight mb-2 group-hover:text-[#21DBA4] transition-colors line-clamp-2">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight mb-2 group-hover:text-[#21DBA4] transition-colors line-clamp-2">
                                     {article.title}
                                 </h3>
 
@@ -254,18 +262,18 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs font-bold text-slate-900 dark:text-white">{article.author}</span>
-                                            <span className="w-0.5 h-0.5 bg-gray-300 rounded-full" />
+                                            <span className="w-1 h-1 bg-gray-300 rounded-full" />
                                             <span className="text-xs text-gray-400">{article.timeAgo}</span>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-3 text-gray-400">
-                                        <button className="flex items-center gap-1 hover:text-red-500 transition-colors group/action">
-                                            <Heart size={16} className="group-hover/action:fill-red-500" />
+                                        <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
+                                            <Heart size={15} />
                                             <span className="text-xs font-medium">{article.likes}</span>
                                         </button>
                                         <button className="hover:text-[#21DBA4] transition-colors">
-                                            <Bookmark size={16} />
+                                            <Bookmark size={15} />
                                         </button>
                                     </div>
                                 </div>
@@ -278,7 +286,6 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ language, onBack, user }) => 
     );
 };
 
-// Filled Sparkles Icon
 function FilledSparkles({ size = 16, className = "" }: { size?: number, className?: string }) {
     return (
         <svg

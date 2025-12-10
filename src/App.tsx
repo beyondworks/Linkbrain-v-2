@@ -23,6 +23,7 @@ import { auth, db } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { toast, Toaster } from 'sonner';
+import { isAdmin } from './utils/adminAuth';
 
 const App = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -107,6 +108,16 @@ const App = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  // Admin route protection: redirect non-admins trying to access insights/articles
+  useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+
+    if ((currentView === 'insights' || currentView === 'articles') && !isAdmin(user)) {
+      setCurrentView('clips'); // Redirect to clips view
+      toast.error(language === 'KR' ? '접근 권한이 없습니다' : 'Access denied');
+    }
+  }, [currentView, user, authLoading, language]);
 
   // toggleDarkMode and toggleLanguage moved up
 
