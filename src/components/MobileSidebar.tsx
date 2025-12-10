@@ -99,12 +99,26 @@ const MobileSidebar = ({
 
     // Toggle favorite
     const toggleFavorite = (categoryName: string) => {
-        setFavoriteCategories(prev =>
-            prev.includes(categoryName)
-                ? prev.filter(c => c !== categoryName)
-                : [...prev, categoryName]
-        );
+        setFavoriteCategories(prev => {
+            if (prev.includes(categoryName)) {
+                return prev.filter(c => c !== categoryName);
+            }
+            if (prev.length >= 5) return prev;
+            return [...prev, categoryName];
+        });
     };
+
+    // Prevent auto-focus on mobile sidebar open
+    useEffect(() => {
+        // Delay blur slightly to override any auto-focus logic from Sheet/Dialog
+        const timer = setTimeout(() => {
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+        }, 50);
+        return () => clearTimeout(timer);
+    }, []);
+
 
     // Track recent category usage
     const handleCategorySelect = (categoryName: string | null) => {
@@ -500,6 +514,8 @@ const MobileSidebar = ({
                                                 placeholder={language === 'KR' ? "컬렉션 검색..." : "Filter..."}
                                                 className="w-full bg-transparent outline-none text-[13px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
                                                 onClick={(e) => e.stopPropagation()}
+                                                autoFocus={false}
+                                                autoComplete="off"
                                             />
                                         </div>
                                     )}
