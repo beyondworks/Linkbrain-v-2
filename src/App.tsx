@@ -115,7 +115,7 @@ const App = () => {
 
     if ((currentView === 'insights' || currentView === 'articles') && !isAdmin(user)) {
       setCurrentView('clips'); // Redirect to clips view
-      toast.error(language === 'KR' ? '접근 권한이 없습니다' : 'Access denied');
+      toast.error(language === 'KR' ? '준비중인 기능입니다' : 'Coming Soon');
     }
   }, [currentView, user, authLoading, language]);
 
