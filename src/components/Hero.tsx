@@ -102,12 +102,21 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         className="text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center"
         style={{ marginBottom: '64px' }}
       >
-        <p style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>{language === 'KR' ? "링크가 쌓일수록 - 지식이 쌓이는 곳" : "Where links become knowledge"}</p>
-        <p style={{ fontSize: '18px', fontWeight: 400 }}>
-          {language === 'KR'
-            ? <>링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요</>
-            : "Just save the link, Linkbrain will handle organizing, analyzing, and summarizing."}
-        </p>
+        {language === 'KR' ? (
+          <>
+            <p style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>링크가 쌓일수록 - 지식이 쌓이는 곳</p>
+            <p style={{ fontSize: '18px', fontWeight: 400 }}>
+              링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요
+            </p>
+          </>
+        ) : (
+          <>
+            <p style={{ fontSize: '18px', fontWeight: 400, marginBottom: '2px' }}>Where links become knowledge</p>
+            <p style={{ fontSize: '18px', fontWeight: 400 }}>
+              Just save the link, Linkbrain will handle organizing, analyzing, and summarizing.
+            </p>
+          </>
+        )}
       </motion.div>
 
       {/* Input Area */}
