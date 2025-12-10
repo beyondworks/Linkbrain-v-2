@@ -98,7 +98,7 @@ async function uploadToStorage(buffer: Buffer, filename: string, contentType: st
         await file.save(buffer, {
             metadata: {
                 contentType,
-                cacheControl: 'public, max-age=31536000'.// Cache for 1 year
+                cacheControl: 'public, max-age=31536000' // Cache for 1 year
             }
         });
 

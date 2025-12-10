@@ -3,11 +3,5 @@
         "api/*.ts": {
             "excludeFiles": "api/lib/**"
         }
-    },
-    "builds": [
-        {
-            "src": "api/*.ts",
-            "use": "@vercel/node"
-        }
-    ]
+    }
 }
