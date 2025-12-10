@@ -227,8 +227,8 @@ const App = () => {
 
   return (
     <div className="flex min-h-screen bg-white dark:bg-[#121212] font-sans text-[#3d3d3d] dark:text-white transition-colors duration-300">
-      {/* Left Sidebar (Desktop Only) */}
-      <div className="hidden md:block">
+      {/* Left Sidebar (Desktop Only) - Fixed position for viewport-centered content */}
+      <div className="hidden md:block fixed left-0 top-0 h-screen z-40">
         <Sidebar
           onCategorySelect={handleCategorySelect}
           onNavigate={handleNavigate}
@@ -253,8 +253,8 @@ const App = () => {
         />
       </div>
 
-      {/* Main Content Area */}
-      <main className="flex-1 ml-0 md:ml-[100px] relative flex flex-col h-screen">
+      {/* Main Content Area - Centered based on full viewport */}
+      <main className="flex-1 relative flex flex-col h-screen">
 
         {/* Mobile Header with Sidebar (Mobile Only) */}
         <MobileHeader
