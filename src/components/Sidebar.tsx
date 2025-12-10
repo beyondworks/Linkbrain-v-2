@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List, Moon, Sun, Image as ImageIcon } from 'lucide-react';
+import { Globe, Smartphone, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List, Moon, Sun, Image as ImageIcon, Sparkles, BookOpen } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,7 @@ import { getCategoryColor } from '../lib/categoryColors';
 
 interface SidebarProps {
   onCategorySelect?: (category: string | null) => void;
-  onNavigate?: (view: 'clips' | 'collections') => void;
+  onNavigate?: (view: 'clips' | 'collections' | 'insights' | 'articles') => void;
   onCreateCollection?: () => void;
   onCollectionSelect?: (collection: any) => void;
   onSourceSelect?: (source: string | null) => void;
@@ -26,7 +26,7 @@ interface SidebarProps {
   onLogout?: () => void;
   onSettingsClick?: () => void;
   onProfileClick?: () => void;
-  currentView: 'clips' | 'collections' | 'collection-detail' | 'settings' | 'profile';
+  currentView: 'clips' | 'collections' | 'collection-detail' | 'settings' | 'profile' | 'insights' | 'articles';
   language?: 'KR' | 'EN';
   user?: any;
   toggleDarkMode?: () => void;
@@ -250,11 +250,11 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
               >
                 <div className="flex items-center gap-[20px]">
                   <div className="w-[40px] h-[40px] bg-[#959595] rounded-[10px] flex items-center justify-center text-white group-hover:bg-[#21DBA4] transition-colors">
-                    <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none">
+                    <svg className="w-9 h-9" viewBox="0 0 40 40" fill="none">
                       <path d={svgPathsOpen.p15428980} fill="currentColor" />
                     </svg>
                   </div>
-                  <span className="text-[#3d3d3d] dark:text-white text-[20px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">My Clip</span>
+                  <span className="text-[#3d3d3d] dark:text-white text-[18px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">My Clip</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {/* View Mode Toggle */}
@@ -289,19 +289,17 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                   >
                     <div className="pl-[60px] pt-2 flex flex-col gap-[10px]">
                       {/* Category Filter Input */}
-                      {tags.length > 3 && (
-                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#252525] rounded-[10px] px-3 py-1.5 mb-1">
-                          <Search className="w-3.5 h-3.5 text-[#959595]" />
-                          <input
-                            type="text"
-                            value={categoryFilter}
-                            onChange={(e) => setCategoryFilter(e.target.value)}
-                            placeholder={language === 'KR' ? "카테고리 검색..." : "Filter..."}
-                            className="w-full bg-transparent outline-none text-[14px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#252525] rounded-[10px] px-3 py-1.5 mb-1">
+                        <Search className="w-3.5 h-3.5 text-[#959595]" />
+                        <input
+                          type="text"
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                          placeholder={language === 'KR' ? "카테고리 검색..." : "Filter..."}
+                          className="w-full bg-transparent outline-none text-[14px] text-[#3d3d3d] dark:text-white placeholder-[#959595]"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
 
                       {/* Cloud or List View */}
                       <div className={categoryViewMode === 'cloud' ? 'flex flex-wrap gap-2' : 'flex flex-col gap-[10px]'}>
@@ -409,9 +407,9 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
               >
                 <div className="flex items-center gap-[20px]">
                   <div className="w-[40px] h-[40px] bg-[#959595] rounded-[10px] flex items-center justify-center text-white group-hover:bg-[#21DBA4] transition-colors">
-                    <Globe className="w-6 h-6" />
+                    <Globe className="w-5 h-5" />
                   </div>
-                  <span className="text-[#3d3d3d] dark:text-white text-[20px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">Source</span>
+                  <span className="text-[#3d3d3d] dark:text-white text-[18px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">Source</span>
                 </div>
                 <motion.div
                   animate={{ rotate: isSourceOpen ? 180 : 0 }}
@@ -466,11 +464,11 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                   }}
                 >
                   <div className="w-[40px] h-[40px] bg-[#959595] rounded-[10px] flex items-center justify-center text-white group-hover:bg-[#21DBA4] transition-colors">
-                    <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none">
+                    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
                       <path d={svgPathsOpen.p18756800} fill="currentColor" />
                     </svg>
                   </div>
-                  <span className="text-[#3d3d3d] dark:text-white text-[20px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">Collections</span>
+                  <span className="text-[#3d3d3d] dark:text-white text-[18px] font-medium group-hover:text-[#21DBA4] transition-colors whitespace-nowrap">Collections</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -559,6 +557,42 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+
+            {/* Divider */}
+            <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-2"></div>
+
+            {/* AI Insight */}
+            <div className="px-8 py-2 flex flex-col gap-2">
+              <div
+                className="flex items-center gap-[20px] cursor-pointer group"
+                onClick={() => onNavigate && onNavigate('insights')}
+              >
+                <div className={`w-[40px] h-[40px] rounded-[10px] flex items-center justify-center transition-colors ${currentView === 'insights' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <span className={`text-[18px] font-medium transition-colors whitespace-nowrap ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                  AI Insight
+                </span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-2"></div>
+
+            {/* Linkbrain Article */}
+            <div className="px-8 py-2 flex flex-col gap-2">
+              <div
+                className="flex items-center gap-[20px] cursor-pointer group"
+                onClick={() => onNavigate && onNavigate('articles')}
+              >
+                <div className={`w-[40px] h-[40px] rounded-[10px] flex items-center justify-center transition-colors ${currentView === 'articles' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <span className={`text-[18px] font-medium transition-colors whitespace-nowrap ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                  Linkbrain Article
+                </span>
+              </div>
             </div>
 
             {/* Divider */}
@@ -728,6 +762,34 @@ const Sidebar = ({ onCategorySelect, onNavigate, onCreateCollection, onCollectio
                 <rect fill="currentColor" className="opacity-0 group-hover:opacity-10 transition-opacity" width="40" height="40" rx="10" />
                 <path d={svgPaths.p18756800} fill="currentColor" />
               </svg>
+            </button>
+
+            {/* AI Insight Icon */}
+            <button
+              onClick={() => {
+                setIsOpen(true);
+                onNavigate && onNavigate('insights');
+              }}
+              className={`w-10 h-10 flex items-center justify-center transition-colors group ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#959595] hover:text-[#21DBA4]'}`}
+            >
+              <div className="w-full h-full flex items-center justify-center relative">
+                <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-10 rounded-[10px] transition-opacity"></div>
+                <Sparkles className="w-6 h-6" />
+              </div>
+            </button>
+
+            {/* Article Icon */}
+            <button
+              onClick={() => {
+                setIsOpen(true);
+                onNavigate && onNavigate('articles');
+              }}
+              className={`w-10 h-10 flex items-center justify-center transition-colors group ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#959595] hover:text-[#21DBA4]'}`}
+            >
+              <div className="w-full h-full flex items-center justify-center relative">
+                <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-10 rounded-[10px] transition-opacity"></div>
+                <BookOpen className="w-6 h-6" />
+              </div>
             </button>
           </div>
 
