@@ -175,24 +175,41 @@ export async function analyzeUserClips(
     const q = query(
         clipsRef,
         where('userId', '==', userId),
-        // where('createdAt', '>=', start.toISOString()),
-        // where('createdAt', '<=', end.toISOString()),
+        // Note: Date filtering done in JavaScript to support both Timestamp and string formats
         orderBy('createdAt', 'desc')
     );
 
     const snapshot = await getDocs(q);
-    const clips = snapshot.docs.map(doc => {
+    const allClips = snapshot.docs.map(doc => {
         const data = doc.data();
-        if (process.env.NODE_ENV !== 'production') {
-            console.log(`[DEBUG] Clip ${doc.id} createdAt:`, data.createdAt, typeof data.createdAt);
-        }
         return {
             id: doc.id,
             ...data
         };
     }) as any[];
 
-    console.log(`[Insights] Found ${clips.length} clips in period (Filter disabled)`);
+    // Filter clips by date range (handles both Firestore Timestamp and ISO string)
+    const clips = allClips.filter(clip => {
+        if (!clip.createdAt) return false;
+
+        let clipDate: Date;
+        if (clip.createdAt.toDate) {
+            // Firestore Timestamp
+            clipDate = clip.createdAt.toDate();
+        } else if (typeof clip.createdAt === 'string') {
+            // ISO string
+            clipDate = new Date(clip.createdAt);
+        } else if (clip.createdAt.seconds) {
+            // Firestore Timestamp object (from JSON)
+            clipDate = new Date(clip.createdAt.seconds * 1000);
+        } else {
+            return false;
+        }
+
+        return clipDate >= start && clipDate <= end;
+    });
+
+    console.log(`[Insights] Found ${clips.length} clips in ${period} period (${allClips.length} total)`);
 
     if (clips.length === 0) {
         return createEmptyInsight(period, start, end);

@@ -121,8 +121,8 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
             const token = await user.getIdToken();
             console.log('[InsightsPage] Got auth token');
 
-            // Fetch insights
-            const insightUrl = `/api/insights?userId=${user.uid}&period=${activeTab}`;
+            // Fetch insights (forceRefresh to bypass cache)
+            const insightUrl = `/api/insights?userId=${user.uid}&period=${activeTab}&forceRefresh=true`;
             console.log('[InsightsPage] Calling API:', insightUrl);
 
             const insightRes = await fetch(insightUrl, {
@@ -154,25 +154,44 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
         }
     };
 
-    const generateReport = async (type: 'weekly' | 'monthly') => {
+    const generateReport = async () => {
         if (!user) return;
         setGenerating(true);
 
         try {
             const token = await user.getIdToken();
-            const response = await fetch('/api/reports', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ userId: user.uid, type })
-            });
 
-            if (response.ok) {
-                toast.success(language === 'KR' ? '리포트가 생성되었습니다' : 'Report generated');
-                fetchData();
+            // Generate both weekly and monthly reports in parallel
+            const [weeklyRes, monthlyRes] = await Promise.all([
+                fetch('/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userId: user.uid, type: 'weekly' })
+                }),
+                fetch('/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userId: user.uid, type: 'monthly' })
+                })
+            ]);
+
+            if (weeklyRes.ok && monthlyRes.ok) {
+                toast.success(language === 'KR' ? '주간 및 월간 리포트가 생성되었습니다' : 'Weekly and monthly reports generated');
+            } else if (weeklyRes.ok) {
+                toast.success(language === 'KR' ? '주간 리포트가 생성되었습니다' : 'Weekly report generated');
+            } else if (monthlyRes.ok) {
+                toast.success(language === 'KR' ? '월간 리포트가 생성되었습니다' : 'Monthly report generated');
+            } else {
+                throw new Error('Both reports failed');
             }
+
+            fetchData();
         } catch (err) {
             toast.error(language === 'KR' ? '리포트 생성에 실패했습니다' : 'Failed to generate report');
         } finally {
@@ -238,7 +257,7 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
                     </div>
 
                     <button
-                        onClick={() => generateReport(activeTab)}
+                        onClick={() => generateReport()}
                         disabled={generating}
                         className={`flex items-center gap-2 px-8 py-2.5 rounded-full text-white font-medium shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 ${brandBg}`}
                         style={{ boxShadow: '0 4px 14px 0 rgba(33, 219, 164, 0.3)' }}
@@ -349,7 +368,7 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
                             </Card>
 
                             {/* Card 3: Sentiment Analysis */}
-                            <Card title={language === 'KR' ? '감정 분석' : 'Sentiment Analysis'} icon={<Activity size={20} className="text-purple-500" />}>
+                            <Card title={language === 'KR' ? '콘텐츠 감정 품질' : 'Content Sentiment Quality'} icon={<Activity size={20} className="text-purple-500" />}>
                                 <div className="space-y-6 pt-2">
                                     <SentimentBar
                                         label={language === 'KR' ? '긍정 (Positive)' : 'Positive'}
