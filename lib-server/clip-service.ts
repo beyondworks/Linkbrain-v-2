@@ -306,8 +306,8 @@ export const createClipFromContent = async (
     console.log(`[Clip Service] - URL: ${url}`);
     console.log(`[Clip Service] - Raw text length: ${rawText?.length || 0} chars`);
     console.log(`[Clip Service] - Images count: ${images?.length || 0}`);
-    console.log(`[Clip Service] - Author: ${author || 'N/A'}`);
-    console.log(`[Clip Service] - Author Avatar: ${authorAvatar || 'N/A'}`);
+    console.log(`[Clip Service] - Author: ${author || './A'}`);
+    console.log(`[Clip Service] - Author Avatar: ${authorAvatar || './A'}`);
 
 
     // INVARIANT: Store raw content exactly as provided

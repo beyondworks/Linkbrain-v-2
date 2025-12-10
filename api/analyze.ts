@@ -10,12 +10,12 @@
  * Response: Clip object (compatible with existing frontend)
  */
 
-import { createClipFromContent, detectPlatform } from './lib/clip-service';
-import { fetchUrlContent } from './lib/url-content-fetcher';
-import { extractImages } from './lib/image-extractor';
-import { requireAuth } from './lib/auth';
-import { setCorsHeaders, handlePreflight } from './lib/cors';
-import { validateUrl } from './lib/url-validator';
+import { createClipFromContent, detectPlatform } from '../lib-server/clip-service';
+import { fetchUrlContent } from '../lib-server/url-content-fetcher';
+import { extractImages } from '../lib-server/image-extractor';
+import { requireAuth } from '../lib-server/auth';
+import { setCorsHeaders, handlePreflight } from '../lib-server/cors';
+import { validateUrl } from '../lib-server/url-validator';
 
 /**
  * Main handler

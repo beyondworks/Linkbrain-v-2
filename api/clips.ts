@@ -1,7 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { verifyAuth } from './lib/auth';
-import { setCorsHeaders, handlePreflight } from './lib/cors';
+import { verifyAuth } from '../lib-server/auth';
+import { setCorsHeaders, handlePreflight } from '../lib-server/cors';
 
 // Define simple interfaces for Vercel Request/Response
 interface VercelRequest {
