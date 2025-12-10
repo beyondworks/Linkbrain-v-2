@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
     Sparkles, TrendingUp, PieChart, BarChart3, Calendar,
     ChevronRight, ChevronLeft, RefreshCw, FileText, Clock, Star,
-    ArrowLeft, Download, Share2
+    ArrowLeft, Download, Share2, Globe, Activity, Zap
 } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -87,6 +87,11 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
     const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly');
     const [generating, setGenerating] = useState(false);
 
+    // Brand Colors
+    const brandColor = "text-[#21DBA4]";
+    const brandBg = "bg-[#21DBA4]";
+    const brandLightBg = "bg-[#21DBA4]/10";
+
     useEffect(() => {
         if (propUser) {
             setUser(propUser);
@@ -105,20 +110,31 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
     }, [user, activeTab]);
 
     const fetchData = async () => {
-        if (!user) return;
+        if (!user) {
+            console.log('[InsightsPage] No user found, skipping fetch');
+            return;
+        }
+        console.log('[InsightsPage] Fetching data for user:', user.uid);
         setLoading(true);
 
         try {
             const token = await user.getIdToken();
+            console.log('[InsightsPage] Got auth token');
 
             // Fetch insights
-            const insightRes = await fetch(`/api/insights?userId=${user.uid}&period=${activeTab}`, {
+            const insightUrl = `/api/insights?userId=${user.uid}&period=${activeTab}`;
+            console.log('[InsightsPage] Calling API:', insightUrl);
+
+            const insightRes = await fetch(insightUrl, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (insightRes.ok) {
                 const data = await insightRes.json();
+                console.log('[InsightsPage] Insight data received:', data);
                 setInsight(data.insight);
+            } else {
+                console.error('[InsightsPage] Insight API failed:', insightRes.status, insightRes.statusText);
             }
 
             // Fetch reports
@@ -178,10 +194,18 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
 
     const sentimentPercentages = getSentimentPercentages();
 
+    // Helper for date range display
+    const getDateRangeLabel = () => {
+        if (!insight) return '';
+        const start = new Date(insight.startDate);
+        const end = new Date(insight.endDate);
+        return `${start.toLocaleDateString(language === 'KR' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString(language === 'KR' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    };
+
     return (
-        <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 pb-20 pt-8">
+        <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 pb-20 pt-8 font-sans text-slate-800">
             {/* Header Area */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={onBack}
@@ -189,257 +213,255 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="text-[#3d3d3d] dark:text-white text-[24px] font-bold leading-none">
-                        {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
-                    </h1>
+                    <div>
+                        <h1 className="text-2xl font-bold flex items-center gap-2 dark:text-white">
+                            {language === 'KR' ? 'AI 인사이트' : 'AI Insight'}
+                            <span className="text-xs font-normal px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">Beta</span>
+                        </h1>
+                    </div>
                 </div>
 
-                {/* Right: Actions */}
                 <div className="flex items-center gap-3">
-                    {/* Period Toggle */}
-                    <div className="bg-white dark:bg-[#1e1e1e] p-1 rounded-full border border-gray-200 dark:border-gray-800 flex items-center">
-                        {(['weekly', 'monthly'] as const).map((period) => (
-                            <button
-                                key={period}
-                                onClick={() => setActiveTab(period)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${activeTab === period
-                                    ? 'bg-[#3d3d3d] text-white dark:bg-white dark:text-black shadow-sm'
-                                    : 'text-[#959595] hover:text-[#3d3d3d] dark:hover:text-gray-300'
-                                    }`}
-                            >
-                                {period === 'weekly'
-                                    ? (language === 'KR' ? '주간' : 'Weekly')
-                                    : (language === 'KR' ? '월간' : 'Monthly')
-                                }
-                            </button>
-                        ))}
+                    <div className="flex bg-gray-100 dark:bg-[#2a2a2a] rounded-full p-1">
+                        <button
+                            onClick={() => setActiveTab('weekly')}
+                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'weekly' ? 'bg-white dark:bg-[#1e1e1e] text-slate-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                        >
+                            {language === 'KR' ? '주간' : 'Weekly'}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('monthly')}
+                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'monthly' ? 'bg-white dark:bg-[#1e1e1e] text-slate-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                        >
+                            {language === 'KR' ? '월간' : 'Monthly'}
+                        </button>
                     </div>
 
-                    {/* Generate Button */}
                     <button
                         onClick={() => generateReport(activeTab)}
                         disabled={generating}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-bold hover:bg-[#1ec795] transition-colors disabled:opacity-50 shadow-sm hover:shadow-md"
+                        className={`flex items-center gap-2 px-8 py-2.5 rounded-full text-white font-medium shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 ${brandBg}`}
+                        style={{ boxShadow: '0 4px 14px 0 rgba(33, 219, 164, 0.3)' }}
                     >
-                        {generating ? (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <FileText className="w-4 h-4" />
-                        )}
-                        {language === 'KR' ? '리포트 생성' : 'Generate Report'}
+                        {generating ? <RefreshCw className="w-4 h- animate-spin" /> : <FileText className="w-4 h-4" />}
+                        <span>{language === 'KR' ? '리포트 생성' : 'Generate Report'}</span>
                     </button>
                 </div>
             </div>
 
-            {/* Content Area */}
-            <div className="w-full">
-                {/* Content */}
-                <div className="space-y-6">
-                    {loading ? (
-                        <LoadingState />
-                    ) : !insight || insight.totalClips === 0 ? (
-                        <EmptyState language={language} />
-                    ) : (
-                        <>
-                            {/* Highlight Card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-gradient-to-br from-[#21DBA4] to-[#1ec795] rounded-[24px] p-8 text-white shadow-lg"
-                            >
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Sparkles className="w-5 h-5" />
-                                    <span className="text-sm font-medium opacity-90">
+            {/* Dashboard Content */}
+            <div className="space-y-8 animate-fade-in">
+                {loading ? (
+                    <LoadingState />
+                ) : !insight || insight.totalClips === 0 ? (
+                    <EmptyState language={language} />
+                ) : (
+                    <>
+                        {/* Top Section: Overview / Trend */}
+                        <section className="bg-white dark:bg-[#1e1e1e] rounded-[32px] p-8 shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800">
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-1 dark:text-white">
                                         {activeTab === 'weekly'
-                                            ? (language === 'KR' ? '이번 주 하이라이트' : 'This Week\'s Highlight')
-                                            : (language === 'KR' ? '이번 달 하이라이트' : 'This Month\'s Highlight')
+                                            ? (language === 'KR' ? '주간 인사이트 요약' : 'Weekly Insight Summary')
+                                            : (language === 'KR' ? '월간 인사이트 요약' : 'Monthly Insight Summary')
                                         }
-                                    </span>
+                                    </h2>
+                                    <p className="text-gray-400 text-sm">{getDateRangeLabel()}</p>
                                 </div>
-                                <p className="text-xl md:text-3xl font-bold leading-snug">
-                                    {insight.highlight}
-                                </p>
-                                <div className="flex items-center gap-2 mt-4 text-sm opacity-80">
-                                    <TrendingUp className="w-4 h-4" />
-                                    <span>
-                                        {language === 'KR'
-                                            ? `총 ${insight.totalClips}개의 클립 분석`
-                                            : `${insight.totalClips} clips analyzed`
-                                        }
-                                    </span>
+                                <div className={`p-3 rounded-2xl ${brandLightBg} ${brandColor}`}>
+                                    <Sparkles size={24} />
                                 </div>
-                            </motion.div>
-
-                            {/* Stats Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Top Keywords */}
-                                <StatsCard
-                                    title={language === 'KR' ? '인기 키워드' : 'Top Keywords'}
-                                    icon={<BarChart3 className="w-5 h-5" />}
-                                >
-                                    <div className="flex flex-wrap gap-2">
-                                        {insight.topKeywords.slice(0, 8).map((kw, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="px-3 py-1.5 rounded-full text-sm font-medium"
-                                                style={{
-                                                    backgroundColor: `rgba(33, 219, 164, ${0.1 + (0.15 * (1 - idx / 8))})`,
-                                                    color: '#21DBA4'
-                                                }}
-                                            >
-                                                {kw.keyword}
-                                                <span className="ml-1 opacity-60">({kw.count})</span>
-                                            </span>
-                                        ))}
-                                    </div>
-                                </StatsCard>
-
-                                {/* Top Sources */}
-                                <StatsCard
-                                    title={language === 'KR' ? '주요 출처' : 'Top Sources'}
-                                    icon={<PieChart className="w-5 h-5" />}
-                                >
-                                    <div className="space-y-3">
-                                        {insight.topSources.slice(0, 5).map((source, idx) => (
-                                            <div key={idx} className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    {source.favicon && (
-                                                        <img src={source.favicon} alt="" className="w-4 h-4 rounded" />
-                                                    )}
-                                                    <span className="text-sm text-[#3d3d3d] dark:text-white">
-                                                        {source.source}
-                                                    </span>
-                                                </div>
-                                                <span className="text-sm text-[#959595]">{source.count}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </StatsCard>
-
-                                {/* Sentiment Analysis */}
-                                <StatsCard
-                                    title={language === 'KR' ? '감정 분석' : 'Sentiment Analysis'}
-                                    icon={<Star className="w-5 h-5" />}
-                                >
-                                    <div className="space-y-3">
-                                        <SentimentBar
-                                            label={language === 'KR' ? '긍정' : 'Positive'}
-                                            percentage={sentimentPercentages.positive}
-                                            color="#21DBA4"
-                                        />
-                                        <SentimentBar
-                                            label={language === 'KR' ? '중립' : 'Neutral'}
-                                            percentage={sentimentPercentages.neutral}
-                                            color="#959595"
-                                        />
-                                        <SentimentBar
-                                            label={language === 'KR' ? '부정' : 'Negative'}
-                                            percentage={sentimentPercentages.negative}
-                                            color="#EF4444"
-                                        />
-                                    </div>
-                                </StatsCard>
-
-                                {/* New Interests */}
-                                <StatsCard
-                                    title={language === 'KR' ? '새로운 관심사' : 'New Interests'}
-                                    icon={<TrendingUp className="w-5 h-5" />}
-                                >
-                                    {insight.newInterests && insight.newInterests.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {insight.newInterests.map((interest, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="flex items-center gap-2 p-2 rounded-lg bg-[#21DBA4]/5"
-                                                >
-                                                    <Star className="w-4 h-4 text-[#21DBA4]" />
-                                                    <span className="text-sm text-[#3d3d3d] dark:text-white">
-                                                        {interest}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-[#959595]">
-                                            {language === 'KR' ? '새로운 관심사가 발견되지 않았습니다' : 'No new interests detected'}
-                                        </p>
-                                    )}
-
-                                    {insight.interestPrediction && (
-                                        <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-                                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
-                                                {language === 'KR' ? '예측' : 'Prediction'}
-                                            </p>
-                                            <p className="text-sm text-blue-800 dark:text-blue-300">
-                                                {insight.interestPrediction}
-                                            </p>
-                                        </div>
-                                    )}
-                                </StatsCard>
                             </div>
 
-                            {/* Past Reports */}
-                            {reports.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="pt-6"
-                                >
-                                    <h2 className="text-lg font-bold text-[#3d3d3d] dark:text-white mb-4 flex items-center gap-2">
-                                        <Clock className="w-5 h-5 text-[#21DBA4]" />
-                                        {language === 'KR' ? '지난 리포트' : 'Past Reports'}
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {reports.map((report) => (
-                                            <ReportCard key={report.id} report={report} language={language} />
-                                        ))}
+                            {/* Highlight Text */}
+                            <div className="mb-8">
+                                <p className="text-lg text-slate-700 dark:text-gray-300 leading-relaxed font-medium">
+                                    {insight.highlight}
+                                </p>
+                            </div>
+
+                            {/* Simulated Chart Area - Visual Only as per request */}
+                            <div className="h-32 w-full flex items-end gap-2 sm:gap-4 opacity-80">
+                                {[40, 65, 45, 80, 55, 90, 70].map((height, i) => (
+                                    <div key={i} className="flex-1 flex flex-col items-center gap-3 group cursor-pointer">
+                                        <div className="w-full relative h-full flex items-end rounded-2xl bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                                            <div
+                                                style={{ height: `${height}%` }}
+                                                className={`w-full rounded-2xl transition-all duration-500 ease-out group-hover:bg-[#21DBA4] ${i === 5 ? brandBg : 'bg-gray-200 dark:bg-gray-700'}`}
+                                            />
+                                        </div>
+                                        <span className={`text-xs font-medium ${i === 5 ? brandColor : 'text-gray-400'}`}>
+                                            {language === 'KR'
+                                                ? ['월', '화', '수', '목', '금', '토', '일'][i]
+                                                : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]
+                                            }
+                                        </span>
                                     </div>
-                                </motion.div>
-                            )}
-                        </>
-                    )}
-                </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* Grid Section */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                            {/* Card 1: Trending Keywords */}
+                            <Card title={language === 'KR' ? '인기 키워드' : 'Popular Keywords'} icon={<TrendingUp size={20} className={brandColor} />}>
+                                <div className="flex flex-wrap gap-2.5">
+                                    {insight.topKeywords.slice(0, 10).map((kw, i) => (
+                                        <span
+                                            key={i}
+                                            className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all hover:scale-105 cursor-default
+                                              ${i < 3
+                                                    ? `${brandLightBg} ${brandColor} border border-[#21DBA4]/20`
+                                                    : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'}
+                                            `}
+                                        >
+                                            {kw.keyword} <span className="opacity-60 text-xs ml-1">{kw.count}</span>
+                                        </span>
+                                    ))}
+                                </div>
+                            </Card>
+
+                            {/* Card 2: Main Sources */}
+                            <Card title={language === 'KR' ? '주요 출처' : 'Top Sources'} icon={<Globe size={20} className="text-blue-500" />}>
+                                <div className="space-y-4">
+                                    {insight.topSources.slice(0, 5).map((source, i) => (
+                                        <div key={i} className="flex items-center justify-between group p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors -mx-2 px-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-slate-600 dark:text-gray-300">
+                                                    {source.favicon ? <img src={source.favicon} alt="" className="w-5 h-5" /> : <Globe size={18} />}
+                                                </div>
+                                                <span className="font-medium text-slate-700 dark:text-gray-200">{source.source}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-24 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-slate-800 dark:bg-gray-400 rounded-full"
+                                                        style={{ width: `${Math.min((source.count / insight.totalClips) * 100 * 2, 100)}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-sm font-bold text-slate-900 dark:text-white w-6 text-right">{source.count}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
+
+                            {/* Card 3: Sentiment Analysis */}
+                            <Card title={language === 'KR' ? '감정 분석' : 'Sentiment Analysis'} icon={<Activity size={20} className="text-purple-500" />}>
+                                <div className="space-y-6 pt-2">
+                                    <SentimentBar
+                                        label={language === 'KR' ? '긍정 (Positive)' : 'Positive'}
+                                        percent={sentimentPercentages.positive}
+                                        color="bg-[#21DBA4]"
+                                    />
+                                    <SentimentBar
+                                        label={language === 'KR' ? '중립 (Neutral)' : 'Neutral'}
+                                        percent={sentimentPercentages.neutral}
+                                        color="bg-gray-300 dark:bg-gray-600"
+                                    />
+                                    <SentimentBar
+                                        label={language === 'KR' ? '부정 (Negative)' : 'Negative'}
+                                        percent={sentimentPercentages.negative}
+                                        color="bg-red-400"
+                                    />
+                                </div>
+                                <div className="mt-8 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                                        <span className="font-bold text-slate-700 dark:text-gray-200">{language === 'KR' ? '인사이트:' : 'Insight:'}</span> {insight.highlight}
+                                    </p>
+                                </div>
+                            </Card>
+
+                            {/* Card 4: New Interests */}
+                            <Card title={language === 'KR' ? '새로운 관심사' : 'New Interests'} icon={<Zap size={20} className="text-yellow-500" />}>
+                                <div className="space-y-3">
+                                    {insight.newInterests && insight.newInterests.length > 0 ? (
+                                        insight.newInterests.slice(0, 4).map((item, i) => (
+                                            <div key={i} className="flex items-center justify-between p-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1e1e1e] hover:border-[#21DBA4]/30 hover:shadow-sm transition-all group">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-[#21DBA4]">
+                                                        <Sparkles size={14} />
+                                                    </div>
+                                                    <span className="font-medium text-slate-700 dark:text-gray-200">{item}</span>
+                                                </div>
+                                                <ChevronRight size={16} className="text-gray-300 group-hover:text-[#21DBA4] transition-colors" />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-gray-400 py-4 text-center">
+                                            {language === 'KR' ? '새로운 관심사가 아직 없습니다.' : 'No new interests found yet.'}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {insight.interestPrediction && (
+                                    <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                            {language === 'KR' ? 'AI 예측' : 'AI Prediction'}
+                                        </h4>
+                                        <p className="text-sm text-slate-600 dark:text-gray-300">
+                                            {insight.interestPrediction}
+                                        </p>
+                                    </div>
+                                )}
+                            </Card>
+
+                        </div>
+
+                        {/* Reports List Section (Optional, kept for history) */}
+                        {reports.length > 0 && (
+                            <section className="mt-12">
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                    <Clock className="w-5 h-5 text-[#21DBA4]" />
+                                    {language === 'KR' ? '지난 리포트' : 'Past Reports'}
+                                </h3>
+                                <div className="flex flex-wrap gap-4">
+                                    {reports.map((report) => (
+                                        <ReportCard key={report.id} report={report} language={language} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
 };
 
-// Sub-components
+// Reusable Components
 
-const StatsCard: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, icon, children }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col"
-    >
-        <div className="flex items-center gap-2.5 mb-5 text-[#21DBA4]">
+const Card: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, icon, children }) => (
+    <div className="bg-white dark:bg-[#1e1e1e] p-6 lg:p-8 rounded-[32px] shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800 flex flex-col h-full transition-transform hover:-translate-y-1 duration-300">
+        <div className="flex items-center gap-3 mb-6">
             {icon}
-            <h3 className="font-semibold text-[#3d3d3d] dark:text-white text-[15px]">{title}</h3>
+            <h3 className="font-bold text-lg text-slate-800 dark:text-white">{title}</h3>
         </div>
         <div className="flex-1">
             {children}
         </div>
-    </motion.div>
+    </div>
 );
 
-const SentimentBar: React.FC<{ label: string; percentage: number; color: string }> = ({ label, percentage, color }) => (
-    <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-sm">
-            <span className="text-[#3d3d3d] dark:text-white text-[13px]">{label}</span>
-            <span className="text-[#959595] text-[12px]">{percentage}%</span>
+const SentimentBar: React.FC<{ label: string; percent: number; color: string }> = ({ label, percent, color }) => (
+    <div>
+        <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-slate-600 dark:text-gray-400">{label}</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white">{percent}%</span>
         </div>
-        <div className="h-2 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-full overflow-hidden">
+        <div className="h-3 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${percentage}%`, backgroundColor: color }}
+                className={`h-full rounded-full transition-all duration-1000 ease-out ${color}`}
+                style={{ width: `${percent}%` }}
             />
         </div>
     </div>
 );
 
 const ReportCard: React.FC<{ report: Report; language: 'KR' | 'EN' }> = ({ report, language }) => (
-    <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-5 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-all cursor-pointer group flex items-center justify-between">
+    <div className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-5 border border-[#b5b5b5]/30 dark:border-gray-800 shadow-sm hover:shadow-md transition-all cursor-pointer group flex items-center justify-between w-full md:w-[300px]">
         <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-[18px] bg-[#21DBA4]/10 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-[#21DBA4]" />
@@ -463,15 +485,15 @@ const ReportCard: React.FC<{ report: Report; language: 'KR' | 'EN' }> = ({ repor
 const LoadingState = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white dark:bg-[#1e1e1e] rounded-[24px] p-6 border border-[#b5b5b5]/30 dark:border-gray-800 h-[200px] animate-pulse">
+            <div key={i} className="bg-white dark:bg-[#1e1e1e] rounded-[32px] p-8 border border-gray-100 dark:border-gray-800 h-[250px] animate-pulse">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#2a2a2a]" />
-                    <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded w-1/3" />
+                    <div className="h-5 bg-gray-100 dark:bg-[#2a2a2a] rounded w-1/3" />
                 </div>
-                <div className="space-y-3">
-                    <div className="h-3 bg-gray-100 dark:bg-[#2a2a2a] rounded w-full" />
-                    <div className="h-3 bg-gray-100 dark:bg-[#2a2a2a] rounded w-3/4" />
-                    <div className="h-3 bg-gray-100 dark:bg-[#2a2a2a] rounded w-1/2" />
+                <div className="space-y-4">
+                    <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded w-full" />
+                    <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded w-3/4" />
+                    <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded w-1/2" />
                 </div>
             </div>
         ))}
@@ -482,16 +504,17 @@ const EmptyState: React.FC<{ language: 'KR' | 'EN' }> = ({ language }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center bg-white dark:bg-[#1e1e1e] rounded-[24px] border border-[#b5b5b5]/30 dark:border-gray-800"
-        style={{ minHeight: '200px' }}
+        className="flex flex-col items-center justify-center bg-white dark:bg-[#1e1e1e] rounded-[32px] border border-gray-100 dark:border-gray-800"
+        style={{ minHeight: '300px' }}
     >
-        <h2 className="text-[15px] font-semibold text-[#3d3d3d] dark:text-white mb-2">
-            {language === 'KR' ? '아직 분석할 데이터가 없어요' : 'No data to analyze yet'}
+        <TrendingUp className="w-12 h-12 text-[#21DBA4] mb-4 opacity-50" />
+        <h2 className="text-[16px] font-semibold text-slate-800 dark:text-white mb-2">
+            {language === 'KR' ? '아직 분석할 데이터가 충분하지 않아요' : 'Not enough data to analyze yet'}
         </h2>
-        <p className="text-[13px] text-[#959595] dark:text-gray-400">
+        <p className="text-[14px] text-gray-500 dark:text-gray-400">
             {language === 'KR'
-                ? '클립을 저장하면 AI가 자동으로 관심사를 분석해드려요'
-                : 'Save clips and AI will analyze your interests automatically'}
+                ? '링크를 저장하면 AI가 인사이트를 분석해드립니다'
+                : 'Save more links and AI will analyze your insights'}
         </p>
     </motion.div>
 );

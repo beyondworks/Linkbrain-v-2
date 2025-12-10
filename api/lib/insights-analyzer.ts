@@ -175,18 +175,24 @@ export async function analyzeUserClips(
     const q = query(
         clipsRef,
         where('userId', '==', userId),
-        where('createdAt', '>=', start.toISOString()),
-        where('createdAt', '<=', end.toISOString()),
+        // where('createdAt', '>=', start.toISOString()),
+        // where('createdAt', '<=', end.toISOString()),
         orderBy('createdAt', 'desc')
     );
 
     const snapshot = await getDocs(q);
-    const clips = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    })) as any[];
+    const clips = snapshot.docs.map(doc => {
+        const data = doc.data();
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`[DEBUG] Clip ${doc.id} createdAt:`, data.createdAt, typeof data.createdAt);
+        }
+        return {
+            id: doc.id,
+            ...data
+        };
+    }) as any[];
 
-    console.log(`[Insights] Found ${clips.length} clips in period`);
+    console.log(`[Insights] Found ${clips.length} clips in period (Filter disabled)`);
 
     if (clips.length === 0) {
         return createEmptyInsight(period, start, end);
