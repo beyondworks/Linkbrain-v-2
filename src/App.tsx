@@ -145,7 +145,15 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    setCurrentView('login');
+    if (user) {
+      if (window.confirm(language === 'KR' ? '로그아웃 하시겠습니까?' : 'Are you sure you want to log out?')) {
+        auth.signOut();
+        toast.success(language === 'KR' ? '로그아웃되었습니다' : 'Logged out successfully');
+        // Stay on current view or go to home, usually stay is fine as content updates
+      }
+    } else {
+      setCurrentView('login');
+    }
   };
 
   const handleCollectionClick = (collection: any) => {

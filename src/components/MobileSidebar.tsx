@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List, Sparkles, BookOpen } from 'lucide-react';
+import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, LogIn, ChevronUp, User, Search, Star, LayoutGrid, List, Sparkles, BookOpen } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -617,8 +617,8 @@ const MobileSidebar = ({
                                 </div>
                                 <div className="h-px bg-gray-100 dark:bg-gray-800 my-1 mx-2" />
                                 <div onClick={() => handleLinkClick(() => onLogout && onLogout())} className="flex items-center px-3 py-3 mx-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 cursor-pointer text-sm text-red-500">
-                                    <LogOut className="mr-3 h-4 w-4" />
-                                    <span>Log Out</span>
+                                    {user ? <LogOut className="mr-3 h-4 w-4" /> : <LogIn className="mr-3 h-4 w-4" />}
+                                    <span>{user ? (language === 'KR' ? '로그아웃' : 'Log Out') : (language === 'KR' ? '로그인' : 'Log In')}</span>
                                 </div>
                             </div>
                         </div>
