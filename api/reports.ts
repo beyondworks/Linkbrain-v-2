@@ -135,7 +135,7 @@ async function handleGetReports(req: VercelRequest, res: VercelResponse, userId:
     const snapshot = await getDocs(q);
     const reports = snapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...(doc.data() as Record<string, any>)
     }));
 
     // Also check for unread reports

@@ -5,7 +5,7 @@
 
 // Image filtering functions (existing logic)
 function isProfilePicture(url: string): boolean {
-    return url.includes('profile') || url.includes('avatar') || url.includes('pp.') || url.match(/\/\d+_\d+_\d+_n\.jpg/);
+    return url.includes('profile') || url.includes('avatar') || url.includes('pp.') || !!url.match(/\/\d+_\d+_\d+_n\.jpg/);
 }
 
 function isTooSmall(url: string): boolean {
