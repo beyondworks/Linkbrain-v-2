@@ -15,6 +15,7 @@ import ProfilePage from './components/ProfilePage';
 import SecurityPage from './components/SecurityPage';
 import NotificationsPage from './components/NotificationsPage';
 import InsightsPage from './components/InsightsPage';
+import ArticlePage from './components/ArticlePage';
 import BrowserZoomGuide from './components/BrowserZoomGuide';
 
 import { Settings } from 'lucide-react';
@@ -26,7 +27,7 @@ import { toast, Toaster } from 'sonner';
 const App = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications' | 'insights'>('clips');
+  const [currentView, setCurrentView] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications' | 'insights' | 'articles'>('clips');
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [selectedClip, setSelectedClip] = useState<any>(null);
   const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
@@ -124,7 +125,7 @@ const App = () => {
     }
   };
 
-  const handleNavigate = (view: 'clips' | 'collections') => {
+  const handleNavigate = (view: 'clips' | 'collections' | 'insights' | 'articles') => {
     setCurrentView(view);
     if (view === 'collections') {
       setSelectedCategory(null);
@@ -364,10 +365,18 @@ const App = () => {
             />
           )}
 
+          {currentView === 'articles' && (
+            <ArticlePage
+              onBack={() => handleNavigate('clips')}
+              language={language}
+              user={user}
+            />
+          )}
+
         </div>
 
         {/* Bottom Gradient Fade */}
-        <div className="w-full h-24 bg-gradient-to-t from-white dark:from-[#121212] to-transparent fixed bottom-0 left-0 pointer-events-none z-10 transition-colors duration-300" />
+        <div className="hidden md:block w-full h-24 bg-gradient-to-t from-white dark:from-[#121212] to-transparent fixed bottom-0 left-0 pointer-events-none z-10 transition-colors duration-300" />
 
       </main>
 

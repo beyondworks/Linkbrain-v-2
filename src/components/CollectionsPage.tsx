@@ -95,7 +95,7 @@ const CollectionsPage = ({ onCollectionClick, onCreateClick, onBack, language = 
     };
 
     return (
-        <div className="w-full px-6 md:px-10 pb-20 pt-8">
+        <div className="w-full px-6 md:px-10 pb-20 pt-8 min-h-screen bg-[#ffffff] dark:bg-[#121212]">
 
             {/* Header Section with Back Button */}
             <div className="flex items-center justify-between mb-8">
@@ -141,7 +141,7 @@ const CollectionsPage = ({ onCollectionClick, onCreateClick, onBack, language = 
             </div>
 
             {/* Grid Layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
                 {/* Create New Card */}
                 <button

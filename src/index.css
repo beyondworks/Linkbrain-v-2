@@ -4431,6 +4431,21 @@ body.dark {
   padding-top: 5rem !important;
 }
 
+@media (max-width: 768px) {
+
+  /* Using zoom to force scaling even for fixed pixel values */
+  html,
+  body {
+    zoom: 0.85 !important;
+    background-color: #ffffff !important;
+  }
+
+  html.dark,
+  html.dark body {
+    background-color: #121212 !important;
+  }
+}
+
 @media (min-width: 768px) {
   .md\:inline {
     display: inline !important;

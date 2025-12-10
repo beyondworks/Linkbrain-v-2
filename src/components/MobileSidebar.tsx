@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List } from 'lucide-react';
+import { Globe, AtSign, Instagram, Youtube, Settings, LogOut, ChevronUp, User, Search, Star, LayoutGrid, List, Sparkles, BookOpen } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,7 +16,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 interface MobileSidebarProps {
     onCategorySelect?: (category: string | null) => void;
-    onNavigate?: (view: 'clips' | 'collections') => void;
+    onNavigate?: (view: 'clips' | 'collections' | 'insights' | 'articles') => void;
     onCreateCollection?: () => void;
     onCollectionSelect?: (collection: any) => void;
     onSourceSelect?: (source: string | null) => void;
@@ -54,6 +54,8 @@ const MobileSidebar = ({
     user
 }: MobileSidebarProps) => {
 
+    const [isOpen, setIsOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [tags, setTags] = React.useState<{ name: string, color: { bg: string, text: string } }[]>([]);
     const [sources, setSources] = React.useState<{ name: string, icon: React.ReactNode }[]>([]);
     const [collections, setCollections] = React.useState<any[]>([]);
@@ -531,55 +533,91 @@ const MobileSidebar = ({
                         )}
                     </AnimatePresence>
                 </div>
+
+                {/* Divider */}
+                <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-800 mt-2 mb-6 mx-4" />
+
+                {/* AI Insight */}
+                <div className="flex flex-col gap-2 mb-4">
+                    <div
+                        className="flex items-center gap-3 cursor-pointer group px-2"
+                        onClick={() => handleLinkClick(() => onNavigate && onNavigate('insights'))}
+                    >
+                        <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center transition-colors ${currentView === 'insights' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                            <Sparkles className="w-4 h-4" />
+                        </div>
+                        <span className={`text-[16px] font-medium transition-colors ${currentView === 'insights' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                            AI Insight
+                        </span>
+                    </div>
+                </div>
+
+                {/* Linkbrain Article */}
+                <div className="flex flex-col gap-2 mb-6">
+                    <div
+                        className="flex items-center gap-3 cursor-pointer group px-2"
+                        onClick={() => handleLinkClick(() => onNavigate && onNavigate('articles'))}
+                    >
+                        <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center transition-colors ${currentView === 'articles' ? 'bg-[#21DBA4] text-white' : 'bg-[#959595] text-white group-hover:bg-[#21DBA4]'}`}>
+                            <BookOpen className="w-4 h-4" />
+                        </div>
+                        <span className={`text-[16px] font-medium transition-colors ${currentView === 'articles' ? 'text-[#21DBA4]' : 'text-[#3d3d3d] dark:text-white group-hover:text-[#21DBA4]'}`}>
+                            Linkbrain Article
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {/* Footer: User Profile */}
             <div className="px-6 pb-8 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <div className="w-full bg-white dark:bg-[#1e1e1e] rounded-[16px] p-4 flex items-center justify-between shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors border border-gray-100 dark:border-gray-800">
-                            <div className="flex items-center gap-3">
-                                <div className="w-[40px] h-[40px] rounded-full bg-[#959595] overflow-hidden flex items-center justify-center text-white">
-                                    {user?.photoURL ? (
-                                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <svg className="w-full h-full" viewBox="0 0 50 50" fill="none">
-                                            <circle cx="25" cy="25" r="25" fill="currentColor" />
-                                        </svg>
-                                    )}
+                <div className="relative">
+                    <div
+                        className="w-full bg-white dark:bg-[#1e1e1e] rounded-[16px] p-4 flex items-center justify-between shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors border border-gray-100 dark:border-gray-800"
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-[40px] h-[40px] rounded-full bg-[#959595] overflow-hidden flex items-center justify-center text-white">
+                                {user?.photoURL ? (
+                                    <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    <svg className="w-full h-full" viewBox="0 0 50 50" fill="none">
+                                        <circle cx="25" cy="25" r="25" fill="currentColor" />
+                                    </svg>
+                                )}
+                            </div>
+                            <div className="flex flex-col items-start">
+                                <span className="text-[#3d3d3d] dark:text-white text-[15px] font-medium leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[140px]">
+                                    {user?.displayName || user?.email || "Guest"}
+                                </span>
+                                <span className="text-[#959595] text-[13px] leading-tight">{user ? "Member" : "Guest"}</span>
+                            </div>
+                        </div>
+                        <ChevronUp className={`w-4 h-4 text-[#959595] transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                    </div>
+
+                    {isProfileOpen && (
+                        <div
+                            className="absolute left-0 right-0 bg-white dark:bg-[#1e1e1e] rounded-[16px] shadow-xl border border-gray-100 dark:border-gray-800 z-30 overflow-hidden"
+                            style={{ top: 0, transform: 'translateY(calc(-100% - 8px))' }}
+                        >
+                            <div className="pb-4 pt-2 px-1">
+                                <div onClick={() => handleLinkClick(() => onProfileClick && onProfileClick())} className="flex items-center px-3 py-3 mx-1 rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] cursor-pointer text-sm text-[#3d3d3d] dark:text-gray-200">
+                                    <User className="mr-3 h-4 w-4" />
+                                    <span>Profile</span>
                                 </div>
-                                <div className="flex flex-col items-start">
-                                    <span className="text-[#3d3d3d] dark:text-white text-[15px] font-medium leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[140px]">
-                                        {user?.displayName || user?.email || "Guest"}
-                                    </span>
-                                    <span className="text-[#959595] text-[13px] leading-tight">{user ? "Member" : "Guest"}</span>
+                                <div onClick={() => handleLinkClick(() => onSettingsClick && onSettingsClick())} className="flex items-center px-3 py-3 mx-1 rounded-lg hover:bg-gray-50 dark:hover:bg-[#252525] cursor-pointer text-sm text-[#3d3d3d] dark:text-gray-200">
+                                    <Settings className="mr-3 h-4 w-4" />
+                                    <span>Settings</span>
+                                </div>
+                                <div className="h-px bg-gray-100 dark:bg-gray-800 my-1 mx-2" />
+                                <div onClick={() => handleLinkClick(() => onLogout && onLogout())} className="flex items-center px-3 py-3 mx-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 cursor-pointer text-sm text-red-500">
+                                    <LogOut className="mr-3 h-4 w-4" />
+                                    <span>Log Out</span>
                                 </div>
                             </div>
-                            <ChevronUp className="w-4 h-4 text-[#959595]" />
                         </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" align="center" sideOffset={8} className="w-[260px] rounded-[16px] bg-white dark:bg-[#1e1e1e]">
-                        <DropdownMenuItem onClick={() => handleLinkClick(() => onProfileClick && onProfileClick())} className="cursor-pointer py-2.5">
-                            <User className="mr-2 h-4 w-4" />
-                            <span>Profile</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleLinkClick(() => onSettingsClick && onSettingsClick())} className="cursor-pointer py-2.5">
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Settings</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => {
-                            if (user) {
-                                handleLinkClick(() => onLogout && onLogout());
-                            } else {
-                                handleLinkClick(() => onLogout && onLogout()); // Assuming onLogout handles redirect or we need to navigate
-                            }
-                        }} className={`cursor-pointer py-2.5 ${user ? 'text-red-500 focus:text-red-500' : 'text-[#3d3d3d] dark:text-white'}`}>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>{user ? "Log Out" : "Log In"}</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -142,8 +142,8 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
             <div className="max-w-[1200px] mx-auto px-6">
 
                 {/* --- HEADER --- */}
-                <header className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200 dark:border-white/10">
-                    <div className="flex items-center gap-3 md:gap-4">
+                <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 mb-8 pb-6 border-b border-gray-200 dark:border-white/10">
+                    <div className="w-full md:w-auto flex items-center gap-3 md:gap-4">
                         <button onClick={onBack} className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors">
                             <ChevronLeft className="w-6 h-6 text-gray-400" />
                         </button>
@@ -157,7 +157,7 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="w-full md:w-auto flex items-center justify-between md:justify-end gap-4">
                         {/* Desktop Date - hidden on mobile */}
                         <p className="hidden md:block text-sm text-gray-400 font-medium mr-4">
                             {getDateRangeLabel()}

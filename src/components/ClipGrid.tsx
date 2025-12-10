@@ -473,9 +473,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           {!isSelectMode && <div className="flex items-center gap-2">
             {/* Sort Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#959595] text-[#959595] text-[11px] hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{sortOrder === 'newest' ? (language === 'KR' ? '최신순' : 'Newest') : (language === 'KR' ? '오래된순' : 'Oldest')}</span>
-                <ChevronDown className="w-2.5 h-2.5" />
+                <ChevronDown className="w-2 h-2" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
@@ -495,9 +495,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
             {/* Category Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#959595] text-[#959595] text-[11px] hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{selectedCategory && selectedCategory !== 'All' ? selectedCategory : (language === 'KR' ? '카테고리' : 'Category')}</span>
-                <ChevronDown className="w-2.5 h-2.5" />
+                <ChevronDown className="w-2 h-2" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
@@ -520,9 +520,9 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
 
             {/* Source Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#959595] text-[#959595] text-xs hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#959595] text-[#959595] text-[11px] hover:border-[#21dba4] hover:text-[#21dba4] transition-colors focus:outline-none">
                 <span>{selectedSource && selectedSource !== 'All Sources' ? selectedSource : (language === 'KR' ? '출처' : 'Source')}</span>
-                <ChevronDown className="w-2.5 h-2.5" />
+                <ChevronDown className="w-2 h-2" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-32 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg p-1">
                 <DropdownMenuItem
@@ -548,14 +548,14 @@ const ClipGrid = ({ selectedCategory, onCategoryChange, selectedSource, onSource
           {!isSelectMode && (
             <button
               onClick={() => setIsSelectMode(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-xs font-medium transition-colors"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#21dba4] hover:text-[#21dba4] text-[#959595] dark:text-gray-400 text-[11px] font-medium transition-colors"
               title={language === 'KR' ? '선택 모드' : 'Selection mode'}
             >
               <input
                 type="checkbox"
                 checked={false}
                 readOnly
-                className="w-3.5 h-3.5 cursor-pointer"
+                className="w-3 h-3 cursor-pointer"
               />
               <span>{language === 'KR' ? '선택' : 'Select'}</span>
             </button>

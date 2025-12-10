@@ -128,7 +128,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
   const uniqueSources = Array.from(new Set(clips.map(clip => clip.source))).filter(Boolean).sort();
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 pb-20 pt-8">
+    <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 pb-20 pt-8 min-h-screen bg-[#ffffff] dark:bg-[#121212]">
 
       {/* Mobile Header */}
       <div className="flex flex-col gap-4 mb-6 md:hidden">
@@ -136,7 +136,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors flex-shrink-0"
+            className="w-10 h-10 rounded-full bg-[#ffffff] dark:bg-[#1e1e1e] border border-[#ffffff] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors flex-shrink-0"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -387,7 +387,7 @@ const CollectionDetail = ({ collection: colData, onBack, onClipClick, language =
       <div className="w-full h-px bg-[#E0E0E0] dark:bg-gray-700 mb-6 md:mb-8"></div>
 
       {/* Mobile List View (Always List) */}
-      <div className="grid gap-4 grid-cols-1 md:hidden">
+      <div className="grid gap-4 grid-cols-2 md:hidden">
         {sortedClips.map(clip => (
           <ClipCard
             key={clip.id}
