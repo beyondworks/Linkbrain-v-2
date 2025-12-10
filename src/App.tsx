@@ -96,6 +96,8 @@ const App = () => {
     }
   }, [isDarkMode]);
 
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);

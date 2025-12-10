@@ -179,63 +179,60 @@ const InsightsPage: React.FC<InsightsPageProps> = ({ language, onBack, user: pro
     const sentimentPercentages = getSentimentPercentages();
 
     return (
-        <div className="w-full h-full bg-white dark:bg-[#121212] overflow-auto pt-2" style={{ zoom: 1.15 }}>
+        <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 pb-20 pt-8">
             {/* Header Area */}
-            <div className="sticky top-0 z-10 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-6 md:px-8 py-4 mb-6">
-                <div className="flex flex-row items-center justify-between gap-4 w-full">
-                    {/* Left: Title & Back */}
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={onBack}
-                            className="w-9 h-9 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <h1 className="text-[18px] font-bold text-[#3d3d3d] dark:text-white">
-                            {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
-                        </h1>
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={onBack}
+                        className="w-10 h-10 rounded-full bg-white dark:bg-[#1e1e1e] border border-[#E0E0E0] dark:border-gray-700 flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:border-[#21DBA4] transition-colors"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-[#3d3d3d] dark:text-white text-[24px] font-bold leading-none">
+                        {language === 'KR' ? 'AI 인사이트' : 'AI Insights'}
+                    </h1>
+                </div>
+
+                {/* Right: Actions */}
+                <div className="flex items-center gap-3">
+                    {/* Period Toggle */}
+                    <div className="bg-white dark:bg-[#1e1e1e] p-1 rounded-full border border-gray-200 dark:border-gray-800 flex items-center">
+                        {(['weekly', 'monthly'] as const).map((period) => (
+                            <button
+                                key={period}
+                                onClick={() => setActiveTab(period)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${activeTab === period
+                                    ? 'bg-[#3d3d3d] text-white dark:bg-white dark:text-black shadow-sm'
+                                    : 'text-[#959595] hover:text-[#3d3d3d] dark:hover:text-gray-300'
+                                    }`}
+                            >
+                                {period === 'weekly'
+                                    ? (language === 'KR' ? '주간' : 'Weekly')
+                                    : (language === 'KR' ? '월간' : 'Monthly')
+                                }
+                            </button>
+                        ))}
                     </div>
 
-                    {/* Right: Actions */}
-                    <div className="flex items-center gap-3">
-                        {/* Period Toggle */}
-                        <div className="bg-white dark:bg-[#1e1e1e] p-1 rounded-full border border-gray-200 dark:border-gray-800 flex items-center">
-                            {(['weekly', 'monthly'] as const).map((period) => (
-                                <button
-                                    key={period}
-                                    onClick={() => setActiveTab(period)}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${activeTab === period
-                                        ? 'bg-[#3d3d3d] text-white dark:bg-white dark:text-black shadow-sm'
-                                        : 'text-[#959595] hover:text-[#3d3d3d] dark:hover:text-gray-300'
-                                        }`}
-                                >
-                                    {period === 'weekly'
-                                        ? (language === 'KR' ? '주간' : 'Weekly')
-                                        : (language === 'KR' ? '월간' : 'Monthly')
-                                    }
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Generate Button */}
-                        <button
-                            onClick={() => generateReport(activeTab)}
-                            disabled={generating}
-                            className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-bold hover:bg-[#1ec795] transition-colors disabled:opacity-50 shadow-sm hover:shadow-md"
-                        >
-                            {generating ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : (
-                                <FileText className="w-4 h-4" />
-                            )}
-                            {language === 'KR' ? '리포트 생성' : 'Generate Report'}
-                        </button>
-                    </div>
+                    {/* Generate Button */}
+                    <button
+                        onClick={() => generateReport(activeTab)}
+                        disabled={generating}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#21DBA4] text-white rounded-full text-sm font-bold hover:bg-[#1ec795] transition-colors disabled:opacity-50 shadow-sm hover:shadow-md"
+                    >
+                        {generating ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <FileText className="w-4 h-4" />
+                        )}
+                        {language === 'KR' ? '리포트 생성' : 'Generate Report'}
+                    </button>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="px-6 md:px-8 pb-20 w-full">
+            <div className="w-full">
                 {/* Content */}
                 <div className="space-y-6">
                     {loading ? (

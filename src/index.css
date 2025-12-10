@@ -4380,13 +4380,13 @@ html {
   padding-right: 20px !important;
 }
 
-/* === GLOBAL 85% UI SCALE (font-size based, safe for popups) === */
-html {
-  font-size: 85%;
-}
-
+/* === GLOBAL UI SCALE === */
+html,
 body {
-  background-color: #f7f7f7;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-color: #f8f8f8;
 }
 
 .dark body,

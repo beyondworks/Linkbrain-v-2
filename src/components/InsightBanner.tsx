@@ -107,7 +107,7 @@ const InsightBanner: React.FC<InsightBannerProps> = ({ language, onViewDetails }
                 className="w-full px-0 flex flex-col items-center gap-4 py-2"
             >
                 {/* Highlight Message - Centered */}
-                <p className="text-[13px] text-[#7d7d7d] dark:text-gray-400 font-medium text-center">
+                <p className="text-[13px] text-[#959595] dark:text-gray-200 font-medium text-center">
                     {language === 'KR'
                         ? '클립을 저장하면 AI가 자동으로 관심사를 분석해드려요'
                         : 'Save clips and AI will analyze your interests'
