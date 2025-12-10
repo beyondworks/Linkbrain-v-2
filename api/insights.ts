@@ -11,7 +11,7 @@
 
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
-import { analyzeUserClips, InsightResult } from './lib/insights-analyzer';
+import { analyzeUserClips, InsightResult } from './_lib/insights-analyzer';
 
 // Define simple interfaces for Vercel Request/Response
 interface VercelRequest {
