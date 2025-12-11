@@ -38,7 +38,7 @@ const MobileHeader = (props: MobileHeaderProps) => {
                      <Menu className="w-6 h-6" />
                   </button>
                </SheetTrigger>
-               <SheetContent side="left" className="w-[] max-w-[360px] p-0 border-r border-gray-200 dark:border-gray-800">
+               <SheetContent side="left" className="w-[85vw] max-w-[360px] p-0 border-r border-gray-200 dark:border-gray-800">
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <SheetDescription className="sr-only">Navigation Menu</SheetDescription>
                   <MobileSidebar
