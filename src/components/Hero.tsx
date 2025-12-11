@@ -89,7 +89,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center flex flex-col items-center"
-        style={{ fontSize: 'clamp(48px, 8vw, 72px)' }}
+        style={{ fontSize: 'clamp(36px, 8vw, 72px)' }}
       >
         <div>Collect links</div>
         <div>Create a second brain</div>
@@ -100,22 +100,33 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         className="text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center flex flex-col items-center"
-        style={{ marginBottom: '64px', fontSize: '18px', fontWeight: 400 }}
+        style={{ marginBottom: '64px' }}
       >
-        {language === 'KR' ? (
-          <>
-            <div>링크가 쌓일수록 - 지식이 쌓이는 곳</div>
-            <div>
-              링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요
-            </div>
-          </>
-        ) : (
-          <>
-            <div>Where links become knowledge</div>
-            <div>Just save the link,</div>
-            <div>Linkbrain will handle organizing, analyzing, and summarizing.</div>
-          </>
-        )}
+        <div className="text-[15px] md:text-[18px] font-normal">
+          {language === 'KR' ? (
+            <>
+              <div className="md:block hidden">
+                <div>링크가 쌓일수록 - 지식이 쌓이는 곳</div>
+                <div>링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요</div>
+              </div>
+              <div className="md:hidden block px-4 break-keep">
+                <div>링크가 쌓일수록 - 지식이 쌓이는 곳</div>
+                <div>링크 하나면 충분해요 <span className="text-[#21DBA4]">정리·분석·요약</span>은 <span className="text-[#21DBA4]">링크브레인</span>이 할게요</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="md:block hidden">
+                <div>Where links become knowledge</div>
+                <div>Just save the link, Linkbrain will handle organizing, analyzing, and summarizing.</div>
+              </div>
+              <div className="md:hidden block px-4">
+                <div>Where links become knowledge</div>
+                <div>Just save the link, Linkbrain will handle organizing, analyzing, and summarizing.</div>
+              </div>
+            </>
+          )}
+        </div>
       </motion.div>
 
       {/* Input Area */}
@@ -141,13 +152,13 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         }
         className="w-full max-w-[800px] relative rounded-full z-10"
       >
-        <div className="relative w-full h-[60px] md:h-[76px] bg-white dark:bg-[#1e1e1e] rounded-full flex items-center px-4 md:px-8 overflow-visible shadow-sm border border-gray-100 dark:border-gray-800">
+        <div className="relative w-full h-[64px] md:h-[76px] bg-white dark:bg-[#1e1e1e] rounded-full flex items-center px-4 md:px-8 overflow-visible shadow-sm border border-gray-100 dark:border-gray-800">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={language === 'KR' ? "URL을 여기에 붙여넣으세요..." : "Paste any URL here..."}
-            className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] transition-opacity duration-500"
+            className="w-full h-full bg-transparent border-none outline-none text-[15px] md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] transition-opacity duration-500"
             style={{ opacity: isFading ? 0 : 1 }}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             disabled={isProcessing}
