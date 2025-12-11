@@ -88,7 +88,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center flex flex-col items-center"
+        className="hidden md:flex font-extrabold text-[#21DBA4] mb-8 leading-[1.1] tracking-tight text-center flex-col items-center"
         style={{ fontSize: 'clamp(48px, 8vw, 72px)' }}
       >
         <div>Collect links</div>
@@ -99,7 +99,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        className="text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center flex flex-col items-center"
+        className="hidden md:flex text-[#3d3d3d] dark:text-gray-300 max-w-4xl leading-relaxed text-center flex-col items-center"
         style={{ marginBottom: '64px', fontSize: '18px', fontWeight: 400 }}
       >
         {language === 'KR' ? (
@@ -191,7 +191,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
       </motion.div>
 
       {/* Insight Banner positioned directly below input */}
-      <div className="w-full max-w-[800px] mt-12 relative z-0">
+      <div className="hidden md:block w-full max-w-[800px] mt-12 relative z-0">
         <InsightBanner language={language} onViewDetails={onViewInsight} />
       </div>
     </div>
