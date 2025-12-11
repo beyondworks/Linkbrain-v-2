@@ -82,7 +82,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center pt-[76px] md:pt-32 pb-[60px] md:pb-20 px-4 text-center relative overflow-hidden">
+    <div className="w-full flex flex-col items-center justify-center pt-8 md:pt-64 pb-10 px-4 text-center relative overflow-hidden">
 
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
@@ -141,13 +141,13 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
         }
         className="w-full max-w-[800px] relative rounded-full z-10"
       >
-        <div className="relative w-full h-[60px] md:h-[76px] bg-white dark:bg-[#1e1e1e] rounded-full flex items-center px-4 md:px-8 overflow-visible shadow-sm border border-gray-100 dark:border-gray-800">
+        <div className="relative w-full h-[60px] md:h-[76px] bg-white dark:bg-[#1e1e1e] rounded-full flex items-center px-8 md:px-8 overflow-visible shadow-sm border border-gray-100 dark:border-gray-800">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={language === 'KR' ? "URL을 여기에 붙여넣으세요..." : "Paste any URL here..."}
-            className="w-full h-full bg-transparent border-none outline-none text-lg md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] transition-opacity duration-500"
+            className="w-full h-full bg-transparent border-none outline-none text-l md:text-xl text-[#3d3d3d] dark:text-white placeholder-[#c5c5c5] transition-opacity duration-500"
             style={{ opacity: isFading ? 0 : 1 }}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             disabled={isProcessing}
