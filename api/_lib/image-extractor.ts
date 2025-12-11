@@ -1,4 +1,5 @@
-import puppeteer, { Page } from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 
 /**
  * Image Extractor
@@ -16,6 +17,8 @@ import puppeteer, { Page } from 'puppeteer';
  * - Duplicate removal
  * - Quality filtering
  * - Platform-specific optimizations
+ * 
+ * FIXED: Uses @sparticuz/chromium for Vercel serverless compatibility
  */
 
 // ============================================================================
@@ -54,9 +57,11 @@ export async function extractImages(url: string, existingPage?: Page): Promise<E
         if (existingPage) {
             page = existingPage;
         } else {
+            // Use @sparticuz/chromium for serverless environments (Vercel/AWS Lambda)
             browser = await puppeteer.launch({
+                args: chromium.args,
+                executablePath: await chromium.executablePath(),
                 headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
             });
             page = await browser.newPage();
             shouldCloseBrowser = true;

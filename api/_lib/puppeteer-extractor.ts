@@ -1,5 +1,6 @@
 // @ts-nocheck
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 
 interface PuppeteerResult {
     text: string;
@@ -15,6 +16,7 @@ interface PuppeteerResult {
  * Priority for social media platforms
  * 
  * ENHANCED: Better Instagram & Threads extraction with improved profile matching
+ * FIXED: Uses @sparticuz/chromium for Vercel serverless compatibility
  */
 export const extractWithPuppeteer = async (url: string): Promise<{
     rawText: string;
@@ -30,9 +32,11 @@ export const extractWithPuppeteer = async (url: string): Promise<{
     try {
         console.log(`[Puppeteer] Starting extraction for: ${url}`);
 
+        // Use @sparticuz/chromium for serverless environments (Vercel/AWS Lambda)
         browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath: await chromium.executablePath(),
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         });
 
         const page = await browser.newPage();
