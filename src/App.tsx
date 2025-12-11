@@ -33,12 +33,13 @@ const App = () => {
   const [currentView, setCurrentViewState] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications' | 'insights' | 'articles'>(() => {
     try {
       const saved = localStorage.getItem('linkbrain_currentView');
-      // Don't restore detail pages (they need context)
+      console.log('[Session] Restoring view from localStorage:', saved);
+      // Don't restore detail pages (they need context) or auth pages
       if (saved && !saved.includes('detail') && saved !== 'login' && saved !== 'signup') {
         return saved as any;
       }
     } catch (e) {
-      // localStorage not available
+      console.log('[Session] localStorage not available');
     }
     return 'clips';
   });
@@ -59,9 +60,10 @@ const App = () => {
       // Don't persist detail pages or auth pages
       if (!view.includes('detail') && view !== 'login' && view !== 'signup') {
         localStorage.setItem('linkbrain_currentView', view);
+        console.log('[Session] Saved view to localStorage:', view);
       }
     } catch (e) {
-      // localStorage not available
+      console.log('[Session] Failed to save to localStorage');
     }
 
     // Push to browser history (enable back button)
