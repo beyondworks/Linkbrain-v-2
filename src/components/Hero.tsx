@@ -82,7 +82,7 @@ const Hero = ({ language, onViewInsight }: HeroProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center pt-[76px] md:pt-32 pb-[60px] md:pb-20 px-4 text-center relative overflow-hidden">
+    <div className="w-full flex flex-col items-center justify-center pt-24 md:pt-32 pb-20 px-4 text-center relative overflow-hidden">
 
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
