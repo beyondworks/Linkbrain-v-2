@@ -369,7 +369,7 @@ const App = () => {
       </div>
 
       {/* Main Content Area - Centered based on full viewport */}
-      <main className="flex-1 relative flex flex-col h-screen">
+      <main className="flex-1 relative flex flex-col md:h-screen min-h-screen">
 
         {/* Mobile Header with Sidebar (Mobile Only) */}
         <MobileHeader
@@ -443,7 +443,7 @@ const App = () => {
 
         <FloatingSearchButton currentView={currentView} language={language} />
 
-        <div className="flex-1 w-full max-w-[1600px] mx-auto overflow-y-auto">
+        <div className="flex-1 w-full max-w-[1600px] mx-auto md:overflow-y-auto pb-4 md:pb-0">
 
           {currentView === 'clips' && (
             <>
