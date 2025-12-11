@@ -311,13 +311,40 @@ const App = () => {
         <Sidebar
           onCategorySelect={handleCategorySelect}
           onNavigate={handleNavigate}
-          onCreateCollection={() => setIsCreateCollectionOpen(true)}
+          onCreateCollection={() => {
+            if (!user) {
+              toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                description: language === 'KR' ? '컬렉션을 만들려면 먼저 로그인해주세요' : 'Sign in to create collections',
+              });
+              setCurrentView('login');
+              return;
+            }
+            setIsCreateCollectionOpen(true);
+          }}
           onCollectionSelect={handleCollectionClick}
           onSourceSelect={handleSourceSelect}
           onSearch={setSearchQuery}
           onLogout={handleLogout}
-          onSettingsClick={() => setCurrentView('settings')}
-          onProfileClick={() => setCurrentView('profile')}
+          onSettingsClick={() => {
+            if (!user) {
+              toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                description: language === 'KR' ? '설정을 보려면 먼저 로그인해주세요' : 'Sign in to access settings',
+              });
+              setCurrentView('login');
+              return;
+            }
+            setCurrentView('settings');
+          }}
+          onProfileClick={() => {
+            if (!user) {
+              toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                description: language === 'KR' ? '프로필을 보려면 먼저 로그인해주세요' : 'Sign in to view profile',
+              });
+              setCurrentView('login');
+              return;
+            }
+            setCurrentView('profile');
+          }}
           currentView={
             currentView.startsWith('settings') ? 'settings' :
               currentView === 'clip-detail' ? 'clips' :
@@ -339,13 +366,40 @@ const App = () => {
         <MobileHeader
           onCategorySelect={handleCategorySelect}
           onNavigate={handleNavigate}
-          onCreateCollection={() => setIsCreateCollectionOpen(true)}
+          onCreateCollection={() => {
+            if (!user) {
+              toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                description: language === 'KR' ? '컬렉션을 만들려면 먼저 로그인해주세요' : 'Sign in to create collections',
+              });
+              setCurrentView('login');
+              return;
+            }
+            setIsCreateCollectionOpen(true);
+          }}
           onCollectionSelect={handleCollectionClick}
           onSourceSelect={handleSourceSelect}
           onSearch={setSearchQuery}
           onLogout={handleLogout}
-          onSettingsClick={() => setCurrentView('settings')}
-          onProfileClick={() => setCurrentView('profile')}
+          onSettingsClick={() => {
+            if (!user) {
+              toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                description: language === 'KR' ? '설정을 보려면 먼저 로그인해주세요' : 'Sign in to access settings',
+              });
+              setCurrentView('login');
+              return;
+            }
+            setCurrentView('settings');
+          }}
+          onProfileClick={() => {
+            if (!user) {
+              toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                description: language === 'KR' ? '프로필을 보려면 먼저 로그인해주세요' : 'Sign in to view profile',
+              });
+              setCurrentView('login');
+              return;
+            }
+            setCurrentView('profile');
+          }}
           currentView={currentView}
           language={language}
           menuState={mobileMenuState}
