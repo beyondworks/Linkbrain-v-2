@@ -415,7 +415,16 @@ const App = () => {
 
             {/* Settings Button */}
             <button
-              onClick={() => setCurrentView('settings')}
+              onClick={() => {
+                if (!user) {
+                  toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+                    description: language === 'KR' ? '설정을 보려면 먼저 로그인해주세요' : 'Sign in to access settings',
+                  });
+                  setCurrentView('login');
+                  return;
+                }
+                setCurrentView('settings');
+              }}
               className="w-12 h-12 bg-white dark:bg-[#1e1e1e] rounded-full shadow-md flex items-center justify-center text-[#959595] hover:text-[#21DBA4] hover:shadow-lg transition-all duration-300"
             >
               <Settings className="w-6 h-6" />
