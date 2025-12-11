@@ -368,8 +368,8 @@ const App = () => {
         />
       </div>
 
-      {/* Main Content Area - Centered based on remaining width (excluding sidebar) */}
-      <main className="flex-1 relative flex flex-col md:h-screen min-h-screen md:pl-[64px]">
+      {/* Main Content Area - Centered based on full viewport */}
+      <main className="flex-1 relative flex flex-col md:h-screen min-h-screen">
 
         {/* Mobile Header with Sidebar (Mobile Only) */}
         <MobileHeader
