@@ -28,13 +28,67 @@ import { isAdmin } from './utils/adminAuth';
 const App = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications' | 'insights' | 'articles'>('clips');
+
+  // Initialize currentView from localStorage (session persistence)
+  const [currentView, setCurrentViewState] = useState<'clips' | 'collections' | 'collection-detail' | 'clip-detail' | 'login' | 'signup' | 'settings' | 'profile' | 'settings-security' | 'settings-notifications' | 'insights' | 'articles'>(() => {
+    try {
+      const saved = localStorage.getItem('linkbrain_currentView');
+      // Don't restore detail pages (they need context)
+      if (saved && !saved.includes('detail') && saved !== 'login' && saved !== 'signup') {
+        return saved as any;
+      }
+    } catch (e) {
+      // localStorage not available
+    }
+    return 'clips';
+  });
+
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [selectedClip, setSelectedClip] = useState<any>(null);
   const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Custom setCurrentView that also updates localStorage and browser history
+  const setCurrentView = (view: typeof currentView, pushHistory = true) => {
+    setCurrentViewState(view);
+
+    // Save to localStorage (session persistence)
+    try {
+      // Don't persist detail pages or auth pages
+      if (!view.includes('detail') && view !== 'login' && view !== 'signup') {
+        localStorage.setItem('linkbrain_currentView', view);
+      }
+    } catch (e) {
+      // localStorage not available
+    }
+
+    // Push to browser history (enable back button)
+    if (pushHistory) {
+      const url = view === 'clips' ? '/' : `/${view}`;
+      window.history.pushState({ view }, '', url);
+    }
+  };
+
+  // Browser back button handler
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.view) {
+        setCurrentViewState(event.state.view);
+      } else {
+        // Default to clips if no state
+        setCurrentViewState('clips');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Set initial history state
+    window.history.replaceState({ view: currentView }, '', window.location.pathname);
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Mobile Sidebar State (Persists during session, resets on reload)
   const [mobileMenuState, setMobileMenuState] = useState({
@@ -109,12 +163,26 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
+  // Auth protection: show toast when trying to access protected views without login
+  const requireAuth = (targetView: typeof currentView): boolean => {
+    if (!user) {
+      toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+        description: language === 'KR'
+          ? '이 기능을 사용하려면 먼저 로그인해주세요'
+          : 'Sign in to access this feature',
+      });
+      setCurrentView('login');
+      return false;
+    }
+    return true;
+  };
+
   // Admin route protection: redirect non-admins trying to access insights/articles
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
 
     if ((currentView === 'insights' || currentView === 'articles') && !isAdmin(user)) {
-      setCurrentView('clips'); // Redirect to clips view
+      setCurrentView('clips');
       toast.error(language === 'KR' ? '준비중인 기능입니다' : 'Coming Soon');
     }
   }, [currentView, user, authLoading, language]);
@@ -137,6 +205,17 @@ const App = () => {
   };
 
   const handleNavigate = (view: 'clips' | 'collections' | 'insights' | 'articles') => {
+    // Protected views require authentication
+    if (view === 'collections' && !user) {
+      toast.error(language === 'KR' ? '로그인이 필요합니다' : 'Please login first', {
+        description: language === 'KR'
+          ? '컬렉션을 보려면 먼저 로그인해주세요'
+          : 'Sign in to view collections',
+      });
+      setCurrentView('login');
+      return;
+    }
+
     setCurrentView(view);
     if (view === 'collections') {
       setSelectedCategory(null);
